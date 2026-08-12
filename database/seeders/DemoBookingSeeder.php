@@ -64,6 +64,8 @@ class DemoBookingSeeder extends Seeder
         // One blacked-out date, so the slot generator has something to
         // exclude and the dashboard screen is not empty.
         BookingBlackoutDate::updateOrCreate(
+            // The model normalises `date` on write, so this equality match
+            // behaves the same on MySQL and SQLite — see its docblock.
             ['date' => (clone $slot)->addDays(10)->toDateString()],
             ['reason' => ['ar' => 'إجازة الفريق '.DemoDataSeeder::SAMPLE_MARKER, 'en' => 'Team holiday '.DemoDataSeeder::SAMPLE_MARKER]]
         );
