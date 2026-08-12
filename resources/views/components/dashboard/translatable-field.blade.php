@@ -63,7 +63,16 @@
                         id="{{ $name }}_{{ $locale }}"
                         name="{{ $name }}[{{ $locale }}]"
                         rows="{{ $rows }}"
-                        dir="{{ $locale === 'ar' ? 'rtl' : 'ltr' }}"
+                        {{-- dir="auto" on a RICH field, not the locale's
+                             direction: the value is raw HTML, so an Arabic
+                             box forced to rtl interleaves the Latin tags
+                             with the prose and becomes genuinely hard to
+                             read. auto lets the browser resolve each line
+                             from its own first strong character, which
+                             handles both the markup and the prose. Plain
+                             textareas keep the locale direction, because
+                             their content is only ever prose. --}}
+                        dir="{{ $type === 'rich' ? 'auto' : ($locale === 'ar' ? 'rtl' : 'ltr') }}"
                         @if ($required && $locale === 'ar') required @endif
                         class="block w-full rounded-lg border-line bg-white text-sm text-ink shadow-sm focus:border-petrol focus:ring-petrol {{ $type === 'rich' ? 'font-mono text-xs' : '' }}"
                     >{{ old("{$name}.{$locale}", $stored($locale)) }}</textarea>
