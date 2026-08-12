@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\MenuItem;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Route;
 
 /**
  * The core public navigation, as data.
@@ -17,6 +18,16 @@ use Illuminate\Database\Seeder;
  * ever adding a second entry pointing at the same page — a legitimate
  * thing to want when one lives inside a dropdown.
  *
+ * ROUTE OR ANCHOR. Each item names the route it will EVENTUALLY point at
+ * plus the homepage section where that content lives TODAY. At seed time
+ * the seeder picks whichever is real: a registered route becomes a route
+ * link, and anything not built yet becomes a link to its homepage section,
+ * which is where a visitor would actually find it right now.
+ *
+ * That keeps the navbar complete and free of dead entries at every stage
+ * of the build, and re-seeding after a later step promotes those items to
+ * real route links automatically — no migration, no manual edit.
+ *
  * NOTE: labels are re-applied on every run. That is intentional for system
  * items (they should track the site's own wording), and it means an admin
  * who renames one will see it revert on a re-seed — re-seeding production
@@ -28,15 +39,12 @@ class MenuItemSeeder extends Seeder
     public function run(): void
     {
         foreach ($this->items() as $sortOrder => $item) {
+            $destination = $this->destinationFor($item);
+
             $existing = MenuItem::where('key', $item['key'])->first();
 
             if ($existing) {
-                $existing->update([
-                    'label' => $item['label'],
-                    'link_type' => 'route',
-                    'route_name' => $item['route'],
-                    'url' => null,
-                ]);
+                $existing->update(['label' => $item['label']] + $destination);
 
                 $existing->is_system = true;
                 $existing->save();
@@ -47,14 +55,11 @@ class MenuItemSeeder extends Seeder
             $created = MenuItem::create([
                 'key' => $item['key'],
                 'label' => $item['label'],
-                'link_type' => 'route',
-                'route_name' => $item['route'],
-                'url' => null,
                 'target' => '_self',
                 'parent_id' => null,
                 'is_visible' => true,
                 'sort_order' => $sortOrder,
-            ]);
+            ] + $destination);
 
             // is_system is guarded — assigned, never mass-assigned.
             $created->is_system = true;
@@ -63,22 +68,52 @@ class MenuItemSeeder extends Seeder
     }
 
     /**
+     * The route if it exists, otherwise the homepage section.
+     *
+     * @param  array<string, mixed>  $item
+     * @return array<string, mixed>
+     */
+    private function destinationFor(array $item): array
+    {
+        if (Route::has($item['route'])) {
+            return ['link_type' => 'route', 'route_name' => $item['route'], 'url' => null];
+        }
+
+        // No route and no anchor means there is nowhere to send anyone yet;
+        // the row is kept (so its label and order survive) but it renders
+        // nothing until one of the two exists.
+        return [
+            'link_type' => isset($item['anchor']) ? 'url' : 'none',
+            'route_name' => null,
+            'url' => $item['anchor'] ?? null,
+        ];
+    }
+
+    /**
      * Every route here is present in MenuItem::ROUTE_WHITELIST, which is
      * what stops a menu row resolving to a route that needs a bound model
      * and 500-ing the navbar on every page.
      *
-     * @return array<int, array{key: string, route: string, label: array<string, string>}>
+     * `anchor` is the homepage section that holds this content until the
+     * dedicated page is built. Fragment-only by design — MenuItem::href()
+     * resolves it against the current locale's homepage, so it works from
+     * /en as well as /.
+     *
+     * @return array<int, array{key: string, route: string, anchor?: string, label: array<string, string>}>
      */
     private function items(): array
     {
         return [
             ['key' => 'nav-home', 'route' => 'home', 'label' => ['ar' => 'الرئيسية', 'en' => 'Home']],
-            ['key' => 'nav-services', 'route' => 'services.index', 'label' => ['ar' => 'خدماتنا', 'en' => 'Services']],
-            ['key' => 'nav-packages', 'route' => 'packages.index', 'label' => ['ar' => 'الباقات', 'en' => 'Packages']],
-            ['key' => 'nav-estimator', 'route' => 'estimator', 'label' => ['ar' => 'حاسبة التكلفة', 'en' => 'Cost Estimator']],
-            ['key' => 'nav-articles', 'route' => 'articles.index', 'label' => ['ar' => 'المدونة', 'en' => 'Blog']],
+            ['key' => 'nav-services', 'route' => 'services.index', 'anchor' => '#services', 'label' => ['ar' => 'خدماتنا', 'en' => 'Services']],
+            ['key' => 'nav-packages', 'route' => 'packages.index', 'anchor' => '#packages', 'label' => ['ar' => 'الباقات', 'en' => 'Packages']],
+            ['key' => 'nav-estimator', 'route' => 'estimator', 'anchor' => '#estimator', 'label' => ['ar' => 'حاسبة التكلفة', 'en' => 'Cost Estimator']],
+            ['key' => 'nav-articles', 'route' => 'articles.index', 'anchor' => '#articles', 'label' => ['ar' => 'المدونة', 'en' => 'Blog']],
             ['key' => 'nav-about', 'route' => 'pages.about', 'label' => ['ar' => 'من نحن', 'en' => 'About']],
-            ['key' => 'nav-booking', 'route' => 'booking', 'label' => ['ar' => 'احجز استشارة', 'en' => 'Book a Consultation']],
+            ['key' => 'nav-booking', 'route' => 'booking', 'anchor' => '#booking', 'label' => ['ar' => 'احجز استشارة', 'en' => 'Book a Consultation']],
+            // No anchor: the booking CTA is already its own entry, so pointing
+            // Contact at the same section would give the navbar two links to
+            // one place. This stays dormant until the contact route exists.
             ['key' => 'nav-contact', 'route' => 'contact', 'label' => ['ar' => 'اتصل بنا', 'en' => 'Contact']],
         ];
     }

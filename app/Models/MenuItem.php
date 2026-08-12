@@ -44,6 +44,7 @@ class MenuItem extends Model
         'faqs.index' => 'dashboard.menu.routes.faqs',
         'articles.index' => 'dashboard.menu.routes.articles',
         'pages.about' => 'dashboard.menu.routes.about',
+        'pages.our-process' => 'dashboard.menu.routes.our_process',
         'pages.privacy-policy' => 'dashboard.menu.routes.privacy_policy',
         'pages.terms-and-conditions' => 'dashboard.menu.routes.terms',
         'contact' => 'dashboard.menu.routes.contact',
@@ -137,10 +138,34 @@ class MenuItem extends Model
     public function href(): ?string
     {
         return match ($this->link_type) {
-            'url' => $this->url ?: null,
+            'url' => $this->resolveUrlHref(),
             'route' => $this->resolveRouteHref(),
             default => null,
         };
+    }
+
+    /**
+     * A stored url is used verbatim, with ONE exception: a fragment-only
+     * value ("#packages") means "that section of the homepage", and is
+     * resolved against the CURRENT locale's homepage.
+     *
+     * Without this, a bare "#packages" in the navbar would scroll to a
+     * section that only exists on the homepage — silently doing nothing on
+     * every other page. Storing "/#packages" instead would be worse: it
+     * hardcodes the Arabic homepage and would send an English visitor out
+     * of /en on every click.
+     */
+    private function resolveUrlHref(): ?string
+    {
+        if (! $this->url) {
+            return null;
+        }
+
+        if (str_starts_with($this->url, '#')) {
+            return lroute('home').$this->url;
+        }
+
+        return $this->url;
     }
 
     private function resolveRouteHref(): ?string
@@ -153,7 +178,11 @@ class MenuItem extends Model
         // routes are ALLOWED, this says which are actually registered. A
         // whitelisted route that has not been built yet must render as a
         // dead entry, not a RouteNotFoundException on every page.
-        return Route::has($this->route_name) ? route($this->route_name) : null;
+        //
+        // lroute(), never route(): every public route is registered twice,
+        // and a bare route() here would send an English visitor to the
+        // Arabic URL from every navbar link on /en.
+        return Route::has($this->route_name) ? lroute($this->route_name) : null;
     }
 
     /**

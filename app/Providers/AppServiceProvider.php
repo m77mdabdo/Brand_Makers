@@ -4,12 +4,16 @@ namespace App\Providers;
 
 use App\Models\Article;
 use App\Models\Country;
+use App\Models\MenuItem;
 use App\Models\Package;
 use App\Models\Page;
 use App\Models\Service;
 use App\Services\Analytics\IpAnonymizer;
+use App\Services\Cms\SettingsRepository;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Spatie\Translatable\Facades\Translatable;
 
@@ -40,6 +44,10 @@ class AppServiceProvider extends ServiceProvider
         // Stateless, and reached from model mutators on a hot path — one
         // instance for the whole request.
         $this->app->singleton(IpAnonymizer::class);
+
+        // Singleton so the settings table is read at most once per
+        // request, however many callers ask for a value.
+        $this->app->singleton(SettingsRepository::class);
     }
 
     public function boot(): void
@@ -54,6 +62,54 @@ class AppServiceProvider extends ServiceProvider
         // translation yet renders blank on /en instead of showing its
         // Arabic value.
         Translatable::fallback(fallbackLocale: config('app.fallback_locale'));
+
+        $this->composePublicLayout();
+    }
+
+    /**
+     * Data every public page's chrome needs.
+     *
+     * A view composer rather than a parameter on every controller: the
+     * navbar, the footer and the floating buttons render on every public
+     * page, and none of the controllers otherwise care about settings or
+     * menu items. Two queries total — the settings singleton, plus the
+     * menu tree with its visible children eager-loaded.
+     */
+    private function composePublicLayout(): void
+    {
+        View::composer('components.layouts.public', function ($view) {
+            $settings = app(SettingsRepository::class);
+
+            $view->with([
+                'siteName' => $settings->translated('site_name') ?? __('site.brand.name'),
+                'siteLogo' => $settings->string('site_logo'),
+                'contactWhatsapp' => $settings->string('contact_whatsapp'),
+                'contactEmail' => $settings->string('contact_email'),
+                'contactPhone' => $settings->string('contact_phone'),
+                'contactAddress' => $settings->translated('contact_address'),
+                'socialLinks' => $settings->socialLinks(),
+                'menu' => $this->publicMenu(),
+            ]);
+        });
+    }
+
+    /**
+     * The visible, ordered navbar tree.
+     *
+     * Two queries (parents plus their children), not one per item.
+     * Children are eager-loaded ALREADY filtered to visible ones, so a
+     * hidden child can never leak into a rendered dropdown.
+     *
+     * @return Collection<int, MenuItem>
+     */
+    private function publicMenu(): Collection
+    {
+        return MenuItem::query()
+            ->topLevel()
+            ->visible()
+            ->ordered()
+            ->with('visibleChildren')
+            ->get();
     }
 
     /**

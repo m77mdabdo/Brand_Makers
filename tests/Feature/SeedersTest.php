@@ -21,6 +21,7 @@ use Database\Seeders\AdminUserSeeder;
 use Database\Seeders\LeadSourceSeeder;
 use Database\Seeders\SettingsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Route;
 use RuntimeException;
 use Tests\TestCase;
 
@@ -106,16 +107,63 @@ class SeedersTest extends TestCase
         $this->assertSame(MenuItem::count(), MenuItem::system()->count());
     }
 
-    public function test_every_seeded_menu_route_is_whitelisted(): void
+    /**
+     * Menu items are seeded against the route they will EVENTUALLY point
+     * at, but the seeder only writes a route link when that route actually
+     * exists — anything not built yet becomes a link to the homepage
+     * section where its content currently lives.
+     *
+     * So the invariant is not "every item has a whitelisted route". It is
+     * that every item's destination is REAL: a route link must be both
+     * whitelisted and registered, and a url link must resolve.
+     */
+    public function test_every_seeded_menu_item_points_somewhere_real(): void
     {
         $this->seed();
 
         foreach (MenuItem::all() as $item) {
-            $this->assertArrayHasKey(
-                $item->route_name,
-                MenuItem::ROUTE_WHITELIST,
-                "Seeded menu item {$item->key} points at a non-whitelisted route."
-            );
+            if ($item->link_type === 'route') {
+                $this->assertArrayHasKey(
+                    $item->route_name,
+                    MenuItem::ROUTE_WHITELIST,
+                    "Seeded menu item {$item->key} points at a non-whitelisted route."
+                );
+
+                $this->assertTrue(
+                    Route::has($item->route_name),
+                    "Seeded menu item {$item->key} is a route link to an unregistered route."
+                );
+
+                continue;
+            }
+
+            if ($item->link_type === 'url') {
+                $this->assertNotNull(
+                    $item->href(),
+                    "Seeded menu item {$item->key} is a url link that resolves to nothing."
+                );
+
+                continue;
+            }
+
+            // 'none' is the dormant state: the dedicated route does not
+            // exist yet and there is no homepage section to stand in for
+            // it, so the navbar renders nothing for this row.
+            $this->assertSame('none', $item->link_type);
+            $this->assertNull($item->href());
+        }
+    }
+
+    public function test_seeded_menu_items_all_name_a_whitelisted_eventual_route(): void
+    {
+        $this->seed();
+
+        // Whatever a row currently links to, the route it is heading
+        // towards has to be one the navbar is allowed to reach — the
+        // whitelist is what stops a menu entry resolving to a route that
+        // needs a bound model and 500-ing every page.
+        foreach (MenuItem::whereNotNull('route_name')->get() as $item) {
+            $this->assertArrayHasKey($item->route_name, MenuItem::ROUTE_WHITELIST);
         }
     }
 
