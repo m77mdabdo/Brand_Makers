@@ -1,11 +1,277 @@
-@import 'tailwindcss';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
+/*
+ * ---------------------------------------------------------------------
+ * Base
+ * ---------------------------------------------------------------------
+ */
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    /*
+     * Anyone who has asked for less motion gets no smooth scrolling
+     * either — a long animated scroll is exactly the kind of movement the
+     * preference exists to suppress.
+     */
+    @media (prefers-reduced-motion: reduce) {
+        html {
+            scroll-behavior: auto;
+        }
+    }
+
+    body {
+        @apply bg-cream text-ink antialiased;
+        /* The hero's wide glow and the marquees both overflow their
+           boxes; without this the page gains a horizontal scrollbar on
+           narrow screens. */
+        overflow-x: hidden;
+    }
+
+    /*
+     * Arabic sits lower and needs more leading than Latin at the same
+     * size. Applied on [dir="rtl"] rather than :lang so it also covers
+     * mixed content inside an RTL page.
+     */
+    [dir='rtl'] body {
+        line-height: 1.75;
+    }
+
+    /* x-cloak hides Alpine-controlled elements until Alpine boots, so
+       nothing flashes open on first paint. */
+    [x-cloak] {
+        display: none !important;
+    }
+}
+
+/*
+ * ---------------------------------------------------------------------
+ * Components
+ * ---------------------------------------------------------------------
+ */
+@layer components {
+    .wrap {
+        @apply mx-auto w-full max-w-wrap px-6;
+    }
+
+    /*
+     * Buttons.
+     *
+     * The fill is orange-ink (#B84A15), NOT the brand orange — white on
+     * brand orange is 3.22:1 and fails AA for a 17px bold label. See
+     * tailwind.config.js. The hover goes darker still, so the state
+     * change never drops below the passing ratio.
+     */
+    .btn {
+        @apply inline-flex min-h-[48px] items-center justify-center gap-2.5 rounded-full px-7 py-3.5
+               text-base font-extrabold transition duration-200
+               focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
+    }
+
+    .btn-primary {
+        @apply bg-orange-ink text-white hover:-translate-y-0.5 hover:bg-orange-ink-hover
+               focus-visible:ring-orange-ink focus-visible:ring-offset-cream;
+    }
+
+    /* On a petrol/photographic background the offset ring needs a dark
+       base or it renders as a white halo. */
+    .btn-on-dark {
+        @apply focus-visible:ring-white focus-visible:ring-offset-petrol-deep;
+    }
+
+    .btn-ghost-light {
+        @apply border-2 border-white/70 bg-white/5 text-white backdrop-blur-sm
+               hover:-translate-y-0.5 hover:border-white hover:bg-white hover:text-petrol;
+    }
+
+    .btn-ghost-dark {
+        @apply border-2 border-petrol text-petrol hover:-translate-y-0.5 hover:bg-petrol hover:text-white
+               focus-visible:ring-petrol focus-visible:ring-offset-cream;
+    }
+
+    .btn-white {
+        @apply bg-white text-orange-ink hover:-translate-y-0.5 hover:bg-petrol hover:text-white
+               focus-visible:ring-white focus-visible:ring-offset-orange-ink;
+    }
+
+    /*
+     * Eyebrow pill.
+     *
+     * Light variant is orange-ink on WHITE, not on a tinted orange wash —
+     * the wash drops the ratio to 4.26:1. On white it is 5.21:1.
+     */
+    .eyebrow {
+        @apply mb-4 inline-block rounded-full px-4 py-1.5 text-xs font-extrabold tracking-wider;
+    }
+
+    .eyebrow-light {
+        @apply bg-white text-orange-ink ring-1 ring-inset ring-line;
+    }
+
+    /* On petrol: amber on a ≤14% amber wash measures 4.56:1. Anything
+       heavier than that fails, which is why the tint is fixed here rather
+       than left to the caller. */
+    .eyebrow-dark {
+        @apply bg-amber/10 text-amber ring-1 ring-inset ring-amber/30;
+    }
+
+    .section {
+        @apply py-16 sm:py-20 lg:py-24;
+    }
+
+    .sec-head {
+        @apply mx-auto mb-12 max-w-2xl text-center;
+    }
+
+    .sec-head h2 {
+        @apply text-3xl font-black tracking-tight sm:text-4xl lg:text-[2.75rem] lg:leading-tight;
+    }
+
+    .sec-head p {
+        @apply mt-3 text-lg text-muted-ink;
+    }
+
+    .card {
+        @apply rounded-3xl border border-line bg-white p-7 transition duration-200
+               hover:-translate-y-1.5 hover:border-orange hover:shadow-[0_20px_40px_-22px_rgba(232,106,34,0.45)];
+    }
+
+    .prose-brand :is(h2, h3) {
+        @apply mt-8 font-black text-ink;
+    }
+
+    .prose-brand p {
+        @apply mt-4 text-muted-ink;
+    }
+}
+
+/*
+ * ---------------------------------------------------------------------
+ * Marquee
+ * ---------------------------------------------------------------------
+ *
+ * The track holds exactly TWO copies of the item run and translates by
+ * 50% of its own width, so the frame at 100% is pixel-identical to the
+ * frame at 0% and the loop has no visible seam.
+ *
+ * Direction is set per-instance through a data attribute rather than a
+ * modifier class, because the value is computed from the locale AND the
+ * caller's base/reverse choice — alternating rows shear past each other,
+ * and the whole pattern flips when the language does.
+ */
+.cm-marquee {
+    @apply relative overflow-hidden;
+
+    /*
+     * LTR on the CONTAINER as well as the track, and this is the half
+     * that actually mattered.
+     *
+     * Under an RTL ancestor an overflowing child is anchored to the
+     * container's RIGHT edge and overflows leftwards, so a 4800px track
+     * in a 1440px window occupies roughly -3360..1440. The reverse
+     * keyframe starts at translateX(-50%), which then puts it at
+     * -5760..-960 — entirely off-screen, and the band renders as a solid
+     * stripe of colour with no text. (Observed: the Arabic homepage's
+     * first marquee was blank while the second, running the other
+     * keyframe, was fine — which is exactly the asymmetry this explains.)
+     *
+     * Pinning both container and track to ltr anchors the overflow left
+     * in every locale, so both keyframes start from the same geometry and
+     * the only thing direction changes is which way the band travels.
+     */
+    direction: ltr;
+}
+
+.cm-marquee__track {
+    display: flex;
+    width: max-content;
+    will-change: transform;
+    animation: marquee-ltr var(--cm-marquee-duration, 30s) linear infinite;
+
+    /*
+     * FORCED LTR, and this is load-bearing.
+     *
+     * The track is a flex row far wider than its overflow-hidden parent.
+     * Under an RTL ancestor the main axis reverses, so the row's overflow
+     * extends to the LEFT and the -50% keyframe then translates the
+     * content clean off the visible area — the band renders as a solid
+     * stripe of colour with no text in it at all. (Observed: the Arabic
+     * homepage shipped an empty orange bar.)
+     *
+     * Pinning the track to ltr makes the geometry identical in both
+     * locales and leaves the animation as the ONLY thing that decides
+     * which way it travels — which is what the base/reverse prop is for.
+     * Each item carries its own dir, so the Arabic text inside still
+     * shapes and orders correctly.
+     */
+    direction: ltr;
+}
+
+.cm-marquee[data-marquee-direction='rtl'] .cm-marquee__track {
+    animation-name: marquee-rtl;
+}
+
+@keyframes marquee-ltr {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+@keyframes marquee-rtl {
+    from {
+        transform: translateX(-50%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+/* Pointer and keyboard users pause with plain CSS, so the marquee stays
+   controllable with JavaScript disabled. Touch has no :hover, which is
+   the one case the Alpine handler covers. */
+.cm-marquee:hover .cm-marquee__track,
+.cm-marquee:focus-within .cm-marquee__track,
+.cm-marquee[data-paused='true'] .cm-marquee__track {
+    animation-play-state: paused;
+}
+
+/*
+ * ---------------------------------------------------------------------
+ * Reduced motion
+ * ---------------------------------------------------------------------
+ *
+ * A blanket kill-switch rather than per-component opt-outs. Everything
+ * decorative in this build is either a CSS animation or the hero canvas
+ * (which checks the same query in JS and never starts its loop), so one
+ * rule here plus one check there covers the whole site — and a component
+ * added later inherits the behaviour instead of having to remember it.
+ *
+ * Deliberately NOT `animation: none`: that would snap a marquee to its
+ * start frame mid-run. Pausing leaves everything where it is, visible and
+ * static.
+ */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .cm-marquee__track {
+        animation: none !important;
+        /* Without the animation the track sits at its natural width, so
+           the second (clone) half would spill. Showing only what fits and
+           letting the user scroll it is the honest static fallback. */
+        width: 100%;
+        overflow-x: auto;
+    }
 }
