@@ -11,13 +11,43 @@
         __('dashboard.nav.overview') => [
             ['route' => 'dashboard', 'label' => __('dashboard.nav.dashboard'), 'icon' => 'home'],
         ],
+        __('dashboard.nav.content') => [
+            ['route' => 'dashboard.services.index', 'label' => __('dashboard.resources.services'), 'icon' => 'sparkles'],
+            ['route' => 'dashboard.packages.index', 'label' => __('dashboard.resources.packages'), 'icon' => 'cube'],
+            ['route' => 'dashboard.countries.index', 'label' => __('dashboard.resources.countries'), 'icon' => 'globe'],
+            ['route' => 'dashboard.faqs.index', 'label' => __('dashboard.resources.faqs'), 'icon' => 'question'],
+            ['route' => 'dashboard.testimonials.index', 'label' => __('dashboard.resources.testimonials'), 'icon' => 'quote'],
+            ['route' => 'dashboard.articles.index', 'label' => __('dashboard.resources.articles'), 'icon' => 'document'],
+            ['route' => 'dashboard.comments.index', 'label' => __('dashboard.resources.comments'), 'icon' => 'chat'],
+            ['route' => 'dashboard.pages.index', 'label' => __('dashboard.resources.pages'), 'icon' => 'page'],
+            ['route' => 'dashboard.media.index', 'label' => __('dashboard.resources.media'), 'icon' => 'image'],
+        ],
         __('dashboard.nav.settings_group') => [
+            ['route' => 'dashboard.menu.index', 'label' => __('dashboard.resources.menu'), 'icon' => 'menu'],
             ['route' => 'dashboard.settings.edit', 'label' => __('dashboard.nav.settings'), 'icon' => 'cog'],
+            ['route' => 'dashboard.tracking.edit', 'label' => __('dashboard.resources.tracking'), 'icon' => 'chart'],
         ],
     ];
 
+    /*
+     * Inline SVG path data, keyed by name. Inline rather than an icon font
+     * or sprite: a dozen icons is fewer bytes than either, they inherit
+     * currentColor for free, and there is no extra request on a page that
+     * is behind auth anyway.
+     */
     $icons = [
         'home' => '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/>',
+        'sparkles' => '<path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/>',
+        'cube' => '<path d="M12 2.8l8 4.4v9.6l-8 4.4-8-4.4V7.2z"/><path d="M4 7.2l8 4.4 8-4.4"/><path d="M12 11.6V21"/>',
+        'globe' => '<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18"/>',
+        'question' => '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.3"/><path d="M12 17h.01"/>',
+        'quote' => '<path d="M7 15a3 3 0 1 1 0-6c0-2 1.5-3.5 3.5-4"/><path d="M17 15a3 3 0 1 1 0-6c0-2 1.5-3.5 3.5-4"/>',
+        'document' => '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/>',
+        'chat' => '<path d="M21 12a8 8 0 0 1-8 8H8l-5 3 1.5-4.5A8 8 0 1 1 21 12z"/>',
+        'page' => '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+        'image' => '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="m21 16-5-5-9 9"/>',
+        'menu' => '<path d="M4 6h16M4 12h16M4 18h16"/>',
+        'chart' => '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
         'cog' => '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
     ];
 @endphp
