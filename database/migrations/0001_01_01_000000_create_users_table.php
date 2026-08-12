@@ -4,11 +4,18 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * `is_admin` and `locale` are declared here rather than in follow-up
+ * ALTER migrations. This project starts with them, so a single CREATE is
+ * the honest schema — and it removes a whole class of rollback hazard,
+ * since dropping the table is the only reversal there is.
+ *
+ * `is_admin` is deliberately absent from User::$fillable: an admin flag
+ * that can be mass-assigned from a registration payload is a privilege
+ * escalation, so it is only ever set by explicit assignment.
+ */
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
@@ -17,6 +24,8 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->boolean('is_admin')->default(false);
+            $table->string('locale', 5)->default('ar');
             $table->rememberToken();
             $table->timestamps();
         });
@@ -37,13 +46,10 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('users');
-        Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
+        Schema::dropIfExists('password_reset_tokens');
+        Schema::dropIfExists('users');
     }
 };
