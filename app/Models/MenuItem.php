@@ -196,6 +196,59 @@ class MenuItem extends Model
     }
 
     /**
+     * Whether this item is the page currently being viewed.
+     *
+     * A dropdown parent lights up when one of its children is active, so
+     * the top-level entry stays highlighted while a visitor reads a page
+     * nested beneath it.
+     */
+    public function isActive(): bool
+    {
+        if ($this->link_type === 'route' && $this->routeMatchesCurrent()) {
+            return true;
+        }
+
+        // Only consults children that are already loaded. The navbar
+        // eager-loads visibleChildren, so this costs nothing there; a
+        // stray unloaded call must not turn one render into N queries.
+        if ($this->relationLoaded('visibleChildren')) {
+            return $this->visibleChildren->contains(fn (self $child) => $child->isActive());
+        }
+
+        return false;
+    }
+
+    /**
+     * Exact match, plus the ONE generalisation worth making: an ".index"
+     * item also owns its ".show" detail pages, so "Services" stays lit
+     * while a visitor reads a single service.
+     *
+     * Deliberately NOT a loose prefix match on the first segment. That
+     * would light up every pages.* item at once — About, Our Process,
+     * Privacy and Terms all share the "pages" prefix — so a visitor
+     * reading the privacy policy would see four highlighted nav entries.
+     * It would also make "articles.index" match "articles.comments.store".
+     *
+     * Compares against current_route_base_name(), which strips the ".en"
+     * suffix, so the highlight is identical in both locales.
+     */
+    private function routeMatchesCurrent(): bool
+    {
+        $current = current_route_base_name();
+
+        if ($current === null || $this->route_name === null) {
+            return false;
+        }
+
+        if ($this->route_name === $current) {
+            return true;
+        }
+
+        return str_ends_with($this->route_name, '.index')
+            && $current === substr($this->route_name, 0, -6).'.show';
+    }
+
+    /**
      * rel="noopener" is required on target="_blank" links — without it the
      * opened page can reach back through window.opener.
      */

@@ -89,8 +89,13 @@ class MenuManagerTest extends TestCase
 
     public function test_an_item_pointing_at_an_unbuilt_route_renders_nothing_rather_than_erroring(): void
     {
-        // packages.index is whitelisted but not registered yet.
-        $item = MenuItem::factory()->create(['link_type' => 'route', 'route_name' => 'packages.index']);
+        // orders.track is whitelisted but not registered yet — the client
+        // portal is a later build step. (This assertion used to name
+        // packages.index, which has since been built; the guard below
+        // keeps the example honest as sections land.)
+        $this->assertFalse(Route::has('orders.track'));
+
+        $item = MenuItem::factory()->create(['link_type' => 'route', 'route_name' => 'orders.track']);
 
         $this->assertNull($item->href());
         $this->get('/')->assertOk();

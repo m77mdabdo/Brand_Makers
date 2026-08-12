@@ -142,6 +142,10 @@ class AppServiceProvider extends ServiceProvider
             ->ordered()
             ->with('visibleChildren')
             ->get();
+        // Two queries total (parents, then their visible children) — not
+        // one per item. isActive() only consults children that are
+        // already loaded, so this eager load is what keeps the highlight
+        // free rather than N+1.
     }
 
     /**

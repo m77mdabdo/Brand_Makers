@@ -186,9 +186,15 @@ class HardeningTest extends TestCase
 
         // The static list names the eventual full sitemap; an entry for a
         // page that has not been built would be a soft 404 in a crawler's
-        // queue.
-        $this->assertStringNotContainsString('/packages', $xml);
+        // queue. /estimator and /booking are still unbuilt.
+        $this->assertStringNotContainsString('/estimator', $xml);
+        $this->assertStringNotContainsString('/booking', $xml);
+
+        // …and a section that HAS been built appears without any change
+        // to the sitemap itself.
         $this->assertStringContainsString('/about', $xml);
+        $this->assertStringContainsString('/packages', $xml);
+        $this->assertStringContainsString('/services', $xml);
     }
 
     public function test_the_sitemap_is_valid_xml(): void

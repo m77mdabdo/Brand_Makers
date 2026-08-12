@@ -13,6 +13,7 @@ return [
     ],
 
     'nav' => [
+        'breadcrumb' => 'Breadcrumb',
         'home' => 'Home',
         'skip_to_content' => 'Skip to main content',
         'open_menu' => 'Open menu',
@@ -49,6 +50,12 @@ return [
     ],
 
     'services' => [
+        'label' => 'Services',
+        'read_more' => 'Read more',
+        'requirements' => 'What we need from you',
+        'process' => 'How it works',
+        'enquire' => 'Enquire about this service',
+        'other' => 'Other services',
         'eyebrow' => 'What we do',
         'title' => 'Work built on understanding, not taste',
         'lead' => 'We ask before we design, and hand over a complete system your team can apply with confidence.',
@@ -70,6 +77,11 @@ return [
     ],
 
     'packages' => [
+        'label' => 'Packages',
+        'compare' => 'Compare packages',
+        'feature' => 'Feature',
+        'included' => 'Included',
+        'not_included' => 'Not included',
         'eyebrow' => 'Our packages',
         'title' => 'Pick the package that fits your stage',
         'lead' => 'Clear scopes and defined deliverables. Compare and choose, or ask for a custom scope.',
@@ -109,12 +121,18 @@ return [
     ],
 
     'faq' => [
+        'label' => 'FAQ',
+        'lead' => 'Answers to what we are asked most. If your question is not here, get in touch.',
+        'empty' => 'No questions yet.',
         'eyebrow' => 'FAQ',
         'title' => 'Questions we are asked often',
         'view_all' => 'All questions',
     ],
 
     'articles' => [
+        'label' => 'Blog',
+        'empty' => 'No articles published yet.',
+        'related' => 'Related articles',
         'eyebrow' => 'From the blog',
         'title' => 'Thinking about brands',
         'read_more' => 'Read the article',
@@ -128,6 +146,32 @@ return [
         'forbidden' => ['title' => 'You do not have access', 'message' => 'This area is for staff only.'],
         'expired' => ['title' => 'Your session expired', 'message' => 'Refresh the page and try again.'],
         'maintenance' => ['title' => 'Down for maintenance', 'message' => 'We are making a quick update and will be back in a few minutes.'],
+    ],
+
+    'countries' => [
+        'label' => 'Markets',
+        'eyebrow' => 'Where we work',
+        'title' => 'The markets we serve',
+        'lead' => 'We work with clients across Saudi Arabia, the Gulf and the wider Middle East.',
+        'empty' => 'No markets have been added yet.',
+    ],
+
+    'contact' => [
+        'label' => 'Contact',
+        'eyebrow' => 'Get in touch',
+        'title' => 'Contact us',
+        'lead' => 'Tell us about your project and we will come back with a clear plan.',
+        'whatsapp' => 'WhatsApp',
+        'phone' => 'Phone',
+        'email' => 'Email',
+        'address' => 'Address',
+        'social' => 'Follow us',
+        'no_details' => 'Contact details are being set up.',
+        'form_coming' => 'The enquiry form is on its way. Until then, please use any of the contact details above.',
+    ],
+
+    'comments' => [
+        'heading' => '{0} No comments|{1} One comment|[2,*] :count comments',
     ],
 
     'footer' => [

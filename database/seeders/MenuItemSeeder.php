@@ -114,7 +114,7 @@ class MenuItemSeeder extends Seeder
             // No anchor: the booking CTA is already its own entry, so pointing
             // Contact at the same section would give the navbar two links to
             // one place. This stays dormant until the contact route exists.
-            ['key' => 'nav-contact', 'route' => 'contact', 'label' => ['ar' => 'اتصل بنا', 'en' => 'Contact']],
+            ['key' => 'nav-contact', 'route' => 'contact', 'anchor' => null, 'label' => ['ar' => 'اتصل بنا', 'en' => 'Contact']],
         ];
     }
 }

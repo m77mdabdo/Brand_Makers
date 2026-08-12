@@ -1,8 +1,14 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Public\ArticleController;
+use App\Http\Controllers\Public\ContactController;
+use App\Http\Controllers\Public\CountryController;
+use App\Http\Controllers\Public\FaqController;
 use App\Http\Controllers\Public\HomeController;
+use App\Http\Controllers\Public\PackageController;
 use App\Http\Controllers\Public\PageController;
+use App\Http\Controllers\Public\ServiceController;
 use App\Http\Controllers\Public\SitemapController;
 use Illuminate\Support\Facades\Route;
 
@@ -30,6 +36,27 @@ use Illuminate\Support\Facades\Route;
 */
 $registerPublicRoutes = function (string $nameSuffix = ''): void {
     Route::get('/', [HomeController::class, 'index'])->name("home{$nameSuffix}");
+
+    /*
+     * The {model:slug} binding is EXPLICIT rather than left to
+     * getRouteKeyName(), so the public URL contract is visible in this
+     * file. The dashboard binds the same models by id (see
+     * routes/dashboard.php) — stating both at the point of use is what
+     * stops one of them silently changing when a model is edited.
+     */
+    Route::get('/services', [ServiceController::class, 'index'])->name("services.index{$nameSuffix}");
+    Route::get('/services/{service:slug}', [ServiceController::class, 'show'])->name("services.show{$nameSuffix}");
+
+    Route::get('/packages', [PackageController::class, 'index'])->name("packages.index{$nameSuffix}");
+
+    Route::get('/countries', [CountryController::class, 'index'])->name("countries.index{$nameSuffix}");
+
+    Route::get('/faqs', [FaqController::class, 'index'])->name("faqs.index{$nameSuffix}");
+
+    Route::get('/articles', [ArticleController::class, 'index'])->name("articles.index{$nameSuffix}");
+    Route::get('/articles/{article:slug}', [ArticleController::class, 'show'])->name("articles.show{$nameSuffix}");
+
+    Route::get('/contact', [ContactController::class, 'show'])->name("contact{$nameSuffix}");
 
     Route::get('/about', [PageController::class, 'about'])->name("pages.about{$nameSuffix}");
     Route::get('/our-process', [PageController::class, 'ourProcess'])->name("pages.our-process{$nameSuffix}");

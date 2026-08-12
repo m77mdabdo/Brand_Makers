@@ -51,10 +51,17 @@
                  x-public.nav-item drops it rather than rendering a dead
                  link — so each later build step lights up its own entry
                  automatically. --}}
-            <nav class="hidden items-center gap-7 text-[0.95rem] font-medium lg:flex" aria-label="{{ __('site.nav.menu_dialog_label') }}">
-                @foreach ($menu as $item)
+            <nav class="hidden items-center gap-6 text-[0.95rem] font-medium lg:flex" aria-label="{{ __('site.nav.menu_dialog_label') }}">
+                @forelse ($menu as $item)
                     <x-public.nav-item :item="$item" />
-                @endforeach
+                @empty
+                    {{-- Empty-menu fallback. The navbar is rendered from
+                         menu_items, so an admin who hid every entry would
+                         otherwise ship a bar with no navigation at all. --}}
+                    <a href="{{ lroute('home') }}" class="flex min-h-[44px] items-center rounded-lg px-3 text-petrol hover:text-orange-ink">
+                        {{ __('site.nav.home') }}
+                    </a>
+                @endforelse
             </nav>
 
             <div class="flex items-center gap-2 sm:gap-3">
@@ -136,10 +143,21 @@
             </button>
         </div>
 
+        {{-- Same component as the desktop bar, in mobile mode: one
+             source of truth for the active state, the dropdown behaviour
+             and the drop-unresolvable-items rule. A second hand-written
+             loop here is how the two quietly diverge. --}}
         <nav class="space-y-1 text-base font-medium" aria-label="{{ __('site.nav.menu_dialog_label') }}">
-            @foreach ($menu as $item)
+            @forelse ($menu as $item)
                 <x-public.nav-item :item="$item" mobile />
-            @endforeach
+            @empty
+                {{-- Empty-menu fallback: an admin who hides or deletes
+                     every item must still leave a way home rather than a
+                     drawer with nothing in it. --}}
+                <a href="{{ lroute('home') }}" class="flex min-h-[44px] items-center rounded-lg px-3 text-petrol">
+                    {{ __('site.nav.home') }}
+                </a>
+            @endforelse
         </nav>
 
         <a href="#booking" @click="mobileOpen = false" class="btn btn-primary mt-5 w-full">
