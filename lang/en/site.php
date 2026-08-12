@@ -34,6 +34,13 @@ return [
         'cta_primary' => 'Book a consultation',
         'cta_secondary' => 'Estimate your cost',
         'scroll_cue' => 'Scroll down',
+        // Labels for the hero figures. The VALUES are editable
+        // settings (seeded empty); these labels are chrome.
+        'stats' => [
+            'companies' => 'projects delivered',
+            'turnaround' => 'average turnaround',
+            'satisfaction' => 'client satisfaction',
+        ],
         'background_label' => 'Decorative background: a city skyline at dusk',
     ],
 
@@ -112,6 +119,15 @@ return [
         'title' => 'Thinking about brands',
         'read_more' => 'Read the article',
         'view_all' => 'All articles',
+    ],
+
+    'errors' => [
+        'back_home' => 'Back to the homepage',
+        'not_found' => ['title' => 'Page not found', 'message' => 'The link you opened no longer exists, or it may have been mistyped.'],
+        'server_error' => ['title' => 'Something went wrong', 'message' => 'The problem is on our side and has been logged. Please try again shortly.'],
+        'forbidden' => ['title' => 'You do not have access', 'message' => 'This area is for staff only.'],
+        'expired' => ['title' => 'Your session expired', 'message' => 'Refresh the page and try again.'],
+        'maintenance' => ['title' => 'Down for maintenance', 'message' => 'We are making a quick update and will be back in a few minutes.'],
     ],
 
     'footer' => [

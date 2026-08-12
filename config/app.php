@@ -82,6 +82,20 @@ return [
 
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Supported Locales
+    |--------------------------------------------------------------------------
+    |
+    | The locales this application actually ships translations for. Stated
+    | once here so the public router, the dashboard locale toggle and
+    | SetDashboardLocale all agree — a stored preference outside this list
+    | would make every __() call fall through to its raw key.
+    |
+    */
+
+    'supported_locales' => ['ar', 'en'],
+
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
     /*

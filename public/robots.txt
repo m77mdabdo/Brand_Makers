@@ -1,2 +1,18 @@
+# Creative Mark
+
 User-agent: *
-Disallow:
+Allow: /
+
+# Staff-only areas. Disallow is a crawling hint, NOT access control —
+# every one of these is gated by auth/admin middleware server-side, and
+# listing them here only keeps them out of search results.
+Disallow: /dashboard
+Disallow: /login
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /confirm-password
+Disallow: /verify-email
+Disallow: /profile
+
+# Generated from the routes that actually exist — see SitemapController.
+Sitemap: /sitemap.xml

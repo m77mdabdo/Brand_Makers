@@ -150,6 +150,30 @@
 
 /*
  * ---------------------------------------------------------------------
+ * Dashboard shell
+ * ---------------------------------------------------------------------
+ *
+ * Written here rather than as h-screen/h-dvh utilities in the layout
+ * because Tailwind emits .h-dvh BEFORE .h-screen: with both classes on
+ * one element the vh rule wins the cascade and the dvh class silently
+ * does nothing. As plain CSS the override is unambiguous.
+ *
+ * dvh matters on mobile: 100vh is measured against the browser chrome's
+ * COLLAPSED height, so a 100vh shell is taller than the visible viewport
+ * and the sidebar's last item sits under the address bar.
+ */
+.dashboard-shell {
+    height: 100vh;
+}
+
+@supports (height: 100dvh) {
+    .dashboard-shell {
+        height: 100dvh;
+    }
+}
+
+/*
+ * ---------------------------------------------------------------------
  * Marquee
  * ---------------------------------------------------------------------
  *

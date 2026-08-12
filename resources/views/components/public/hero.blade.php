@@ -3,6 +3,28 @@
     'poster' => null,
 ])
 
+@php
+    /*
+     * The three hero figures.
+     *
+     * Every one comes from settings and is seeded EMPTY, so a fresh
+     * install shows no stats block at all rather than the design
+     * reference's "+500 companies / 48h / 98%" — numbers nobody has
+     * verified have no business on the most visible part of the site.
+     *
+     * The VALUE is the business fact and lives in settings (editable, and
+     * per-locale because "٤٨ ساعة" and "48 hours" are different strings).
+     * The LABEL beside it is UI chrome and lives in the lang files.
+     */
+    $settings = app(App\Services\Cms\SettingsRepository::class);
+
+    $stats = collect([
+        'companies' => $settings->translated('home_stat_companies'),
+        'turnaround' => $settings->translated('home_stat_turnaround'),
+        'satisfaction' => $settings->translated('home_stat_satisfaction'),
+    ])->filter();
+@endphp
+
 {{--
     The hero shell.
 
@@ -50,6 +72,23 @@
             <a href="#booking" class="btn btn-primary btn-on-dark">{{ __('site.hero.cta_primary') }}</a>
             <a href="#estimator" class="btn btn-ghost-light btn-on-dark">{{ __('site.hero.cta_secondary') }}</a>
         </div>
+
+        @if ($stats->isNotEmpty())
+            {{-- Individually conditional as well as collectively: an admin
+                 who has filled in one figure gets one, not two blanks
+                 beside it. --}}
+            <dl class="mt-12 flex flex-wrap items-start justify-center gap-x-12 gap-y-6">
+                @foreach ($stats as $key => $value)
+                    <div class="text-center">
+                        <dt class="sr-only">{{ __('site.hero.stats.'.$key) }}</dt>
+                        <dd>
+                            <span class="block text-3xl font-black text-amber sm:text-4xl">{{ $value }}</span>
+                            <span class="mt-1 block text-sm text-mist">{{ __('site.hero.stats.'.$key) }}</span>
+                        </dd>
+                    </div>
+                @endforeach
+            </dl>
+        @endif
 
         {{ $slot }}
     </div>

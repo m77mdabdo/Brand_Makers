@@ -10,8 +10,12 @@ use App\Models\Page;
 use App\Models\Service;
 use App\Services\Analytics\IpAnonymizer;
 use App\Services\Cms\SettingsRepository;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Http\Middleware\TrustProxies;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -54,7 +58,9 @@ class AppServiceProvider extends ServiceProvider
     {
         Relation::enforceMorphMap(self::MORPH_MAP);
 
+        $this->configureTrustedProxies();
         $this->forceHttpsInProduction();
+        $this->configureRateLimiting();
 
         // spatie/laravel-translatable ships no publishable config file in
         // this version, so this is the actual equivalent of setting the
@@ -64,6 +70,32 @@ class AppServiceProvider extends ServiceProvider
         Translatable::fallback(fallbackLocale: config('app.fallback_locale'));
 
         $this->composePublicLayout();
+    }
+
+    /**
+     * Rate limits.
+     *
+     * The dashboard had no ceiling at all, so a stolen session could
+     * drive unlimited writes. Safe methods return Limit::none() so the
+     * limiter can be applied to the WHOLE dashboard group without
+     * rationing ordinary browsing — only writes are counted.
+     *
+     * Keyed on the user id (falling back to IP for the theoretically
+     * unauthenticated case), so two admins never share a bucket.
+     * 60/minute is far above human editing speed: this is a
+     * runaway/abuse ceiling, not a usability constraint.
+     */
+    private function configureRateLimiting(): void
+    {
+        RateLimiter::for('dashboard-writes', function (Request $request) {
+            if ($request->isMethodSafe()) {
+                return Limit::none();
+            }
+
+            return Limit::perMinute(60)->by(
+                $request->user()?->getAuthIdentifier() ?? $request->ip()
+            );
+        });
     }
 
     /**
@@ -110,6 +142,33 @@ class AppServiceProvider extends ServiceProvider
             ->ordered()
             ->with('visibleChildren')
             ->get();
+    }
+
+    /**
+     * Trust the load balancer in front of us.
+     *
+     * Without this, a TLS-terminating proxy makes every request look like
+     * plain http to the app: $request->secure() is false, so a `secure`
+     * session cookie is never sent and the session breaks; generated URLs
+     * come out as http:// on an https:// site; and $request->ip() is the
+     * balancer's address, so rate limiting keys every visitor to one
+     * bucket.
+     *
+     * Configured HERE rather than in bootstrap/app.php because config()
+     * is not bound while the middleware stack is being built — see the
+     * note there.
+     */
+    private function configureTrustedProxies(): void
+    {
+        TrustProxies::at(config('trustedproxy.proxies'));
+
+        TrustProxies::withHeaders(
+            Request::HEADER_X_FORWARDED_FOR
+            | Request::HEADER_X_FORWARDED_HOST
+            | Request::HEADER_X_FORWARDED_PORT
+            | Request::HEADER_X_FORWARDED_PROTO
+            | Request::HEADER_X_FORWARDED_AWS_ELB
+        );
     }
 
     /**

@@ -115,10 +115,43 @@ class SettingsRepository
     }
 
     /**
+     * The whole table, key => raw value. Public because the settings
+     * editor renders every field from it in one pass.
+     *
      * @return Collection<string, mixed>
      */
-    private function all(): Collection
+    public function all(): Collection
     {
         return $this->values ??= Setting::query()->pluck('value', 'key');
+    }
+
+    /**
+     * Drops the in-memory copy so writes are reflected by later reads in
+     * the SAME request — without it, the redirect after saving settings
+     * re-renders the values as they were before the save.
+     */
+    public function flush(): void
+    {
+        $this->values = null;
+    }
+
+    /**
+     * A per-locale value as the raw {ar, en} array, for the editor form
+     * (which must show each locale's own field, with no fallback filling
+     * one in from the other).
+     *
+     * @return array<string, string>
+     */
+    public function raw(string $key): array
+    {
+        $value = $this->get($key);
+
+        if (is_string($value)) {
+            // A value stored before the key became bilingual. Show it
+            // under the fallback locale rather than losing it.
+            return [config('app.fallback_locale') => $value];
+        }
+
+        return is_array($value) ? array_filter($value, 'is_string') : [];
     }
 }

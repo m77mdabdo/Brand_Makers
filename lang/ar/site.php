@@ -40,6 +40,13 @@ return [
         'scroll_cue' => 'مرّر لأسفل',
         // The decorative sky/skyline is announced once, so a screen reader
         // is not left with an unexplained canvas element.
+        // Labels for the hero figures. The VALUES are editable
+        // settings (seeded empty); these labels are chrome.
+        'stats' => [
+            'companies' => 'مشروع منجز',
+            'turnaround' => 'متوسط مدة الإنجاز',
+            'satisfaction' => 'رضا العملاء',
+        ],
         'background_label' => 'خلفية توضيحية: أفق مدينة عند الغروب',
     ],
 
@@ -120,6 +127,15 @@ return [
         'title' => 'أفكار عن العلامات التجارية',
         'read_more' => 'اقرأ المقال',
         'view_all' => 'كل المقالات',
+    ],
+
+    'errors' => [
+        'back_home' => 'العودة إلى الرئيسية',
+        'not_found' => ['title' => 'الصفحة غير موجودة', 'message' => 'الرابط الذي فتحته لم يعد موجوداً، أو ربما كُتب بشكل غير صحيح.'],
+        'server_error' => ['title' => 'حدث خطأ غير متوقع', 'message' => 'المشكلة من طرفنا وقد سُجّلت. جرّب مرة أخرى بعد قليل.'],
+        'forbidden' => ['title' => 'لا تملك صلاحية الوصول', 'message' => 'هذه الصفحة مخصّصة لفريق العمل فقط.'],
+        'expired' => ['title' => 'انتهت صلاحية الجلسة', 'message' => 'حدّث الصفحة وأعد المحاولة.'],
+        'maintenance' => ['title' => 'الموقع تحت الصيانة', 'message' => 'نجري تحديثاً سريعاً. سنعود خلال دقائق.'],
     ],
 
     'footer' => [

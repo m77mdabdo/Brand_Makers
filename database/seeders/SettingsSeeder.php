@@ -83,6 +83,16 @@ class SettingsSeeder extends Seeder
                 'en' => 'Visual identity, logo design and brand strategy for startups and established companies across Saudi Arabia and the Gulf.',
             ]],
 
+            // --- Homepage stats ------------------------------------------
+            // Seeded EMPTY and hidden when empty. The design reference
+            // carried "+500 companies / 48h / 98% satisfaction"; shipping
+            // those as defaults would publish unverified claims on the
+            // most visible part of the site. An admin enters real figures
+            // in Settings and the hero starts rendering them.
+            ['key' => 'home_stat_companies', 'group' => 'home_stats', 'value' => null],
+            ['key' => 'home_stat_turnaround', 'group' => 'home_stats', 'value' => null],
+            ['key' => 'home_stat_satisfaction', 'group' => 'home_stats', 'value' => null],
+
             // --- Visitor sessions ----------------------------------------
             // Capture defaults ON but records nothing until a visitor
             // accepts the cookie notice, so a fresh install is not quietly

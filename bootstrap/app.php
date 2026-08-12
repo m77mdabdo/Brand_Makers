@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\SecurityHeaders;
+use App\Http\Middleware\SetDashboardLocale;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -20,8 +22,25 @@ return Application::configure(basePath: dirname(__DIR__))
             SecurityHeaders::class,
         ]);
 
+        /*
+         * Trusted proxies are configured in AppServiceProvider::boot(),
+         * NOT here.
+         *
+         * This closure runs while the kernel is being resolved, before the
+         * config repository is bound — calling config() here throws
+         * "Target class [config] does not exist". Reading env() instead
+         * would appear to work and then silently return null in
+         * production, because a cached config means .env is never loaded.
+         *
+         * TrustProxies is already in Laravel's default global stack, and
+         * its static at()/withHeaders() configurators are read when the
+         * middleware runs, which is long after providers boot.
+         */
+
         $middleware->alias([
             'setlocale' => SetLocale::class,
+            'dashboardlocale' => SetDashboardLocale::class,
+            'admin' => EnsureUserIsAdmin::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
