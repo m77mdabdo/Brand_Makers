@@ -12,16 +12,15 @@ use Illuminate\Support\Str;
  */
 class UserFactory extends Factory
 {
-    /**
-     * The current password being used by the factory.
-     */
-    protected static ?string $password;
+    protected $model = User::class;
 
     /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
+     * Hashed once per process rather than per row — bcrypt is deliberately
+     * slow, and a test creating fifty users should not pay for it fifty
+     * times.
      */
+    protected static ?string $password = null;
+
     public function definition(): array
     {
         return [
@@ -29,17 +28,27 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
+            'locale' => 'ar',
             'remember_token' => Str::random(10),
         ];
     }
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
     public function unverified(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
-        ]);
+        return $this->state(fn () => ['email_verified_at' => null]);
+    }
+
+    /**
+     * is_admin is guarded, so it cannot be set through the definition
+     * array — the factory has to assign it after the model is built, the
+     * same way real code does.
+     */
+    public function admin(): static
+    {
+        return $this->afterMaking(fn (User $user) => $user->is_admin = true)
+            ->afterCreating(function (User $user) {
+                $user->is_admin = true;
+                $user->save();
+            });
     }
 }
