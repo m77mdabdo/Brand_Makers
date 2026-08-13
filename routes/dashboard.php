@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\Dashboard\ArticleController;
 use App\Http\Controllers\Dashboard\CommentController;
+use App\Http\Controllers\Dashboard\ContactMessageController;
 use App\Http\Controllers\Dashboard\CountryController;
 use App\Http\Controllers\Dashboard\DashboardHomeController;
 use App\Http\Controllers\Dashboard\FaqController;
+use App\Http\Controllers\Dashboard\LeadController;
 use App\Http\Controllers\Dashboard\LocaleController;
 use App\Http\Controllers\Dashboard\MediaController;
 use App\Http\Controllers\Dashboard\MenuItemController;
@@ -101,6 +103,20 @@ Route::prefix('dashboard')
             Route::get('pages/{page:id}/sections/{section:id}/edit', [PageSectionController::class, 'edit'])->name('pages.sections.edit');
             Route::match(['put', 'patch'], 'pages/{page:id}/sections/{section:id}', [PageSectionController::class, 'update'])->name('pages.sections.update');
             Route::delete('pages/{page:id}/sections/{section:id}', [PageSectionController::class, 'destroy'])->name('pages.sections.destroy');
+
+            // --- enquiries ------------------------------------------------
+            Route::get('leads', [LeadController::class, 'index'])->name('leads.index');
+            Route::get('leads/{lead}', [LeadController::class, 'show'])->name('leads.show');
+            Route::delete('leads/{lead}', [LeadController::class, 'destroy'])->name('leads.destroy');
+
+            /*
+             * The inbox is a VIEW of leads where type = 'contact', not a
+             * second table — see ContactMessageService. Declared before
+             * the {lead} routes above would be ambiguous, so it gets its
+             * own prefix rather than sharing one.
+             */
+            Route::get('contact-messages', [ContactMessageController::class, 'index'])->name('contact-messages.index');
+            Route::patch('contact-messages/{lead}/handled', [ContactMessageController::class, 'toggleHandled'])->name('contact-messages.handled');
 
             // --- moderation ---------------------------------------------
             Route::get('comments', [CommentController::class, 'index'])->name('comments.index');

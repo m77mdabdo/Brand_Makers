@@ -71,12 +71,35 @@
                 </div>
             @endif
 
-            {{-- The enquiry form is the NEXT build step. Saying so beats
-                 shipping a form that posts nowhere and silently loses what
-                 people write. --}}
-            <p class="mt-10 rounded-2xl border border-dashed border-line bg-white px-6 py-8 text-center text-sm text-muted-ink">
-                {{ __('site.contact.form_coming') }}
-            </p>
+            <div id="contact-form" class="mt-12 scroll-mt-24">
+                <h2 class="text-2xl font-black">{{ __('site.forms.heading') }}</h2>
+                <p class="mt-1 text-sm text-muted-ink">{{ __('site.forms.lead') }}</p>
+
+                <div class="mt-6">
+                    <x-public.flash />
+
+                    <x-public.form-shell :action="lroute('contact.store')">
+                        <div class="grid gap-5 sm:grid-cols-2">
+                            <x-public.form-field name="full_name" :label="__('site.forms.name')" :required="true" />
+                            {{-- dir="ltr" whatever the interface language:
+                                 an email address and a phone number are
+                                 never Arabic text, and an RTL field renders
+                                 them with the wrong end first. --}}
+                            <x-public.form-field name="email" type="email" dir="ltr" :label="__('site.forms.email')" :required="true" />
+                        </div>
+
+                        <x-public.form-field name="phone" type="tel" dir="ltr" :label="__('site.forms.phone')" />
+
+                        <x-public.form-field name="message" type="textarea" :label="__('site.forms.message')" :required="true" />
+
+                        <x-public.consent-field />
+
+                        <button type="submit" class="btn btn-primary w-full sm:w-auto">
+                            {{ __('site.forms.submit') }}
+                        </button>
+                    </x-public.form-shell>
+                </div>
+            </div>
         </div>
     </section>
 </x-layouts.public>

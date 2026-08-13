@@ -77,6 +77,9 @@ return [
     ],
 
     'packages' => [
+        'enquiry_heading' => 'Request the :package package',
+        'enquiry_lead' => 'Leave your details and we will be in touch about this package.',
+        'back' => 'Back to packages',
         'label' => 'Packages',
         'compare' => 'Compare packages',
         'feature' => 'Feature',
@@ -171,7 +174,33 @@ return [
     ],
 
     'comments' => [
+        'form_heading' => 'Add a comment',
+        'moderation_note' => 'Comments are reviewed before they appear.',
         'heading' => '{0} No comments|{1} One comment|[2,*] :count comments',
+    ],
+
+    'forms' => [
+        'name' => 'Name',
+        'email' => 'Email',
+        'phone' => 'Phone number',
+        'message' => 'Your message',
+        'comment' => 'Your comment',
+        'consent' => 'Consent',
+        'required' => 'required',
+        'optional' => 'optional',
+        'submit' => 'Send',
+        'honeypot_label' => 'Leave this field empty',
+        'errors_heading' => 'Please check the following:',
+        'consent_label' => 'I agree to my details being stored so you can reply to my enquiry.',
+        'consent_note' => 'We never share your details with anyone else. See our :policy.',
+        'heading' => 'Send us a message',
+        'lead' => 'Fill in the form and we will come back to you shortly.',
+    ],
+
+    'flash' => [
+        'contact_submitted' => 'Thank you. We have your message and will come back to you shortly.',
+        'comment_submitted' => 'Thank you. Your comment will appear once it has been reviewed.',
+        'package_enquiry_submitted' => 'Thank you. We have your request and will be in touch about the package.',
     ],
 
     'footer' => [

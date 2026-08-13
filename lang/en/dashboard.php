@@ -8,6 +8,7 @@ return [
     'title' => 'Dashboard',
 
     'nav' => [
+        'enquiries' => 'Enquiries',
         'overview' => 'Overview',
         'content' => 'Content',
         'settings_group' => 'Settings',
@@ -90,6 +91,9 @@ return [
     ],
 
     'resources' => [
+        'leads' => 'Enquiries',
+        'contact_messages' => 'Contact messages',
+        'unhandled' => 'unhandled',
         'services' => 'Services',
         'countries' => 'Countries',
         'faqs' => 'FAQs',
@@ -104,6 +108,12 @@ return [
     ],
 
     'actions' => [
+        'filter' => 'Filter',
+        'reset' => 'Reset',
+        'view' => 'View',
+        'archive' => 'Archive',
+        'mark_handled' => 'Mark handled',
+        'mark_unhandled' => 'Mark unhandled',
         'create' => 'Add new',
         'edit' => 'Edit',
         'manage_sections' => 'Manage sections',
@@ -117,6 +127,24 @@ return [
     ],
 
     'fields' => [
+        'type' => 'Type',
+        'source_platform' => 'Source',
+        'interest' => 'Interest',
+        'received' => 'Received',
+        'date_from' => 'From',
+        'date_to' => 'To',
+        'linked_campaign' => 'Linked campaign',
+        'first_touch' => 'First touch',
+        'latest_touch' => 'Latest touch',
+        'utm_source' => 'utm_source',
+        'utm_medium' => 'utm_medium',
+        'utm_campaign' => 'utm_campaign',
+        'campaign_id' => 'External campaign id',
+        'gclid' => 'gclid',
+        'fbclid' => 'fbclid',
+        'ttclid' => 'ttclid',
+        'landing_page_url' => 'Landing page',
+        'referrer_url' => 'Referrer',
         'slug' => 'Slug',
         'slug_help' => 'Leave blank to generate it from the name.',
         'icon' => 'Icon',
@@ -249,6 +277,29 @@ return [
     'pages' => [
         'intro' => 'The site\'s fixed pages. Their content is editable, but pages cannot be added or deleted — they are tied to fixed routes and links.',
         'sections_intro' => 'Extra blocks shown beneath the page body.',
+    ],
+
+    'lead_types' => [
+        'consultation' => 'Consultation',
+        'contact' => 'Contact message',
+        'booking' => 'Booking',
+        'estimate' => 'Estimate',
+        'package_enquiry' => 'Package enquiry',
+    ],
+
+    'leads' => [
+        'intro' => 'Every enquiry the public forms have produced.',
+        'empty' => 'No enquiries.',
+        'enquiry' => 'Enquiry details',
+        'attribution' => 'Where it came from',
+        'no_attribution' => 'No attribution data for this enquiry.',
+        'snapshots' => 'Stored snapshots',
+        'snapshots_help' => 'What the browser reported at submission, kept verbatim.',
+        'consent' => 'Consent',
+        'consent_given' => 'Consent given on :date.',
+        'consent_missing' => 'No consent recorded.',
+        'confirm_archive' => 'Archive this enquiry? It can be restored later.',
+        'inbox_intro' => 'Contact form messages. Unhandled ones appear first.',
     ],
 
     'settings' => [

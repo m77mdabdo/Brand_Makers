@@ -37,6 +37,22 @@ return Application::configure(basePath: dirname(__DIR__))
          * middleware runs, which is long after providers boot.
          */
 
+        /*
+         * The two attribution cookies are read and written by JavaScript
+         * as well as by PHP, so they cannot be encrypted — an encrypted
+         * cookie is opaque to the client that has to read it.
+         *
+         * Safe to except: both carry only UTM parameters and click IDs
+         * that were already visible in the URL the visitor arrived on.
+         * Neither is an identifier, and neither is trusted — the server
+         * treats their contents as untrusted input and validates before
+         * storing (see AttributionService).
+         */
+        $middleware->encryptCookies(except: [
+            'cm_first_touch',
+            'cm_latest_touch',
+        ]);
+
         $middleware->alias([
             'setlocale' => SetLocale::class,
             'dashboardlocale' => SetDashboardLocale::class,

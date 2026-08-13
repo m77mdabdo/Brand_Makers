@@ -2,11 +2,13 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Public\ArticleController;
+use App\Http\Controllers\Public\CommentController;
 use App\Http\Controllers\Public\ContactController;
 use App\Http\Controllers\Public\CountryController;
 use App\Http\Controllers\Public\FaqController;
 use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\PackageController;
+use App\Http\Controllers\Public\PackageEnquiryController;
 use App\Http\Controllers\Public\PageController;
 use App\Http\Controllers\Public\ServiceController;
 use App\Http\Controllers\Public\SitemapController;
@@ -48,6 +50,18 @@ $registerPublicRoutes = function (string $nameSuffix = ''): void {
     Route::get('/services/{service:slug}', [ServiceController::class, 'show'])->name("services.show{$nameSuffix}");
 
     Route::get('/packages', [PackageController::class, 'index'])->name("packages.index{$nameSuffix}");
+    /*
+     * throttle:5,1 on every public WRITE.
+     *
+     * Five per minute per IP is far above anyone filling in a form by
+     * hand and far below what makes automated submission worthwhile. It
+     * is applied per route rather than to the whole public group because
+     * the group is mostly GETs, and rationing those would throttle
+     * ordinary browsing.
+     */
+    Route::post('/packages/enquire', [PackageEnquiryController::class, 'store'])
+        ->middleware('throttle:5,1')
+        ->name("packages.enquire{$nameSuffix}");
 
     Route::get('/countries', [CountryController::class, 'index'])->name("countries.index{$nameSuffix}");
 
@@ -55,8 +69,14 @@ $registerPublicRoutes = function (string $nameSuffix = ''): void {
 
     Route::get('/articles', [ArticleController::class, 'index'])->name("articles.index{$nameSuffix}");
     Route::get('/articles/{article:slug}', [ArticleController::class, 'show'])->name("articles.show{$nameSuffix}");
+    Route::post('/articles/{article:slug}/comments', [CommentController::class, 'store'])
+        ->middleware('throttle:5,1')
+        ->name("articles.comments.store{$nameSuffix}");
 
     Route::get('/contact', [ContactController::class, 'show'])->name("contact{$nameSuffix}");
+    Route::post('/contact', [ContactController::class, 'store'])
+        ->middleware('throttle:5,1')
+        ->name("contact.store{$nameSuffix}");
 
     Route::get('/about', [PageController::class, 'about'])->name("pages.about{$nameSuffix}");
     Route::get('/our-process', [PageController::class, 'ourProcess'])->name("pages.our-process{$nameSuffix}");

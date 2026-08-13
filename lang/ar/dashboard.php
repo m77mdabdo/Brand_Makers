@@ -13,6 +13,7 @@ return [
     'title' => 'لوحة التحكم',
 
     'nav' => [
+        'enquiries' => 'الطلبات',
         'overview' => 'نظرة عامة',
         'content' => 'المحتوى',
         'settings_group' => 'الإعدادات',
@@ -95,6 +96,9 @@ return [
     ],
 
     'resources' => [
+        'leads' => 'الطلبات',
+        'contact_messages' => 'رسائل التواصل',
+        'unhandled' => 'غير مُعالجة',
         'services' => 'الخدمات',
         'countries' => 'الدول',
         'faqs' => 'الأسئلة الشائعة',
@@ -109,6 +113,12 @@ return [
     ],
 
     'actions' => [
+        'filter' => 'تصفية',
+        'reset' => 'إعادة تعيين',
+        'view' => 'عرض',
+        'archive' => 'أرشفة',
+        'mark_handled' => 'وضع كمُعالَج',
+        'mark_unhandled' => 'وضع كغير مُعالَج',
         'create' => 'إضافة جديد',
         'edit' => 'تعديل',
         'manage_sections' => 'إدارة الأقسام',
@@ -122,6 +132,24 @@ return [
     ],
 
     'fields' => [
+        'type' => 'النوع',
+        'source_platform' => 'المصدر',
+        'interest' => 'الاهتمام',
+        'received' => 'وصل في',
+        'date_from' => 'من تاريخ',
+        'date_to' => 'إلى تاريخ',
+        'linked_campaign' => 'الحملة المرتبطة',
+        'first_touch' => 'أول تفاعل',
+        'latest_touch' => 'آخر تفاعل',
+        'utm_source' => 'utm_source',
+        'utm_medium' => 'utm_medium',
+        'utm_campaign' => 'utm_campaign',
+        'campaign_id' => 'معرّف الحملة الخارجي',
+        'gclid' => 'gclid',
+        'fbclid' => 'fbclid',
+        'ttclid' => 'ttclid',
+        'landing_page_url' => 'صفحة الوصول',
+        'referrer_url' => 'المُحيل',
         'slug' => 'المعرّف (slug)',
         'slug_help' => 'اتركه فارغاً ليُولَّد تلقائياً من الاسم.',
         'icon' => 'الأيقونة',
@@ -254,6 +282,29 @@ return [
     'pages' => [
         'intro' => 'الصفحات الثابتة للموقع. يمكن تعديل محتواها لكن لا يمكن إضافة صفحات جديدة أو حذفها — فهي مرتبطة بمسارات وروابط ثابتة.',
         'sections_intro' => 'أقسام إضافية تظهر أسفل نص الصفحة.',
+    ],
+
+    'lead_types' => [
+        'consultation' => 'استشارة',
+        'contact' => 'رسالة تواصل',
+        'booking' => 'حجز',
+        'estimate' => 'تقدير تكلفة',
+        'package_enquiry' => 'طلب باقة',
+    ],
+
+    'leads' => [
+        'intro' => 'كل الطلبات الواردة من نماذج الموقع.',
+        'empty' => 'لا توجد طلبات.',
+        'enquiry' => 'تفاصيل الطلب',
+        'attribution' => 'مصدر الطلب',
+        'no_attribution' => 'لا توجد بيانات مصدر لهذا الطلب.',
+        'snapshots' => 'اللقطات المحفوظة',
+        'snapshots_help' => 'ما أرسله المتصفح وقت الإرسال، محفوظ كما هو.',
+        'consent' => 'الموافقة',
+        'consent_given' => 'تمت الموافقة بتاريخ :date.',
+        'consent_missing' => 'لم تُسجَّل موافقة.',
+        'confirm_archive' => 'أرشفة هذا الطلب؟ يمكن استرجاعه لاحقاً.',
+        'inbox_intro' => 'رسائل نموذج التواصل. غير المُعالَجة تظهر أولاً.',
     ],
 
     'settings' => [

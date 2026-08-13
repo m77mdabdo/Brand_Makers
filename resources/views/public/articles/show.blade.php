@@ -28,15 +28,12 @@
         </div>
     </article>
 
-    {{--
-        Approved comments, oldest first. READ-ONLY for now: the submission
-        form and its throttling are the next build step, and a form that
-        posted nowhere would look functional while silently losing what
-        people wrote.
-    --}}
-    @if ($comments->isNotEmpty())
-        <section class="section pt-0" aria-labelledby="comments-heading">
-            <div class="wrap max-w-3xl">
+    {{-- Approved comments, oldest first. --}}
+    <section id="comments" class="section scroll-mt-24 pt-0" aria-labelledby="comments-heading">
+        <div class="wrap max-w-3xl">
+            <x-public.flash />
+
+            @if ($comments->isNotEmpty())
                 <h2 id="comments-heading" class="text-2xl font-black">
                     {{ trans_choice('site.comments.heading', $comments->count(), ['count' => $comments->count()]) }}
                 </h2>
@@ -57,9 +54,29 @@
                         </li>
                     @endforeach
                 </ul>
+            @endif
+
+            <div class="mt-10">
+                <h2 class="text-xl font-extrabold">{{ __('site.comments.form_heading') }}</h2>
+                <p class="mt-1 text-sm text-muted-ink">{{ __('site.comments.moderation_note') }}</p>
+
+                <div class="mt-5">
+                    <x-public.form-shell :action="lroute('articles.comments.store', $article)">
+                        <div class="grid gap-5 sm:grid-cols-2">
+                            <x-public.form-field name="name" :label="__('site.forms.name')" :required="true" />
+                            <x-public.form-field name="email" type="email" dir="ltr" :label="__('site.forms.email')" :required="true" />
+                        </div>
+
+                        <x-public.form-field name="body" type="textarea" :rows="4" :label="__('site.forms.comment')" :required="true" />
+
+                        <button type="submit" class="btn btn-primary w-full sm:w-auto">
+                            {{ __('site.forms.submit') }}
+                        </button>
+                    </x-public.form-shell>
+                </div>
             </div>
-        </section>
-    @endif
+        </div>
+    </section>
 
     @if ($related->isNotEmpty())
         <section class="section pt-0">

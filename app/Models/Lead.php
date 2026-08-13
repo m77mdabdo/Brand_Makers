@@ -21,12 +21,15 @@ class Lead extends Model
 
     public const TYPE_ESTIMATE = 'estimate';
 
+    public const TYPE_PACKAGE_ENQUIRY = 'package_enquiry';
+
     /** @var list<string> */
     public const TYPES = [
         self::TYPE_CONSULTATION,
         self::TYPE_CONTACT,
         self::TYPE_BOOKING,
         self::TYPE_ESTIMATE,
+        self::TYPE_PACKAGE_ENQUIRY,
     ];
 
     /**
@@ -45,6 +48,7 @@ class Lead extends Model
         'nationality',
         'country_of_residence',
         'requested_service_id',
+        'package_id',
         'requested_activity',
         'owns_external_company',
         'message',
@@ -120,6 +124,16 @@ class Lead extends Model
     public function requestedService(): BelongsTo
     {
         return $this->belongsTo(Service::class, 'requested_service_id')->withTrashed();
+    }
+
+    /**
+     * withTrashed(): Package soft-deletes, and an enquiry is a historical
+     * record — retiring a package must not erase which one a client asked
+     * about.
+     */
+    public function package(): BelongsTo
+    {
+        return $this->belongsTo(Package::class)->withTrashed();
     }
 
     /**

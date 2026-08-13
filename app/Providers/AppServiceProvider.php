@@ -10,6 +10,7 @@ use App\Models\Page;
 use App\Models\Service;
 use App\Services\Analytics\IpAnonymizer;
 use App\Services\Cms\SettingsRepository;
+use App\Services\Crm\ContactMessageService;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Middleware\TrustProxies;
@@ -70,6 +71,7 @@ class AppServiceProvider extends ServiceProvider
         Translatable::fallback(fallbackLocale: config('app.fallback_locale'));
 
         $this->composePublicLayout();
+        $this->composeDashboardSidebar();
     }
 
     /**
@@ -122,6 +124,21 @@ class AppServiceProvider extends ServiceProvider
                 'socialLinks' => $settings->socialLinks(),
                 'menu' => $this->publicMenu(),
             ]);
+        });
+    }
+
+    /**
+     * The unread badge on the Contact Messages sidebar item.
+     *
+     * Composed onto the sidebar rather than passed from each controller,
+     * because every dashboard section renders it and none of them
+     * otherwise care about leads. One indexed COUNT per dashboard page
+     * render, covered by leads_type_is_handled_index.
+     */
+    private function composeDashboardSidebar(): void
+    {
+        View::composer('components.dashboard.sidebar', function ($view) {
+            $view->with('unhandledContactMessages', app(ContactMessageService::class)->unhandledCount());
         });
     }
 

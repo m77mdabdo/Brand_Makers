@@ -11,6 +11,11 @@
         __('dashboard.nav.overview') => [
             ['route' => 'dashboard', 'label' => __('dashboard.nav.dashboard'), 'icon' => 'home'],
         ],
+        __('dashboard.nav.enquiries') => [
+            ['route' => 'dashboard.leads.index', 'label' => __('dashboard.resources.leads'), 'icon' => 'inbox'],
+            ['route' => 'dashboard.contact-messages.index', 'label' => __('dashboard.resources.contact_messages'), 'icon' => 'mail', 'badge' => 'unhandledContactMessages'],
+            ['route' => 'dashboard.comments.index', 'label' => __('dashboard.resources.comments'), 'icon' => 'chat'],
+        ],
         __('dashboard.nav.content') => [
             ['route' => 'dashboard.services.index', 'label' => __('dashboard.resources.services'), 'icon' => 'sparkles'],
             ['route' => 'dashboard.packages.index', 'label' => __('dashboard.resources.packages'), 'icon' => 'cube'],
@@ -18,7 +23,6 @@
             ['route' => 'dashboard.faqs.index', 'label' => __('dashboard.resources.faqs'), 'icon' => 'question'],
             ['route' => 'dashboard.testimonials.index', 'label' => __('dashboard.resources.testimonials'), 'icon' => 'quote'],
             ['route' => 'dashboard.articles.index', 'label' => __('dashboard.resources.articles'), 'icon' => 'document'],
-            ['route' => 'dashboard.comments.index', 'label' => __('dashboard.resources.comments'), 'icon' => 'chat'],
             ['route' => 'dashboard.pages.index', 'label' => __('dashboard.resources.pages'), 'icon' => 'page'],
             ['route' => 'dashboard.media.index', 'label' => __('dashboard.resources.media'), 'icon' => 'image'],
         ],
@@ -44,6 +48,8 @@
         'quote' => '<path d="M7 15a3 3 0 1 1 0-6c0-2 1.5-3.5 3.5-4"/><path d="M17 15a3 3 0 1 1 0-6c0-2 1.5-3.5 3.5-4"/>',
         'document' => '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/>',
         'chat' => '<path d="M21 12a8 8 0 0 1-8 8H8l-5 3 1.5-4.5A8 8 0 1 1 21 12z"/>',
+        'inbox' => '<path d="M3 12h5l2 3h4l2-3h5"/><path d="M5 5h14l2 7v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5z"/>',
+        'mail' => '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
         'page' => '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>',
         'image' => '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="m21 16-5-5-9 9"/>',
         'menu' => '<path d="M4 6h16M4 12h16M4 18h16"/>',
@@ -151,7 +157,18 @@
                                 <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                     {!! $icons[$item['icon']] !!}
                                 </svg>
-                                {{ $item['label'] }}
+                                <span class="flex-1">{{ $item['label'] }}</span>
+
+                                @if (($item['badge'] ?? null) === 'unhandledContactMessages' && ($unhandledContactMessages ?? 0) > 0)
+                                    {{-- The unread count. Rendered only when
+                                         there IS something unread, so the
+                                         sidebar is not permanently decorated
+                                         with a zero. --}}
+                                    <span class="inline-flex min-w-[1.5rem] items-center justify-center rounded-full bg-orange-ink px-1.5 py-0.5 text-xs font-black text-white" dir="ltr">
+                                        {{ $unhandledContactMessages }}
+                                        <span class="sr-only">{{ __('dashboard.resources.unhandled') }}</span>
+                                    </span>
+                                @endif
                             </a>
                         </li>
                     @endforeach

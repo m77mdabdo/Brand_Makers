@@ -5,7 +5,7 @@
         :lead="__('site.packages.lead')"
     />
 
-    <section class="section">
+    <section class="section" x-data="{ selected: '' }">
         <div class="wrap">
             @if ($packages->isEmpty())
                 <p class="text-center text-muted-ink">{{ __('site.packages.empty') }}</p>
@@ -73,10 +73,24 @@
                                 @endforeach
                             </ul>
 
-                            {{-- Points at the contact page for now; the
-                                 lead capture behind it is the forms step. --}}
+                            {{--
+                                A LINK to the form below, not a second
+                                form per card. Ten cards each wrapping
+                                their own form would be ten copies of the
+                                CSRF token, the honeypot and the
+                                attribution fields — and only one of them
+                                can be filled in at a time anyway.
+
+                                The fragment carries the package id, and
+                                the Alpine handler on the form selects it.
+                                With JavaScript off the visitor still
+                                lands on the form and picks from the
+                                select, which is why that select exists
+                                rather than a hidden input.
+                            --}}
                             <a
-                                href="{{ lroute('contact') }}"
+                                href="#package-enquiry"
+                                @click="selected = '{{ $package->id }}'"
                                 @class([
                                     'btn mt-6 w-full',
                                     'btn-white btn-on-dark' => $package->is_popular,
@@ -143,6 +157,57 @@
                         </div>
                     </div>
                 @endif
+            @endif
+
+            @if ($packages->isNotEmpty())
+                <div id="package-enquiry" class="mx-auto mt-16 max-w-2xl scroll-mt-24">
+                    <h2 class="text-2xl font-black">{{ __('site.packages.enquiry_heading', ['package' => '']) }}</h2>
+                    <p class="mt-1 text-sm text-muted-ink">{{ __('site.packages.enquiry_lead') }}</p>
+
+                    <div class="mt-6">
+                        <x-public.flash />
+
+                        <x-public.form-shell :action="lroute('packages.enquire')">
+                            <div>
+                                <label for="package_id" class="block text-sm font-bold text-ink">
+                                    {{ __('site.packages.label') }}
+                                    <span class="text-orange-ink" aria-hidden="true">*</span>
+                                </label>
+                                {{-- x-model binds to the same Alpine state
+                                     the cards' buttons write, so clicking
+                                     a card preselects it here. Falls back
+                                     to a plain select with no JS. --}}
+                                <select
+                                    id="package_id"
+                                    name="package_id"
+                                    x-model="selected"
+                                    required
+                                    class="mt-1 block min-h-[44px] w-full rounded-xl border-line bg-white text-sm text-ink shadow-sm focus:border-petrol focus:ring-petrol"
+                                >
+                                    <option value="">{{ __('site.packages.choose') }}</option>
+                                    @foreach ($packages as $package)
+                                        <option value="{{ $package->id }}" @selected(old('package_id') == $package->id)>{{ $package->name }}</option>
+                                    @endforeach
+                                </select>
+                                <x-input-error :messages="$errors->get('package_id')" class="mt-1" />
+                            </div>
+
+                            <div class="grid gap-5 sm:grid-cols-2">
+                                <x-public.form-field name="full_name" :label="__('site.forms.name')" :required="true" />
+                                <x-public.form-field name="email" type="email" dir="ltr" :label="__('site.forms.email')" :required="true" />
+                            </div>
+
+                            <x-public.form-field name="phone" type="tel" dir="ltr" :label="__('site.forms.phone')" />
+                            <x-public.form-field name="message" type="textarea" :rows="3" :label="__('site.forms.message')" />
+
+                            <x-public.consent-field />
+
+                            <button type="submit" class="btn btn-primary w-full sm:w-auto">
+                                {{ __('site.forms.submit') }}
+                            </button>
+                        </x-public.form-shell>
+                    </div>
+                </div>
             @endif
         </div>
     </section>

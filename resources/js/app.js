@@ -1,6 +1,7 @@
 import Alpine from 'alpinejs';
 import focus from '@alpinejs/focus';
 
+import { initAttribution } from './attribution';
 import { initHero } from './hero';
 
 Alpine.plugin(focus);
@@ -12,3 +13,4 @@ Alpine.start();
 // in the DOM — no DOMContentLoaded wrapper needed, and starting immediately
 // means the canvas is live before the first paint settles.
 initHero();
+initAttribution();
