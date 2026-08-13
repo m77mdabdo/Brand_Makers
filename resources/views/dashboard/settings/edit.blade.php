@@ -102,6 +102,34 @@
                                     </div>
                                 </fieldset>
 
+                            @elseif ($type === SettingsService::TYPE_BOOLEAN)
+                                {{-- The hidden "0" is what makes an
+                                     UNCHECKED box submit at all. Without
+                                     it the key is simply absent, and
+                                     while SettingsService already reads a
+                                     missing boolean as false, relying on
+                                     that would mean the form and the
+                                     service disagreed about what was
+                                     sent. --}}
+                                <label for="{{ $key }}" class="flex items-start gap-3">
+                                    <input type="hidden" name="{{ $name }}" value="0">
+                                    <input
+                                        id="{{ $key }}"
+                                        name="{{ $name }}"
+                                        type="checkbox"
+                                        value="1"
+                                        @checked((bool) old("settings.{$key}", $settings->boolean($key)))
+                                        class="mt-0.5 h-5 w-5 rounded border-line text-petrol focus:ring-petrol"
+                                    >
+                                    <span class="text-sm font-bold text-ink">{{ $label }}</span>
+                                </label>
+
+                                @if (Lang::has('dashboard.settings.field_help.'.$key))
+                                    <p class="ms-8 mt-1 text-xs text-muted-ink">{{ __('dashboard.settings.field_help.'.$key) }}</p>
+                                @endif
+
+                                <x-input-error :messages="$errors->get(\"settings.{$key}\")" class="mt-2" />
+
                             @else
                                 <x-input-label :for="$key" :value="$label" />
 
@@ -123,9 +151,27 @@
                                     @if (in_array($type, [SettingsService::TYPE_EMAIL, SettingsService::TYPE_PHONE, SettingsService::TYPE_URL], true))
                                         dir="ltr"
                                     @endif
-                                    value="{{ old("settings.{$key}", $settings->string($key)) }}"
+                                    @if ($type === SettingsService::TYPE_INTEGER)
+                                        {{-- Mirrors the rule in
+                                             UpdateSettingsRequest, so the
+                                             browser refuses the same
+                                             values the server would. --}}
+                                        min="1" max="3650" step="1" dir="ltr"
+                                    @endif
+                                    {{-- string() returns null for an int,
+                                         because it folds every non-string
+                                         to the default — so an integer
+                                         setting read through it would
+                                         render as an empty box and save
+                                         as null on the next submit. --}}
+                                    value="{{ old("settings.{$key}", $type === SettingsService::TYPE_INTEGER ? ($settings->integer($key) ?: '') : $settings->string($key)) }}"
                                     class="mt-1 block w-full min-h-[44px] rounded-lg border-line bg-white text-sm text-ink shadow-sm focus:border-petrol focus:ring-petrol"
                                 >
+
+                                @if (Lang::has('dashboard.settings.field_help.'.$key))
+                                    <p class="mt-1 text-xs text-muted-ink">{{ __('dashboard.settings.field_help.'.$key) }}</p>
+                                @endif
+
                                 <x-input-error :messages="$errors->get(\"settings.{$key}\")" class="mt-2" />
                             @endif
                         </div>

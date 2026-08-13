@@ -46,6 +46,7 @@ class SettingsManagerTest extends TestCase
                 SettingsService::TYPE_PHONE => '+966500000000',
                 SettingsService::TYPE_URL => 'https://example.test/page',
                 SettingsService::TYPE_INTEGER => 30,
+                SettingsService::TYPE_BOOLEAN => '1',
                 default => 'value',
             };
         }

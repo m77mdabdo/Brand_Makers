@@ -119,6 +119,23 @@ class SettingsService
             'home_stat_turnaround' => self::TYPE_TRANSLATED,
             'home_stat_satisfaction' => self::TYPE_TRANSLATED,
         ],
+        /*
+         * Visitor journey recording.
+         *
+         * Both rows are seeded, but they were not editable until now —
+         * which meant the retention window named in the privacy policy
+         * could only be changed by a developer. A retention promise the
+         * business cannot adjust is one it will eventually break.
+         *
+         * The switch governs SESSION RECORDING ONLY. It is deliberately
+         * not consulted by VisitorTrackingGate::marketingAllowed(), so
+         * turning journey recording off does not silently disable the
+         * advertising pixels as well — see that method for why.
+         */
+        'visitor_sessions' => [
+            'visitor_sessions_enabled' => self::TYPE_BOOLEAN,
+            'visitor_sessions_retention_days' => self::TYPE_INTEGER,
+        ],
     ];
 
     public function __construct(private readonly SettingsRepository $settings) {}
