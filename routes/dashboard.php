@@ -16,6 +16,7 @@ use App\Http\Controllers\Dashboard\ServiceController;
 use App\Http\Controllers\Dashboard\SettingsController;
 use App\Http\Controllers\Dashboard\TestimonialController;
 use App\Http\Controllers\Dashboard\TrackingSettingController;
+use App\Http\Controllers\Dashboard\VisitorSessionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -117,6 +118,19 @@ Route::prefix('dashboard')
              */
             Route::get('contact-messages', [ContactMessageController::class, 'index'])->name('contact-messages.index');
             Route::patch('contact-messages/{lead}/handled', [ContactMessageController::class, 'toggleHandled'])->name('contact-messages.handled');
+
+            /*
+             * Visitor journeys.
+             *
+             * The two export routes are declared BEFORE the {visitorSession}
+             * one, or "visitor-sessions/export" would be swallowed by
+             * "visitor-sessions/{visitorSession}" and Laravel would try to
+             * bind a model with the id "export".
+             */
+            Route::get('visitor-sessions/export', [VisitorSessionController::class, 'export'])->name('visitor-sessions.export');
+            Route::get('visitor-sessions', [VisitorSessionController::class, 'index'])->name('visitor-sessions.index');
+            Route::get('visitor-sessions/{visitorSession}/export', [VisitorSessionController::class, 'exportOne'])->name('visitor-sessions.export-one');
+            Route::get('visitor-sessions/{visitorSession}', [VisitorSessionController::class, 'show'])->name('visitor-sessions.show');
 
             // --- moderation ---------------------------------------------
             Route::get('comments', [CommentController::class, 'index'])->name('comments.index');
