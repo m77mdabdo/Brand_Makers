@@ -123,6 +123,10 @@ class AppServiceProvider extends ServiceProvider
                 'contactAddress' => $settings->translated('contact_address'),
                 'socialLinks' => $settings->socialLinks(),
                 'menu' => $this->publicMenu(),
+                // Whether to render the consent banner at all. Read from
+                // the same singleton as everything else here, so it costs
+                // nothing beyond the array lookup.
+                'visitorTrackingEnabled' => $settings->boolean('visitor_sessions_enabled', true),
             ]);
         });
     }

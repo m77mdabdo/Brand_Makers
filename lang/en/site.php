@@ -45,6 +45,17 @@ return [
         'background_label' => 'Decorative background: a city skyline at dusk',
     ],
 
+    // The cookie banner. Both buttons are real answers: declining stores
+    // "denied" so the visitor is not asked again, and ignoring the banner
+    // is treated exactly like declining server-side.
+    'consent' => [
+        'aria_label' => 'Cookie consent',
+        'message' => 'We record how visitors move through this site, and use advertising tools, only if you agree. Nothing is recorded before you do, and we never store your full IP address.',
+        'policy_link' => 'Read our privacy policy',
+        'accept' => 'Accept',
+        'decline' => 'Decline',
+    ],
+
     'marquee' => [
         'label' => 'What we do',
     ],

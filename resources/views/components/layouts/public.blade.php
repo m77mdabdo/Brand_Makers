@@ -57,9 +57,17 @@
         <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
         <link href="https://fonts.bunny.net/css?family=tajawal:400,500,700,800,900&display=swap" rel="stylesheet">
 
+        {{-- The beacon needs both of these: an endpoint to post to, and a
+             CSRF token it can put in a FORM FIELD — sendBeacon cannot set
+             headers, so the token cannot travel as one. --}}
         <meta name="csrf-token" content="{{ csrf_token() }}">
+        <meta name="visitor-beacon-url" content="{{ route('visitor.beacon') }}">
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+        {{-- Last in <head>, after the bundle, so the Consent Mode default
+             block is still the first thing any Google tag sees. --}}
+        <x-tracking-scripts />
     </head>
 
     <body class="font-sans">
@@ -91,5 +99,10 @@
         />
 
         <x-public.back-to-top />
+
+        {{-- $visitorTrackingEnabled comes from the layout's view composer.
+             When journey recording is off the banner is not rendered at
+             all — see the component for why. --}}
+        <x-public.cookie-consent :enabled="$visitorTrackingEnabled" />
     </body>
 </html>
