@@ -12,6 +12,7 @@ use App\Http\Controllers\Public\PackageEnquiryController;
 use App\Http\Controllers\Public\PageController;
 use App\Http\Controllers\Public\ServiceController;
 use App\Http\Controllers\Public\SitemapController;
+use App\Http\Controllers\Public\VisitorBeaconController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -85,10 +86,38 @@ $registerPublicRoutes = function (string $nameSuffix = ''): void {
 };
 
 // Arabic — canonical names, no prefix.
-Route::middleware('setlocale')->group(fn () => $registerPublicRoutes());
+//
+// 'trackvisitor' records the visitor journey. It is on the PUBLIC groups
+// only: an admin browsing the site from the dashboard is not a visitor,
+// and the middleware itself writes nothing until the gate agrees —
+// consent, DNT/GPC, the bot filter and the admin switch. See
+// VisitorTrackingGate.
+Route::middleware(['setlocale', 'trackvisitor'])->group(fn () => $registerPublicRoutes());
 
 // English — "{name}.en" names, "en" prefix.
-Route::prefix('en')->middleware('setlocale')->group(fn () => $registerPublicRoutes('.en'));
+Route::prefix('en')->middleware(['setlocale', 'trackvisitor'])->group(fn () => $registerPublicRoutes('.en'));
+
+/*
+ * The time-on-page beacon.
+ *
+ * Registered ONCE, outside the dual-locale closure: it is an endpoint,
+ * not a page, so it has no Arabic and English variants to keep in step.
+ *
+ * Deliberately NOT in the 'trackvisitor' group. It is a POST, so the
+ * middleware would skip it anyway — keeping it out makes that independent
+ * of the middleware's internals rather than a consequence of them.
+ *
+ * Throttled hard. A beacon fires a handful of times per page at most, so
+ * 60/minute is far above real use and well below what would let anyone
+ * inflate a session's duration by hammering it.
+ *
+ * It keeps CSRF: sendBeacon cannot set headers, so the client sends the
+ * token as a `_token` form field, which is exactly what Laravel's CSRF
+ * middleware already reads.
+ */
+Route::post('_visitor/beacon', VisitorBeaconController::class)
+    ->middleware('throttle:60,1')
+    ->name('visitor.beacon');
 
 // Single document listing BOTH locales, so it is registered once rather
 // than through the dual-locale closure above.

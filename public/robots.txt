@@ -14,5 +14,9 @@ Disallow: /confirm-password
 Disallow: /verify-email
 Disallow: /profile
 
+# The time-on-page beacon. A POST-only endpoint with nothing to index —
+# listing it stops a crawler wasting a request discovering that.
+Disallow: /_visitor
+
 # Generated from the routes that actually exist — see SitemapController.
 Sitemap: /sitemap.xml
