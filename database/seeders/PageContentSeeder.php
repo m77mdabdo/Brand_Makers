@@ -102,6 +102,10 @@ class PageContentSeeder extends Seeder
                     .'<p>تُحذف سجلات الجلسات تلقائياً بعد انقضاء مدة الاحتفاظ المحددة (٩٠ يوماً افتراضياً). تُحفظ بيانات طلبات الاستشارة والمشاريع طوال مدة التعامل وبعدها بالمدة التي تقتضيها المتطلبات النظامية والمحاسبية.</p>'
                     .'<h2>المشاركة مع الغير</h2>'
                     .'<p>لا نبيع بياناتك ولا نؤجّرها. نستخدم أدوات تحليلات وإعلانات من أطراف ثالثة، ولا تعمل هذه الأدوات إلا بعد موافقتك عبر إشعار ملفات تعريف الارتباط.</p>'
+                    .'<h2>إشارات الخصوصية في المتصفح</h2>'
+                    .'<p>إذا كان متصفحك يرسل إشارة "عدم التتبع" (DNT) أو إشارة التحكم العام بالخصوصية (GPC)، فلا نسجّل جلستك ولا نُشغّل أي أداة تتبع إعلانية، حتى لو سبق أن وافقت على إشعار ملفات تعريف الارتباط. تُفحص هذه الإشارة قبل الموافقة، ولا تستطيع الموافقة إلغاءها.</p>'
+                    .'<p>ولا نخزّن كذلك أي شيء يأتي بعد علامة الاستفهام في الروابط التي تزورها؛ نحفظ المسار وحده. أما معطيات الحملات الإعلانية (utm) فتُحفظ في حقول مستقلة محددة سلفاً، لا كنص خام للرابط.</p>'
+                    .'<p>لا تُحمَّل بكسلات «ميتا» و«تيك توك» إطلاقاً قبل موافقتك، فلا يصل أي طلب إلى خوادمها. وتعمل أدوات «جوجل» بوضع الموافقة (Consent Mode) وكل إشاراته على «مرفوض» حتى توافق، فلا تحفظ ملفات تعريف ارتباط ولا ترسل معرّفات.</p>'
                     .'<h2>حقوقك</h2>'
                     .'<p>يمكنك طلب نسخة من بياناتك لدينا أو طلب حذفها، عبر وسائل التواصل المذكورة في صفحة اتصل بنا.</p>',
                 'en' => '<h2>What we collect</h2>'
@@ -114,6 +118,10 @@ class PageContentSeeder extends Seeder
                     .'<p>Session records are deleted automatically once the configured retention window has passed (90 days by default). Consultation and project records are kept for the duration of our engagement and afterwards for as long as legal and accounting requirements demand.</p>'
                     .'<h2>Sharing</h2>'
                     .'<p>We do not sell or rent your data. We use third-party analytics and advertising tools, and none of them run before you have agreed via the cookie notice.</p>'
+                    .'<h2>Browser privacy signals</h2>'
+                    .'<p>If your browser sends a Do Not Track (DNT) or Global Privacy Control (GPC) signal, we do not record your session and we do not run any advertising tracker — even if you previously accepted the cookie notice. The signal is checked before consent, and consent cannot override it.</p>'
+                    .'<p>We also do not store anything after the "?" in the URLs you visit; only the path is kept. Campaign parameters (utm) are stored in named fields of their own, never as raw URL text.</p>'
+                    .'<p>The Meta and TikTok pixels are not loaded at all before you agree — no request reaches their servers. Google\'s tags run in Consent Mode with every signal set to "denied" until you agree, so they store no cookies and send no identifiers.</p>'
                     .'<h2>Your rights</h2>'
                     .'<p>You can request a copy of the data we hold about you, or ask us to delete it, using the contact details on our contact page.</p>',
             ],
