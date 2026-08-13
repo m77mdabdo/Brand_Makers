@@ -6,11 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Public\StoreCommentRequest;
 use App\Models\Article;
 use App\Models\Comment;
+use App\Services\Analytics\VisitorSessionService;
 use App\Support\Honeypot;
 use Illuminate\Http\RedirectResponse;
 
 class CommentController extends Controller
 {
+    public function __construct(private readonly VisitorSessionService $visitorSessions) {}
+
     public function store(StoreCommentRequest $request, Article $article): RedirectResponse
     {
         /*
@@ -46,6 +49,15 @@ class CommentController extends Controller
             // stored; the raw address never reaches the database.
             'ip_address' => $request->ip(),
         ]);
+
+        /*
+         * An action on the timeline, with NO lead argument.
+         *
+         * A comment is engagement, not a conversion — see submitted()
+         * below. Passing a lead here would be how a comment silently
+         * started counting as one in every journey report.
+         */
+        $this->visitorSessions->recordConversion($request, 'comment_submitted');
 
         return $this->submitted($article);
     }

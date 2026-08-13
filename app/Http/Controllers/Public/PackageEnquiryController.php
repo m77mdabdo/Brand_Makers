@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Public\StorePackageEnquiryRequest;
 use App\Models\Lead;
 use App\Models\Package;
+use App\Services\Analytics\VisitorSessionService;
 use App\Services\Marketing\AttributionService;
 use App\Support\Honeypot;
 use Illuminate\Http\RedirectResponse;
@@ -20,7 +21,10 @@ use Illuminate\Http\RedirectResponse;
  */
 class PackageEnquiryController extends Controller
 {
-    public function __construct(private readonly AttributionService $attribution) {}
+    public function __construct(
+        private readonly AttributionService $attribution,
+        private readonly VisitorSessionService $visitorSessions,
+    ) {}
 
     public function store(StorePackageEnquiryRequest $request): RedirectResponse
     {
@@ -30,7 +34,7 @@ class PackageEnquiryController extends Controller
 
         $package = Package::findOrFail($request->validated('package_id'));
 
-        Lead::create([
+        $lead = Lead::create([
             ...$request->safe()->only(['full_name', 'email', 'phone', 'message']),
             ...$this->attribution->resolve($request),
             'package_id' => $package->getKey(),
@@ -40,6 +44,9 @@ class PackageEnquiryController extends Controller
             'consent_given' => true,
             'consented_at' => now(),
         ]);
+
+        // Consent-gated inside the service — see ContactController.
+        $this->visitorSessions->recordConversion($request, 'package_enquiry_submitted', $lead);
 
         return $this->submitted();
     }

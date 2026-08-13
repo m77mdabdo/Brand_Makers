@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Public\StoreContactRequest;
 use App\Models\Lead;
+use App\Services\Analytics\VisitorSessionService;
 use App\Services\Cms\SettingsRepository;
 use App\Services\Marketing\AttributionService;
 use App\Support\Honeypot;
@@ -16,6 +17,7 @@ class ContactController extends Controller
     public function __construct(
         private readonly SettingsRepository $settings,
         private readonly AttributionService $attribution,
+        private readonly VisitorSessionService $visitorSessions,
     ) {}
 
     public function show(): View
@@ -46,7 +48,7 @@ class ContactController extends Controller
             return $this->submitted();
         }
 
-        Lead::create([
+        $lead = Lead::create([
             ...$request->safe()->only(['full_name', 'email', 'phone', 'message']),
             ...$this->attribution->resolve($request),
             'type' => Lead::TYPE_CONTACT,
@@ -55,6 +57,19 @@ class ContactController extends Controller
             'consent_given' => true,
             'consented_at' => now(),
         ]);
+
+        /*
+         * Close the journey: record the submission as an action on the
+         * timeline and attach the session to the lead it produced.
+         *
+         * Silent when the visitor never consented, when there is no
+         * session cookie, or when journey recording is switched off — the
+         * gate is checked inside the service, not here, so a form added
+         * later cannot record a conversion without it. The enquiry is the
+         * point; the journey is a nice-to-have that must never be able to
+         * break it.
+         */
+        $this->visitorSessions->recordConversion($request, 'contact_submitted', $lead);
 
         return $this->submitted();
     }
