@@ -162,10 +162,21 @@
                         {{-- ---------------------------------------------
                              3. Time
                         --------------------------------------------- --}}
-                        <fieldset x-show="selectedDate" x-cloak class="rounded-2xl border border-line bg-white p-6">
+                        {{-- Always rendered, never x-show'd away.
+
+                             Hiding the whole step until a date is chosen
+                             left the visible numbering reading 1, 2, 4 —
+                             which looks like a missing step rather than a
+                             sequence. It stays in place and says what to
+                             do instead. --}}
+                        <fieldset class="rounded-2xl border border-line bg-white p-6">
                             <legend class="px-2 text-lg font-black text-ink">{{ __('site.booking.step_time') }}</legend>
 
-                            <div class="mt-4 flex flex-wrap gap-2" role="radiogroup" aria-label="{{ __('site.booking.step_time') }}">
+                            <p x-show="! selectedDate" class="mt-1 text-sm text-muted-ink">
+                                {{ __('site.booking.pick_a_day_first') }}
+                            </p>
+
+                            <div x-show="selectedDate" x-cloak class="mt-4 flex flex-wrap gap-2" role="radiogroup" aria-label="{{ __('site.booking.step_time') }}">
                                 <template x-for="slot in slots" :key="slot.time">
                                     <button
                                         type="button"

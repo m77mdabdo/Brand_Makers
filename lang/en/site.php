@@ -265,6 +265,7 @@ return [
         'topic_unsure' => 'Not sure yet',
         'step_date' => '2 · Pick a day',
         'step_time' => '3 · Pick a time',
+        'pick_a_day_first' => 'Pick a day above and the free times will appear here.',
         'step_details' => '4 · Your details',
         'selected' => 'Your appointment',
         'full_name' => 'Full name',
