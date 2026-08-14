@@ -5,6 +5,7 @@ use App\Http\Controllers\Dashboard\CommentController;
 use App\Http\Controllers\Dashboard\ContactMessageController;
 use App\Http\Controllers\Dashboard\CountryController;
 use App\Http\Controllers\Dashboard\DashboardHomeController;
+use App\Http\Controllers\Dashboard\EstimatorItemController;
 use App\Http\Controllers\Dashboard\FaqController;
 use App\Http\Controllers\Dashboard\LeadController;
 use App\Http\Controllers\Dashboard\LocaleController;
@@ -84,6 +85,17 @@ Route::prefix('dashboard')
             $idBound('services', ServiceController::class, 'service');
             $idBound('countries', CountryController::class, 'country');
             $idBound('articles', ArticleController::class, 'article');
+
+            /*
+             * The estimator's price list.
+             *
+             * Route::resource, not $idBound: EstimatorItem has no slug, so
+             * its default binding is already the id. `except('show')` —
+             * there is nothing to show that the edit form does not.
+             */
+            Route::resource('estimator-items', EstimatorItemController::class)
+                ->except('show')
+                ->parameters(['estimator-items' => 'estimatorItem']);
 
             // Faqs and Testimonials have no slug, so their default binding
             // is already the id.
