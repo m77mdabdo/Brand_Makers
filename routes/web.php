@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Public\ArticleController;
+use App\Http\Controllers\Public\BookingController;
 use App\Http\Controllers\Public\CommentController;
 use App\Http\Controllers\Public\ContactController;
 use App\Http\Controllers\Public\CountryController;
@@ -77,6 +78,19 @@ $registerPublicRoutes = function (string $nameSuffix = ''): void {
     Route::post('/cost-estimator', [EstimatorController::class, 'store'])
         ->middleware('throttle:5,1')
         ->name("estimator.store{$nameSuffix}");
+
+    /*
+     * Appointment booking.
+     *
+     * URL "/book", route NAME "booking" — the name MenuItem::ROUTES
+     * whitelists and the seeded menu item already points at, so
+     * registering it is what lights up the dormant "احجز استشارة / Book a
+     * Consultation" entry in the navbar.
+     */
+    Route::get('/book', [BookingController::class, 'show'])->name("booking{$nameSuffix}");
+    Route::post('/book', [BookingController::class, 'store'])
+        ->middleware('throttle:5,1')
+        ->name("booking.store{$nameSuffix}");
 
     Route::get('/countries', [CountryController::class, 'index'])->name("countries.index{$nameSuffix}");
 

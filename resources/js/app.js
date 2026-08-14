@@ -2,6 +2,9 @@ import Alpine from 'alpinejs';
 import focus from '@alpinejs/focus';
 
 import { initAttribution } from './attribution';
+// Registers the `bookingPicker` Alpine component and exposes
+// bookingConfig() for the booking page's x-data to call.
+import './booking';
 // Registers the `costEstimator` Alpine component on import, and exposes
 // estimatorConfig() on window for the estimator page's x-data to call.
 import './estimator';
