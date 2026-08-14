@@ -69,13 +69,27 @@ class MigrationCycleTest extends TestCase
     }
 
     /**
-     * Indexes are declared inside CREATE TABLE throughout this schema
-     * rather than added by later ALTERs — which is what makes every down()
-     * a plain drop and removes the whole errno-1061 class of failure. This
-     * pins that convention down so a future migration cannot quietly
-     * reintroduce it without someone deciding to.
+     * Indexes belong inside CREATE TABLE, and when they cannot be, the
+     * down() must drop them BY NAME.
+     *
+     * The original rule here was a blanket ban on adding an index through
+     * Schema::table(), which is the right default: declaring them in
+     * create() is what makes every down() a plain drop and removes the
+     * whole errno-1061 (duplicate key name) class of failure.
+     *
+     * It is not achievable in one case, though — a column added to a table
+     * that already exists cannot have its index declared in a create()
+     * that already ran. Banning it outright would mean either shipping such
+     * a column with no database-level guarantee, or rewriting an earlier
+     * migration, which is worse.
+     *
+     * So this now pins the invariant the ban was protecting rather than the
+     * ban itself: an ALTER may add an index, but only if the same file
+     * removes it explicitly. A down() that leaves the index behind is what
+     * makes the NEXT migrate fail with 1061, and that is the thing worth
+     * making impossible.
      */
-    public function test_no_migration_alters_a_table_to_add_an_index(): void
+    public function test_an_index_added_by_an_alter_is_dropped_by_its_own_down(): void
     {
         $offenders = [];
 
@@ -86,15 +100,28 @@ class MigrationCycleTest extends TestCase
                 continue;
             }
 
-            if (preg_match('/Schema::table\(.*?\$table->(index|unique)\(/s', $source)) {
-                $offenders[] = $file->getFilename();
+            // Index names added by an ALTER, e.g. $table->unique('reference', 'bookings_reference_unique').
+            if (! preg_match_all('/Schema::table\(.*?\$table->(?:index|unique)\([^)]*?[\'"]([a-z0-9_]+_(?:index|unique))[\'"]\s*\)/s', $source, $matches)) {
+                // An index added with no explicit name: the framework
+                // generates one, which down() then cannot drop reliably.
+                if (preg_match('/Schema::table\(.*?\$table->(?:index|unique)\(/s', $source)) {
+                    $offenders[] = $file->getFilename().' (index added by ALTER without an explicit name)';
+                }
+
+                continue;
+            }
+
+            foreach ($matches[1] as $indexName) {
+                if (! str_contains($source, "dropUnique('{$indexName}')") && ! str_contains($source, "dropIndex('{$indexName}')")) {
+                    $offenders[] = $file->getFilename()." (adds {$indexName} but never drops it)";
+                }
             }
         }
 
         $this->assertSame(
             [],
             $offenders,
-            'Declare indexes inside Schema::create() so down() stays a plain drop: '.implode(', ', $offenders)
+            'An index added by an ALTER must be dropped by name in the same down(): '.implode(', ', $offenders)
         );
     }
 
