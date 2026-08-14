@@ -58,11 +58,28 @@ class EstimatorItem extends Model
     /**
      * The whole estimator form in one indexed read, grouped for rendering.
      *
+     * Ordered by sort_order ALONE, not by group first.
+     *
+     * groupBy() preserves the order the rows arrive in, so the groups come
+     * out in the order their first item does — which is the sequence the
+     * catalogue was written in (identity, strategy, print, digital,
+     * content). Sorting by `group` first would order them alphabetically
+     * by slug instead, putting "content" at the top of a page whose whole
+     * argument starts with visual identity.
+     *
+     * scopeOrdered() keeps its group-first sort: that one is for the
+     * admin list, where alphabetical grouping is what you want to scan.
+     *
      * @return Collection<string, Collection<int, static>>
      */
     public static function grouped(): Collection
     {
-        return static::query()->active()->ordered()->get()->groupBy('group');
+        return static::query()
+            ->active()
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get()
+            ->groupBy('group');
     }
 
     /**

@@ -49,6 +49,8 @@ class Lead extends Model
         'country_of_residence',
         'requested_service_id',
         'package_id',
+        'estimate_total',
+        'estimate_snapshot',
         'requested_activity',
         'owns_external_company',
         'message',
@@ -94,6 +96,8 @@ class Lead extends Model
         return [
             'is_handled' => 'boolean',
             'owns_external_company' => 'boolean',
+            'estimate_total' => 'decimal:2',
+            'estimate_snapshot' => 'array',
             'first_touch' => 'array',
             'latest_touch' => 'array',
             'consent_given' => 'boolean',
