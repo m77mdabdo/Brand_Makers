@@ -9,6 +9,7 @@ use App\Models\Package;
 use App\Models\Page;
 use App\Models\Service;
 use App\Services\Analytics\IpAnonymizer;
+use App\Services\Booking\BookingReportService;
 use App\Services\Cms\SettingsRepository;
 use App\Services\Crm\ContactMessageService;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -142,7 +143,12 @@ class AppServiceProvider extends ServiceProvider
     private function composeDashboardSidebar(): void
     {
         View::composer('components.dashboard.sidebar', function ($view) {
-            $view->with('unhandledContactMessages', app(ContactMessageService::class)->unhandledCount());
+            $view->with([
+                'unhandledContactMessages' => app(ContactMessageService::class)->unhandledCount(),
+                // Bookings waiting for a decision. One indexed COUNT,
+                // covered by bookings_status_scheduled_at_index.
+                'pendingBookings' => app(BookingReportService::class)->pendingCount(),
+            ]);
         });
     }
 

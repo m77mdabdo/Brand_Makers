@@ -156,7 +156,7 @@
                                              UpdateSettingsRequest, so the
                                              browser refuses the same
                                              values the server would. --}}
-                                        min="1" max="3650" step="1" dir="ltr"
+                                        min="{{ $key === 'booking_minimum_notice_hours' ? 0 : 1 }}" max="3650" step="1" dir="ltr"
                                     @endif
                                     {{-- string() returns null for an int,
                                          because it folds every non-string

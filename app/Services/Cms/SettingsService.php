@@ -120,6 +120,20 @@ class SettingsService
             'home_stat_satisfaction' => self::TYPE_TRANSLATED,
         ],
         /*
+         * How far ahead the booking calendar opens, and how much notice
+         * the studio needs before the next bookable slot.
+         *
+         * They live here rather than on the Booking Availability screen so
+         * there is ONE write path into `settings` — the definition-driven
+         * one that is already hardened against arbitrary keys. That screen
+         * shows both values read-only and says where they are edited,
+         * because they change what its configuration actually produces.
+         */
+        'booking' => [
+            'booking_window_days' => self::TYPE_INTEGER,
+            'booking_minimum_notice_hours' => self::TYPE_INTEGER,
+        ],
+        /*
          * Visitor journey recording.
          *
          * Both rows are seeded, but they were not editable until now —

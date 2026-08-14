@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Dashboard\ArticleController;
+use App\Http\Controllers\Dashboard\BookingAvailabilityController;
+use App\Http\Controllers\Dashboard\BookingController;
 use App\Http\Controllers\Dashboard\CommentController;
 use App\Http\Controllers\Dashboard\ContactMessageController;
 use App\Http\Controllers\Dashboard\CountryController;
@@ -143,6 +145,24 @@ Route::prefix('dashboard')
             Route::get('visitor-sessions', [VisitorSessionController::class, 'index'])->name('visitor-sessions.index');
             Route::get('visitor-sessions/{visitorSession}/export', [VisitorSessionController::class, 'exportOne'])->name('visitor-sessions.export-one');
             Route::get('visitor-sessions/{visitorSession}', [VisitorSessionController::class, 'show'])->name('visitor-sessions.show');
+
+            /*
+             * Appointments.
+             *
+             * "bookings/agenda" is declared BEFORE "bookings/{booking}",
+             * or the day view would be swallowed by the detail route and
+             * Laravel would try to bind a booking with the id "agenda".
+             */
+            Route::get('bookings/agenda', [BookingController::class, 'agenda'])->name('bookings.agenda');
+            Route::get('bookings', [BookingController::class, 'index'])->name('bookings.index');
+            Route::get('bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
+            Route::patch('bookings/{booking}/status', [BookingController::class, 'transition'])->name('bookings.status');
+
+            // When the studio is open, and the one-off closures.
+            Route::get('booking-availability', [BookingAvailabilityController::class, 'edit'])->name('booking-availability.edit');
+            Route::put('booking-availability', [BookingAvailabilityController::class, 'update'])->name('booking-availability.update');
+            Route::post('booking-availability/blackouts', [BookingAvailabilityController::class, 'storeBlackout'])->name('booking-availability.blackouts.store');
+            Route::delete('booking-availability/blackouts/{blackoutDate}', [BookingAvailabilityController::class, 'destroyBlackout'])->name('booking-availability.blackouts.destroy');
 
             // --- moderation ---------------------------------------------
             Route::get('comments', [CommentController::class, 'index'])->name('comments.index');

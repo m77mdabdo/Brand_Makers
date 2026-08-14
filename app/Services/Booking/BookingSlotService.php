@@ -130,7 +130,14 @@ class BookingSlotService
      */
     public function slotsOn(CarbonImmutable|string $date): array
     {
-        $date = CarbonImmutable::parse($date, $this->timezone())->startOfDay();
+        $date = $date instanceof CarbonImmutable
+            ? $date->setTimezone($this->timezone())->startOfDay()
+            : BookingDate::parse($date, $this->timezone());
+
+        // Not a real calendar date at all.
+        if ($date === null) {
+            return [];
+        }
 
         $config = BookingAvailability::query()->open()->forDate($date)->first();
 
@@ -164,7 +171,9 @@ class BookingSlotService
             return null;
         }
 
-        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) !== 1 || preg_match('/^\d{2}:\d{2}$/', $time) !== 1) {
+        // A STRICT date check, not a shape check: "2026-13-45" matches
+        // the shape and is not a date. See BookingDate.
+        if (! BookingDate::isValid($date) || preg_match('/^\d{2}:\d{2}$/', $time) !== 1) {
             return null;
         }
 

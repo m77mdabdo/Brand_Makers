@@ -53,7 +53,7 @@ class UpdateSettingsRequest extends FormRequest
                 SettingsService::TYPE_PHONE => [$field => ['nullable', 'string', 'regex:/^[0-9+\-\s()]{6,30}$/']],
                 SettingsService::TYPE_URL => [$field => ['nullable', 'string', 'url', 'max:255', 'starts_with:https://,http://']],
                 SettingsService::TYPE_BOOLEAN => [$field => ['nullable', 'boolean']],
-                SettingsService::TYPE_INTEGER => [$field => ['nullable', 'integer', 'min:1', 'max:3650']],
+                SettingsService::TYPE_INTEGER => [$field => ['nullable', 'integer', 'min:'.self::minimumFor($key), 'max:3650']],
                 SettingsService::TYPE_TEXTAREA => [$field => ['nullable', 'string', 'max:500']],
                 // The logo arrives as a file, outside the settings array.
                 SettingsService::TYPE_IMAGE => [],
@@ -76,6 +76,24 @@ class UpdateSettingsRequest extends FormRequest
         $rules['site_logo'] = ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'];
 
         return $rules;
+    }
+
+    /**
+     * The floor for an integer setting.
+     *
+     * 1 for almost everything — a retention window or a calendar window of
+     * zero days is not a configuration, it is a mistake with consequences.
+     *
+     * ZERO IS LEGITIMATE for the booking notice period, though: a studio
+     * happy to take a booking for an hour's time is expressing a real
+     * policy, and BookingSlotService::minimumNoticeHours() already clamps
+     * at 0 rather than 1. Without this exception the editor would refuse a
+     * value the rest of the system supports, which is the kind of
+     * disagreement nobody finds until they try to set it.
+     */
+    private static function minimumFor(string $key): int
+    {
+        return $key === 'booking_minimum_notice_hours' ? 0 : 1;
     }
 
     /**
