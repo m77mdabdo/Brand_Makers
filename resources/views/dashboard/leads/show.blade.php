@@ -31,6 +31,105 @@
                 @endif
             </x-dashboard.card>
 
+            @if ($lead->estimate_snapshot)
+                {{--
+                    The estimate exactly as the visitor was shown it.
+
+                    Rendered from the SNAPSHOT, never by re-reading the
+                    catalogue: prices change and labels get rewritten, and
+                    a breakdown that silently updated itself after the next
+                    price rise would misrepresent what was quoted. Every
+                    value here is read defensively — the column is JSON, so
+                    an older or hand-edited shape must degrade to a shorter
+                    table rather than a 500.
+                --}}
+                @php
+                    $estimate = $lead->estimate_snapshot;
+
+                    /*
+                     * Labels are stored as the full per-locale map so the
+                     * breakdown reads correctly for either admin. Resolved
+                     * here in the DASHBOARD locale, falling back to Arabic
+                     * (the primary), then to whatever single string an
+                     * older snapshot happens to hold.
+                     */
+                    $localised = function ($value) {
+                        if (is_string($value)) {
+                            return $value;
+                        }
+
+                        if (! is_array($value)) {
+                            return null;
+                        }
+
+                        return $value[app()->getLocale()] ?? $value[config('app.fallback_locale')] ?? reset($value) ?: null;
+                    };
+                @endphp
+
+                <x-dashboard.card :title="__('dashboard.leads.estimate')" :subtitle="__('dashboard.leads.estimate_help')">
+                    <div class="overflow-x-auto">
+                        <table class="w-full min-w-[24rem] text-sm">
+                            <tbody class="divide-y divide-line">
+                                @if (! empty($estimate['package']) && is_array($estimate['package']))
+                                    <tr>
+                                        <td class="py-2">
+                                            <span class="font-bold text-ink">{{ $localised($estimate['package']['name'] ?? null) ?? $estimate['package']['slug'] ?? '—' }}</span>
+                                            <span class="block text-xs text-muted-ink">{{ __('dashboard.leads.estimate_base_package') }}</span>
+                                        </td>
+                                        <td class="py-2 text-end tabular-nums" dir="ltr">
+                                            @if (($estimate['package']['price'] ?? null) !== null)
+                                                {{ number_format((float) $estimate['package']['price'], 2) }}
+                                            @else
+                                                <span class="text-xs font-bold text-muted-ink">{{ __('dashboard.leads.estimate_on_request') }}</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endif
+
+                                @foreach ($estimate['items'] ?? [] as $line)
+                                    @if (is_array($line))
+                                        <tr>
+                                            <td class="py-2">
+                                                <span class="text-ink">{{ $localised($line['label'] ?? null) ?? $line['key'] ?? '—' }}</span>
+                                            </td>
+                                            <td class="py-2 text-end tabular-nums" dir="ltr">
+                                                {{ number_format((float) ($line['price'] ?? 0), 2) }}
+                                            </td>
+                                        </tr>
+                                    @endif
+                                @endforeach
+                            </tbody>
+                            <tfoot class="border-t-2 border-line">
+                                <tr>
+                                    <th class="py-3 text-start font-extrabold text-ink">
+                                        {{ __('dashboard.leads.estimate_total') }}
+                                    </th>
+                                    <td class="py-3 text-end" dir="ltr">
+                                        @if ($lead->estimate_total !== null)
+                                            <span class="text-lg font-black tabular-nums text-orange-ink">
+                                                {{ number_format((float) $lead->estimate_total, 2) }}
+                                            </span>
+                                            <span class="text-xs font-bold text-muted-ink">{{ $estimate['currency'] ?? 'SAR' }}</span>
+                                        @else
+                                            {{-- null, not 0.00: every line was
+                                                 priced on request, and a zero
+                                                 would be a different claim. --}}
+                                            <span class="text-xs font-bold text-muted-ink">{{ __('dashboard.leads.estimate_no_total') }}</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    @if (! empty($estimate['is_partial']))
+                        <p class="rounded-lg bg-cream p-3 text-xs text-muted-ink">
+                            {{ __('dashboard.leads.estimate_partial') }}
+                        </p>
+                    @endif
+                </x-dashboard.card>
+            @endif
+
             <x-dashboard.card :title="__('dashboard.leads.consent')">
                 <p class="text-sm text-muted-ink">
                     @if ($lead->consent_given)

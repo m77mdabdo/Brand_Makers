@@ -5,6 +5,7 @@ use App\Http\Controllers\Public\ArticleController;
 use App\Http\Controllers\Public\CommentController;
 use App\Http\Controllers\Public\ContactController;
 use App\Http\Controllers\Public\CountryController;
+use App\Http\Controllers\Public\EstimatorController;
 use App\Http\Controllers\Public\FaqController;
 use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\PackageController;
@@ -63,6 +64,19 @@ $registerPublicRoutes = function (string $nameSuffix = ''): void {
     Route::post('/packages/enquire', [PackageEnquiryController::class, 'store'])
         ->middleware('throttle:5,1')
         ->name("packages.enquire{$nameSuffix}");
+
+    /*
+     * The cost estimator.
+     *
+     * URL "/cost-estimator", route NAME "estimator". The name is what the
+     * navigation whitelist and the seeded menu item already reference (see
+     * MenuItem::ROUTES), so registering it here is what lights up the
+     * dormant "حاسبة التكلفة / Cost Estimator" entry in the navbar.
+     */
+    Route::get('/cost-estimator', [EstimatorController::class, 'show'])->name("estimator{$nameSuffix}");
+    Route::post('/cost-estimator', [EstimatorController::class, 'store'])
+        ->middleware('throttle:5,1')
+        ->name("estimator.store{$nameSuffix}");
 
     Route::get('/countries', [CountryController::class, 'index'])->name("countries.index{$nameSuffix}");
 

@@ -2,6 +2,9 @@ import Alpine from 'alpinejs';
 import focus from '@alpinejs/focus';
 
 import { initAttribution } from './attribution';
+// Registers the `costEstimator` Alpine component on import, and exposes
+// estimatorConfig() on window for the estimator page's x-data to call.
+import './estimator';
 import { initHero } from './hero';
 // Imported for its side effect as well as its export: the module body
 // registers the `cookieConsent` Alpine component, and imports are
