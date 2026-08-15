@@ -200,18 +200,52 @@ class RouteSweepTest extends TestCase
         }
     }
 
-    public function test_a_whitelisted_but_unbuilt_route_does_not_appear_as_a_sidebar_link(): void
+    /**
+     * The sidebar is data, and an entry naming a route that does not exist
+     * must simply not render rather than throwing on route().
+     *
+     * A SENTINEL NAME, not a real-but-unbuilt one. This fixture named
+     * dashboard.packages.index, which has since been built — the third
+     * time this pattern has expired in this suite (the other two named
+     * packages.index and orders.track). The behaviour under test does not
+     * depend on the name being one the sidebar happens to list, so it now
+     * uses a name nothing will ever register.
+     */
+    public function test_a_sidebar_entry_for_an_unregistered_route_renders_nothing(): void
     {
-        // dashboard.packages.index is listed in the sidebar's section
-        // definition but is not registered yet — it must simply not
-        // render, rather than throwing on route().
-        $this->assertFalse(Route::has('dashboard.packages.index'));
+        $unregistered = 'dashboard.never.to.be.registered';
+
+        $this->assertFalse(Route::has($unregistered));
 
         $admin = User::factory()->admin()->create();
 
         $this->actingAs($admin)->get(route('dashboard'))
             ->assertOk()
-            ->assertDontSee('/dashboard/packages', false);
+            ->assertDontSee('/dashboard/never', false);
+    }
+
+    /**
+     * The other half, which is what actually broke: an entry whose route
+     * HAS been built must appear. Packages sat in the sidebar definition
+     * for four build steps while silently filtered out, because the route
+     * did not exist and nothing asserted that it should.
+     */
+    public function test_every_sidebar_entry_whose_route_exists_is_rendered(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $html = $this->actingAs($admin)->get(route('dashboard'))->getContent();
+
+        foreach (['dashboard.packages.index', 'dashboard.campaigns.index'] as $name) {
+            if (! Route::has($name)) {
+                continue;
+            }
+
+            $this->assertStringContainsString(
+                route($name),
+                $html,
+                "[{$name}] is registered but does not appear in the sidebar."
+            );
+        }
     }
 
     /**
