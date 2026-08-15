@@ -74,7 +74,7 @@ return [
         'empty' => 'No services have been added yet.',
     ],
 
-    'estimator' => [
+    'home_estimator' => [
         'eyebrow' => 'Interactive calculator',
         'title' => 'Estimate your project in seconds',
         'lead' => 'Pick the deliverables you need and get an instant indicative figure — no phone call required.',
@@ -107,7 +107,7 @@ return [
         'empty' => 'No packages have been added yet.',
     ],
 
-    'tracker' => [
+    'home_tracker' => [
         'eyebrow' => 'Client portal',
         'title' => 'Follow your project, step by step',
         'lead' => 'Every order gets its own private tracking link showing the current stage, progress and latest update.',
@@ -123,7 +123,7 @@ return [
         'progress_label' => 'Progress',
     ],
 
-    'booking' => [
+    'home_booking' => [
         'title' => 'Ready to build your brand?',
         'lead' => 'Book a consultation and we will map the route from idea to a complete identity with you.',
         'cta' => 'Book your slot',
@@ -290,6 +290,48 @@ return [
         'contact_cta' => 'Contact us',
         'noscript_title' => 'Available times',
         'noscript_hint' => 'The picker needs JavaScript. These are the times currently free — contact us to take one.',
+    ],
+
+    // The client portal. Nothing here identifies an order in a URL — see
+    // OrderTrackerController.
+    'tracker' => [
+        'label' => 'Track your order',
+        'eyebrow' => 'Client portal',
+        'title' => 'Track your order',
+        'lead' => 'Enter your order reference and the tracking code we sent you to see exactly where your project has got to.',
+        'form_heading' => 'Open your order',
+        'form_hint' => 'Both are on the confirmation we sent you. The tracking code is long — paste it rather than typing it.',
+        'reference' => 'Order reference',
+        'code' => 'Tracking code',
+        'submit' => 'Open my order',
+        'not_found' => 'We could not open an order with those details. Check the reference and the tracking code and try again.',
+        'lost_code' => 'Lost your tracking code? We cannot recover it — it is never stored in a readable form — but we can issue a new one.',
+        'contact_us' => 'Get in touch',
+        'package' => 'Package',
+        'progress' => 'Progress',
+        'stages_heading' => 'Where your project is',
+        'updates_heading' => 'Updates from the studio',
+        'latest_note' => 'Latest note',
+        'cancelled_note' => 'This order was cancelled. The stages below show how far it had got.',
+        'check_another' => 'Check another order',
+        'statuses' => [
+            'pending' => 'Received',
+            'in_progress' => 'In production',
+            'in_review' => 'In review',
+            'completed' => 'Delivered',
+            'cancelled' => 'Cancelled',
+        ],
+        'stages' => [
+            'pending' => 'Received',
+            'in_progress' => 'In production',
+            'in_review' => 'In review with you',
+            'completed' => 'Delivered',
+        ],
+        'stage_states' => [
+            'done' => 'Done',
+            'current' => 'In progress now',
+            'upcoming' => 'Still to come',
+        ],
     ],
 
     'flash' => [

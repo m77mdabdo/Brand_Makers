@@ -55,35 +55,35 @@
         <div class="wrap">
             <div class="grid items-center gap-10 rounded-[2rem] bg-petrol p-8 text-white sm:p-12 lg:grid-cols-2">
                 <div>
-                    <span class="eyebrow eyebrow-dark">{{ __('site.estimator.eyebrow') }}</span>
-                    <h2 class="text-3xl font-black leading-tight sm:text-4xl">{{ __('site.estimator.title') }}</h2>
-                    <p class="mt-4 text-mist">{{ __('site.estimator.lead') }}</p>
+                    <span class="eyebrow eyebrow-dark">{{ __('site.home_estimator.eyebrow') }}</span>
+                    <h2 class="text-3xl font-black leading-tight sm:text-4xl">{{ __('site.home_estimator.title') }}</h2>
+                    <p class="mt-4 text-mist">{{ __('site.home_estimator.lead') }}</p>
                 </div>
 
                 <div class="rounded-3xl bg-petrol-2 p-7">
-                    <p class="text-sm font-bold uppercase tracking-wide text-mist-dim">{{ __('site.estimator.panel_title') }}</p>
+                    <p class="text-sm font-bold uppercase tracking-wide text-mist-dim">{{ __('site.home_estimator.panel_title') }}</p>
 
                     @if ($estimatorRange)
                         {{-- A REAL range from priced, active items — never
                              an invented figure. --}}
-                        <p class="mt-4 text-sm text-mist">{{ __('site.estimator.total_label') }}</p>
+                        <p class="mt-4 text-sm text-mist">{{ __('site.home_estimator.total_label') }}</p>
                         <p class="mt-1 text-3xl font-black text-amber sm:text-4xl" dir="ltr">
                             {{ number_format($estimatorRange['min'], 0) }}
                             <span class="text-mist-dim">–</span>
                             {{ number_format($estimatorRange['max'], 0) }}
-                            <span class="text-xl text-mist">{{ __('site.estimator.currency') }}</span>
+                            <span class="text-xl text-mist">{{ __('site.home_estimator.currency') }}</span>
                         </p>
-                        <p class="mt-4 text-xs leading-relaxed text-mist-dim">{{ __('site.estimator.disclaimer') }}</p>
+                        <p class="mt-4 text-xs leading-relaxed text-mist-dim">{{ __('site.home_estimator.disclaimer') }}</p>
                     @else
                         {{-- Nothing has been priced yet (EstimatorItemSeeder
                              ships its catalogue inactive on purpose), so the
                              teaser says so instead of quoting a number the
                              studio never agreed. --}}
-                        <p class="mt-4 text-2xl font-black text-amber">{{ __('site.estimator.unpriced') }}</p>
-                        <p class="mt-3 text-sm leading-relaxed text-mist">{{ __('site.estimator.unpriced_hint') }}</p>
+                        <p class="mt-4 text-2xl font-black text-amber">{{ __('site.home_estimator.unpriced') }}</p>
+                        <p class="mt-3 text-sm leading-relaxed text-mist">{{ __('site.home_estimator.unpriced_hint') }}</p>
                     @endif
 
-                    <a href="#booking" class="btn btn-primary btn-on-dark mt-6 w-full">{{ __('site.estimator.cta') }}</a>
+                    <a href="#booking" class="btn btn-primary btn-on-dark mt-6 w-full">{{ __('site.home_estimator.cta') }}</a>
                 </div>
             </div>
         </div>
@@ -192,12 +192,12 @@
         <div class="wrap">
             <div class="grid items-center gap-10 lg:grid-cols-2">
                 <div>
-                    <span class="eyebrow eyebrow-light">{{ __('site.tracker.eyebrow') }}</span>
-                    <h2 class="text-3xl font-black tracking-tight sm:text-4xl">{{ __('site.tracker.title') }}</h2>
-                    <p class="mt-3 text-muted-ink">{{ __('site.tracker.lead') }}</p>
+                    <span class="eyebrow eyebrow-light">{{ __('site.home_tracker.eyebrow') }}</span>
+                    <h2 class="text-3xl font-black tracking-tight sm:text-4xl">{{ __('site.home_tracker.title') }}</h2>
+                    <p class="mt-3 text-muted-ink">{{ __('site.home_tracker.lead') }}</p>
 
                     <ol class="mt-6">
-                        @foreach (__('site.tracker.steps') as $index => $step)
+                        @foreach (__('site.home_tracker.steps') as $index => $step)
                             <li class="flex gap-4 border-b border-dashed border-line py-4 last:border-0">
                                 <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-petrol font-black text-white" aria-hidden="true">
                                     {{ $index + 1 }}
@@ -218,27 +218,27 @@
                      be a fabricated record. --}}
                 <figure class="rounded-3xl border border-line bg-white p-7">
                     <div class="flex items-center justify-between gap-3">
-                        <b class="font-extrabold" dir="ltr">{{ __('site.tracker.sample_reference') }}</b>
+                        <b class="font-extrabold" dir="ltr">{{ __('site.home_tracker.sample_reference') }}</b>
                         <span class="rounded-full bg-white px-3 py-1 text-xs font-extrabold text-orange-ink ring-1 ring-inset ring-line">
-                            {{ __('site.tracker.sample_status') }}
+                            {{ __('site.home_tracker.sample_status') }}
                         </span>
                     </div>
 
                     <div
                         class="my-4 h-2.5 overflow-hidden rounded-full bg-cream-2"
                         role="img"
-                        aria-label="{{ __('site.tracker.progress_label') }}: 66%"
+                        aria-label="{{ __('site.home_tracker.progress_label') }}: 66%"
                     >
                         <div class="h-full w-2/3 rounded-full bg-orange-ink"></div>
                     </div>
 
                     <div class="flex justify-between text-xs text-muted-ink">
-                        @foreach (__('site.tracker.steps') as $step)
+                        @foreach (__('site.home_tracker.steps') as $step)
                             <span>{{ $step['title'] }}</span>
                         @endforeach
                     </div>
 
-                    <figcaption class="mt-5 text-sm text-muted-ink">{{ __('site.tracker.sample_note') }}</figcaption>
+                    <figcaption class="mt-5 text-sm text-muted-ink">{{ __('site.home_tracker.sample_note') }}</figcaption>
                 </figure>
             </div>
         </div>
@@ -339,9 +339,9 @@
     <section id="booking" class="section scroll-mt-24 pt-0">
         <div class="wrap">
             <div class="rounded-[2rem] bg-[linear-gradient(120deg,#B84A15,#8C370D)] p-10 text-center text-white sm:p-14">
-                <h2 class="text-3xl font-black sm:text-4xl">{{ __('site.booking.title') }}</h2>
-                <p class="mx-auto mt-4 max-w-lg text-lg text-white/95">{{ __('site.booking.lead') }}</p>
-                <a href="{{ lroute('pages.about') }}" class="btn btn-white btn-on-dark mt-7">{{ __('site.booking.cta') }}</a>
+                <h2 class="text-3xl font-black sm:text-4xl">{{ __('site.home_booking.title') }}</h2>
+                <p class="mx-auto mt-4 max-w-lg text-lg text-white/95">{{ __('site.home_booking.lead') }}</p>
+                <a href="{{ lroute('pages.about') }}" class="btn btn-white btn-on-dark mt-7">{{ __('site.home_booking.cta') }}</a>
             </div>
         </div>
     </section>

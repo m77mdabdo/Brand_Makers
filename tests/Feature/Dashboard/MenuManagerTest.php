@@ -12,6 +12,11 @@ class MenuManagerTest extends TestCase
 {
     use RefreshDatabase;
 
+    /**
+     * A route name nothing will ever register. See the test that uses it.
+     */
+    private const UNREGISTERED_ROUTE = 'never.to.be.registered';
+
     private User $admin;
 
     protected function setUp(): void
@@ -89,13 +94,19 @@ class MenuManagerTest extends TestCase
 
     public function test_an_item_pointing_at_an_unbuilt_route_renders_nothing_rather_than_erroring(): void
     {
-        // orders.track is whitelisted but not registered yet — the client
-        // portal is a later build step. (This assertion used to name
-        // packages.index, which has since been built; the guard below
-        // keeps the example honest as sections land.)
-        $this->assertFalse(Route::has('orders.track'));
+        /*
+         * A NAME THAT WILL NEVER BE REGISTERED, deliberately.
+         *
+         * This fixture has now gone stale twice — it named packages.index,
+         * which got built, then orders.track, which got built too. The
+         * behaviour under test is href() returning null for a route that
+         * does not resolve, and that does not depend on the name being one
+         * the whitelist happens to offer. A sentinel says the same thing
+         * and cannot expire.
+         */
+        $this->assertFalse(Route::has(self::UNREGISTERED_ROUTE));
 
-        $item = MenuItem::factory()->create(['link_type' => 'route', 'route_name' => 'orders.track']);
+        $item = MenuItem::factory()->create(['link_type' => 'route', 'route_name' => self::UNREGISTERED_ROUTE]);
 
         $this->assertNull($item->href());
         $this->get('/')->assertOk();

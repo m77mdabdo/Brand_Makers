@@ -294,8 +294,8 @@ class HomepageTest extends TestCase
         $this->assertSame(0, EstimatorItem::active()->count());
 
         $response = $this->get('/');
-        $response->assertSee(__('site.estimator.unpriced'), false);
-        $response->assertDontSee(__('site.estimator.total_label'), false);
+        $response->assertSee(__('site.home_estimator.unpriced'), false);
+        $response->assertDontSee(__('site.home_estimator.total_label'), false);
     }
 
     public function test_the_estimator_teaser_shows_a_real_range_once_items_are_priced(): void

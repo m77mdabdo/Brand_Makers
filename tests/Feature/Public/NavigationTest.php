@@ -70,13 +70,22 @@ class NavigationTest extends TestCase
 
     public function test_an_item_whose_route_does_not_exist_yet_is_dropped_not_rendered_dead(): void
     {
+        /*
+         * A sentinel name, not a real-but-unbuilt one: this fixture named
+         * packages.index and then orders.track, and both were subsequently
+         * built. What is under test is that an unresolvable route is
+         * dropped rather than rendered dead, which holds for any name the
+         * router does not know.
+         */
+        $unregistered = 'never.to.be.registered';
+
         $item = MenuItem::factory()->create([
             'label' => ['ar' => 'قسم غير جاهز', 'en' => 'Unbuilt section'],
             'link_type' => 'route',
-            'route_name' => 'orders.track',
+            'route_name' => $unregistered,
         ]);
 
-        $this->assertFalse(Route::has('orders.track'));
+        $this->assertFalse(Route::has($unregistered));
         $this->assertNull($item->href());
 
         $this->get('/')->assertOk()->assertDontSee('قسم غير جاهز', false);
