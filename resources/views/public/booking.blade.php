@@ -92,13 +92,11 @@
                     id="booking-form"
                 >
                     <x-public.form-shell :action="lroute('booking.store')">
-                        {{-- The picker writes into these. They are the only
-                             thing about the slot that is submitted, and the
-                             server re-derives the whole slot list to look
+                        {{-- No hidden inputs: the day and time controls below
+                             ARE the form fields. Whatever they submit, the
+                             server re-derives the whole slot list and looks
                              the pair up — a crafted pair cannot become an
                              appointment. --}}
-                        <input type="hidden" name="date" :value="selectedDate">
-                        <input type="hidden" name="time" :value="selectedTime">
 
                         {{-- ---------------------------------------------
                              1. Topic
@@ -135,24 +133,46 @@
                                 {{ __('site.booking.timezone_note', ['timezone' => __('site.booking.timezone_label')]) }}
                             </p>
 
-                            {{-- role="radiogroup" over buttons: these behave
-                                 like radios, and without the role a screen
-                                 reader announces a wall of unlabelled
-                                 buttons. --}}
-                            <div class="mt-4 flex flex-wrap gap-2" role="radiogroup" aria-label="{{ __('site.booking.step_date') }}">
+                            {{--
+                                NATIVE RADIOS, not buttons carrying
+                                role="radio".
+
+                                The previous markup announced a radiogroup
+                                and did not implement one: the WAI-ARIA
+                                pattern requires arrow-key navigation with a
+                                roving tabindex, so a screen-reader user
+                                told "radio group, 1 of 21" pressed the
+                                arrow keys and nothing happened.
+
+                                Hand-rolling that is the wrong fix. A real
+                                <input type="radio"> already gives arrow-key
+                                navigation, aria-checked, a single tab stop
+                                for the group, form submission and — the
+                                part easiest to get wrong by hand — arrow
+                                directions that flip correctly under RTL,
+                                because the browser knows the writing
+                                direction. The estimator uses the same
+                                pattern for the same reason.
+
+                                The input is sr-only rather than hidden, so
+                                it stays focusable, and `peer` drives the
+                                label's selected and focus styling.
+                            --}}
+                            <div class="mt-4 flex flex-wrap gap-2">
                                 <template x-for="day in days" :key="day.date">
-                                    <button
-                                        type="button"
-                                        role="radio"
-                                        :aria-checked="isDateSelected(day.date)"
-                                        @click="selectDate(day.date)"
-                                        :class="isDateSelected(day.date)
-                                            ? 'border-petrol bg-petrol text-white'
-                                            : 'border-line bg-white text-ink hover:border-petrol'"
-                                        class="inline-flex min-h-[44px] items-center rounded-xl border px-4 text-sm font-bold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-petrol"
-                                    >
-                                        <span x-text="day.label"></span>
-                                    </button>
+                                    <label class="cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="date"
+                                            class="peer sr-only"
+                                            :value="day.date"
+                                            x-model="selectedDate"
+                                            @change="onDateChange()"
+                                        >
+                                        <span class="inline-flex min-h-[44px] items-center rounded-xl border border-line bg-white px-4 text-sm font-bold text-ink transition hover:border-petrol peer-checked:border-petrol peer-checked:bg-petrol peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-petrol peer-focus-visible:ring-offset-2">
+                                            <span x-text="day.label"></span>
+                                        </span>
+                                    </label>
                                 </template>
                             </div>
 
@@ -176,21 +196,20 @@
                                 {{ __('site.booking.pick_a_day_first') }}
                             </p>
 
-                            <div x-show="selectedDate" x-cloak class="mt-4 flex flex-wrap gap-2" role="radiogroup" aria-label="{{ __('site.booking.step_time') }}">
+                            <div x-show="selectedDate" x-cloak class="mt-4 flex flex-wrap gap-2">
                                 <template x-for="slot in slots" :key="slot.time">
-                                    <button
-                                        type="button"
-                                        role="radio"
-                                        :aria-checked="isTimeSelected(slot.time)"
-                                        @click="selectTime(slot.time)"
-                                        :class="isTimeSelected(slot.time)
-                                            ? 'border-orange-ink bg-orange-ink text-white'
-                                            : 'border-line bg-white text-ink hover:border-orange-ink'"
-                                        class="inline-flex min-h-[44px] items-center rounded-xl border px-4 text-sm font-bold tabular-nums transition focus:outline-none focus-visible:ring-2 focus-visible:ring-petrol"
-                                        dir="ltr"
-                                    >
-                                        <span x-text="slot.time"></span>
-                                    </button>
+                                    <label class="cursor-pointer" dir="ltr">
+                                        <input
+                                            type="radio"
+                                            name="time"
+                                            class="peer sr-only"
+                                            :value="slot.time"
+                                            x-model="selectedTime"
+                                        >
+                                        <span class="inline-flex min-h-[44px] items-center rounded-xl border border-line bg-white px-4 text-sm font-bold tabular-nums text-ink transition hover:border-orange-ink peer-checked:border-orange-ink peer-checked:bg-orange-ink peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-petrol peer-focus-visible:ring-offset-2">
+                                            <span x-text="slot.time"></span>
+                                        </span>
+                                    </label>
                                 </template>
                             </div>
 

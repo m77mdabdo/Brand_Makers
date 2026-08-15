@@ -4,10 +4,12 @@ import Alpine from 'alpinejs';
  * The date and slot picker.
  *
  * PURELY A VIEW over availability the server already generated. It filters
- * a list it was handed and writes the chosen pair into two hidden inputs;
- * it never decides what is bookable. On submission the server re-derives
- * the whole slot list and looks the pair up in it, so nothing here can
- * produce an appointment the studio did not offer.
+ * a list it was handed; it never decides what is bookable, and it is not
+ * where the chosen pair is stored either — the day and time controls are
+ * native radios, so the browser handles selection, keyboard navigation and
+ * form submission. On submission the server re-derives the whole slot list
+ * and looks the pair up in it, so nothing here can produce an appointment
+ * the studio did not offer.
  *
  * That is also why there is no fetch: the whole window is a few dozen
  * days, it is already on the page, and a request per date would put a
@@ -15,11 +17,10 @@ import Alpine from 'alpinejs';
  */
 
 /**
- * Days are chunked into weeks for the grid. Availability is sparse —
- * closed weekdays and blackout dates are absent entirely — so this pads
- * each week to a full seven columns and marks the gaps unavailable, or
- * the calendar would visibly shift under the visitor as they page
- * through it.
+ * Availability is sparse — closed weekdays, blackout dates, days inside
+ * the notice period and full slots are all absent from the list the
+ * server sends — so the picker renders exactly what it was given rather
+ * than a calendar grid with holes in it.
  */
 Alpine.data('bookingPicker', (config = {}) => ({
     days: config.days || [],
@@ -62,28 +63,18 @@ Alpine.data('bookingPicker', (config = {}) => ({
         return `${this.selectedDay.label} · ${this.selectedTime}`;
     },
 
-    selectDate(date) {
-        if (this.selectedDate === date) {
-            return;
-        }
-
-        this.selectedDate = date;
-        // Times differ per day, so a time chosen for the previous date is
-        // meaningless here — and keeping it would submit a pair the
-        // server rejects.
+    /**
+     * Clears the chosen time when the day changes.
+     *
+     * The day and time controls are native radios bound with x-model, so
+     * Alpine already has the new date by the time this fires — the only
+     * thing left to do is drop a time that belonged to the previous day.
+     * Times differ per day, so keeping it would submit a pair the server
+     * rejects and the visitor would be told to pick again for no visible
+     * reason.
+     */
+    onDateChange() {
         this.selectedTime = '';
-    },
-
-    selectTime(time) {
-        this.selectedTime = time;
-    },
-
-    isDateSelected(date) {
-        return this.selectedDate === date;
-    },
-
-    isTimeSelected(time) {
-        return this.selectedTime === time;
     },
 }));
 
