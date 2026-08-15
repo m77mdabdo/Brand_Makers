@@ -323,6 +323,69 @@ class BookingFlowTest extends TestCase
     }
 
     // -----------------------------------------------------------------
+    // The picker's keyboard contract
+    // -----------------------------------------------------------------
+
+    public function test_the_day_and_time_pickers_are_native_radios(): void
+    {
+        $html = $this->get('/book')->getContent();
+
+        /*
+         * The markup used to be <button role="radio"> inside
+         * role="radiogroup", which announces the WAI-ARIA radiogroup
+         * pattern — and that pattern requires arrow-key navigation with a
+         * roving tabindex, which was never implemented. A screen-reader
+         * user told "radio group, 1 of 21" pressed the arrow keys and
+         * nothing happened.
+         *
+         * Native radios give arrow-key navigation, aria-checked, a single
+         * tab stop per group and correct RTL arrow direction, all from the
+         * browser. These assertions pin that they stay native rather than
+         * regressing to hand-rolled buttons.
+         */
+        $this->assertStringContainsString('type="radio"', $html);
+        $this->assertStringContainsString('name="date"', $html);
+        $this->assertStringContainsString('name="time"', $html);
+
+        // No promise of a pattern the page does not implement.
+        $this->assertStringNotContainsString('role="radiogroup"', $html);
+        $this->assertStringNotContainsString('role="radio"', $html);
+    }
+
+    public function test_the_radios_stay_focusable_rather_than_being_hidden(): void
+    {
+        $html = $this->get('/book')->getContent();
+
+        // sr-only, not `hidden` or display:none — a hidden input is
+        // removed from the tab order entirely, which would take the
+        // keyboard pattern away again.
+        $this->assertStringContainsString('peer sr-only', $html);
+        $this->assertStringNotContainsString('type="radio" hidden', $html);
+    }
+
+    public function test_the_slot_is_submitted_by_the_radios_not_by_hidden_inputs(): void
+    {
+        $html = $this->get('/book')->getContent();
+
+        // The hidden mirrors are gone: the controls a keyboard user
+        // operates are the ones that submit, so the two cannot disagree.
+        $this->assertStringNotContainsString('<input type="hidden" name="date"', $html);
+        $this->assertStringNotContainsString('<input type="hidden" name="time"', $html);
+    }
+
+    public function test_each_step_is_a_labelled_fieldset(): void
+    {
+        $response = $this->get('/book');
+
+        // Grouping and the group's name now come from fieldset/legend
+        // rather than an aria-label on a div, which is what a native
+        // radio group expects.
+        $response->assertSee('<legend', false);
+        $response->assertSee(__('site.booking.step_date'), false);
+        $response->assertSee(__('site.booking.step_time'), false);
+    }
+
+    // -----------------------------------------------------------------
     // The notification seam
     // -----------------------------------------------------------------
 
