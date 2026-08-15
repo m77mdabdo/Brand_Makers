@@ -496,6 +496,22 @@ return [
         'create_hint' => 'The reference and the tracking code are both generated — you will see the code once, on the next screen.',
     ],
 
+    'packages' => [
+        'intro' => 'The public pricing catalogue. Nothing on the site hardcodes a price — what you set here is what visitors see.',
+        'empty' => 'No packages yet.',
+        'pricing' => 'Pricing',
+        'price' => 'Price',
+        'currency' => 'Currency',
+        'price_help' => 'Leave the price blank to show "On request" instead of a figure.',
+        'price_blank_help' => 'Blank = on request. Zero would mean free, which is a different claim.',
+        'on_request' => 'On request',
+        'features' => 'What is included',
+        'features_help' => 'One feature per line. Line 1 in Arabic pairs with line 1 in English, so keep the two columns in step — an English line with no Arabic counterpart is dropped.',
+        'is_popular' => 'Most popular',
+        'is_popular_help' => 'Highlights this package on the pricing page. Marking one clears the others — "most popular" means one.',
+        'unpriced_notice' => '{1} :count package is still showing "On request" on the public pricing page.|[2,*] :count packages are still showing "On request" on the public pricing page.',
+    ],
+
     'settings' => [
         'heading' => 'Site settings',
         'intro' => 'Everything that appears in the site header, footer and share cards. Empty fields are not rendered on the site at all.',

@@ -14,6 +14,7 @@ use App\Http\Controllers\Dashboard\LocaleController;
 use App\Http\Controllers\Dashboard\MediaController;
 use App\Http\Controllers\Dashboard\MenuItemController;
 use App\Http\Controllers\Dashboard\OrderController;
+use App\Http\Controllers\Dashboard\PackageController;
 use App\Http\Controllers\Dashboard\PageController;
 use App\Http\Controllers\Dashboard\PageSectionController;
 use App\Http\Controllers\Dashboard\ServiceController;
@@ -86,6 +87,10 @@ Route::prefix('dashboard')
             };
 
             $idBound('services', ServiceController::class, 'service');
+            // Packages bind by slug publicly and by id here, like the
+            // other slugged resources — an admin who edits a slug must not
+            // 404 their own bookmarked edit URL.
+            $idBound('packages', PackageController::class, 'package');
             $idBound('countries', CountryController::class, 'country');
             $idBound('articles', ArticleController::class, 'article');
 
