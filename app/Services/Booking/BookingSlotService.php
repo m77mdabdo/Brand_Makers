@@ -6,6 +6,7 @@ use App\Models\Booking;
 use App\Models\BookingAvailability;
 use App\Models\BookingBlackoutDate;
 use App\Services\Cms\SettingsRepository;
+use App\Support\CalendarDate;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 
@@ -132,7 +133,7 @@ class BookingSlotService
     {
         $date = $date instanceof CarbonImmutable
             ? $date->setTimezone($this->timezone())->startOfDay()
-            : BookingDate::parse($date, $this->timezone());
+            : CalendarDate::parse($date, $this->timezone());
 
         // Not a real calendar date at all.
         if ($date === null) {
@@ -172,8 +173,8 @@ class BookingSlotService
         }
 
         // A STRICT date check, not a shape check: "2026-13-45" matches
-        // the shape and is not a date. See BookingDate.
-        if (! BookingDate::isValid($date) || preg_match('/^\d{2}:\d{2}$/', $time) !== 1) {
+        // the shape and is not a date. See CalendarDate.
+        if (! CalendarDate::isValid($date) || preg_match('/^\d{2}:\d{2}$/', $time) !== 1) {
             return null;
         }
 

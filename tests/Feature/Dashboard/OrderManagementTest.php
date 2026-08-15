@@ -569,6 +569,13 @@ class OrderManagementTest extends TestCase
         return [
             'an unknown status' => [['status' => 'shipped']],
             'a date that is not a date' => [['date_from' => 'yesterday']],
+            // Both of these used to pass the shape regex and reach
+            // whereDate(), silently emptying the list. See CalendarDate.
+            'a shaped-but-impossible date' => [['date_from' => '2026-13-45']],
+            'a shaped-but-impossible date_to' => [['date_to' => '2026-13-45']],
+            'a date that rolls over' => [['date_from' => '2026-02-31']],
+            'a zero month' => [['date_from' => '2026-00-10']],
+            'an injection attempt in a date' => [['date_to' => "2026-01-01' OR 1=1--"]],
             'a wildcard in the reference' => [['reference' => '%']],
             'an injection attempt' => [['reference' => "' OR 1=1--"]],
         ];
@@ -583,6 +590,20 @@ class OrderManagementTest extends TestCase
         Order::factory()->count(3)->create();
 
         $response = $this->actingAs($this->admin)->get(route('dashboard.orders.index', $filter));
+
+        $response->assertOk();
+        $this->assertCount(3, $response->viewData('orders'));
+    }
+
+    public function test_a_malformed_date_neither_errors_nor_hides_the_list(): void
+    {
+        Order::factory()->count(3)->create();
+
+        // The audit measured this returning 200 with 0 of 3 rows — no
+        // crash, but an admin staring at an empty list with no hint that
+        // their filter was the problem.
+        $response = $this->actingAs($this->admin)
+            ->get(route('dashboard.orders.index', ['date_from' => '2026-13-45', 'date_to' => '2026-02-31']));
 
         $response->assertOk();
         $this->assertCount(3, $response->viewData('orders'));

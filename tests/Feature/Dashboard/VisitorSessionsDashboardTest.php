@@ -172,6 +172,12 @@ class VisitorSessionsDashboardTest extends TestCase
             'an unknown conversion state' => [['converted' => 'maybe']],
             'an unknown device' => [['device' => 'fridge']],
             'a date that is not a date' => [['date_from' => 'yesterday']],
+            // Shaped like a date but not one — these used to survive the
+            // whitelist and silently empty the table. See CalendarDate.
+            'a shaped-but-impossible date' => [['date_from' => '2026-13-45']],
+            'a shaped-but-impossible date_to' => [['date_to' => '2026-13-45']],
+            'a date that rolls over' => [['date_from' => '2026-02-31']],
+            'a zero month' => [['date_from' => '2026-00-10']],
             'an injection attempt in a date' => [['date_to' => "2020-01-01' OR 1=1--"]],
         ];
     }
@@ -187,6 +193,17 @@ class VisitorSessionsDashboardTest extends TestCase
         // A bad filter returning nothing would read as "no sessions" and
         // hide the real data.
         $response = $this->actingAs($this->admin)->get(route('dashboard.visitor-sessions.index', $filter));
+
+        $response->assertOk();
+        $this->assertCount(3, $response->viewData('sessions'));
+    }
+
+    public function test_a_malformed_date_neither_errors_nor_hides_the_table(): void
+    {
+        VisitorSession::factory()->count(3)->create();
+
+        $response = $this->actingAs($this->admin)
+            ->get(route('dashboard.visitor-sessions.index', ['date_from' => '2026-13-45', 'date_to' => '2026-02-31']));
 
         $response->assertOk();
         $this->assertCount(3, $response->viewData('sessions'));

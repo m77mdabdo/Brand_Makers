@@ -3,6 +3,7 @@
 namespace App\Services\Orders;
 
 use App\Models\Order;
+use App\Support\CalendarDate;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -67,9 +68,16 @@ class OrderReportService
         }
 
         foreach (['date_from', 'date_to'] as $key) {
-            $value = $filters[$key] ?? null;
-
-            if (! is_string($value) || preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) !== 1) {
+            /*
+             * A STRICT check, not a shape check. "2026-13-45" matches
+             * /^\d{4}-\d{2}-\d{2}$/ and is not a date; it used to survive
+             * this whitelist and reach whereDate(), where MySQL compared
+             * against a nonsense string and returned nothing — so the
+             * admin saw an empty list with no hint that their filter was
+             * the problem. "2026-02-31" was worse: it silently matched
+             * 3 March. See CalendarDate.
+             */
+            if (! CalendarDate::isValid($filters[$key] ?? null)) {
                 unset($filters[$key]);
             }
         }
