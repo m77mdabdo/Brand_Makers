@@ -3,6 +3,7 @@
 use App\Http\Controllers\Dashboard\ArticleController;
 use App\Http\Controllers\Dashboard\BookingAvailabilityController;
 use App\Http\Controllers\Dashboard\BookingController;
+use App\Http\Controllers\Dashboard\CampaignController;
 use App\Http\Controllers\Dashboard\CommentController;
 use App\Http\Controllers\Dashboard\ContactMessageController;
 use App\Http\Controllers\Dashboard\CountryController;
@@ -124,6 +125,16 @@ Route::prefix('dashboard')
             Route::get('pages/{page:id}/sections/{section:id}/edit', [PageSectionController::class, 'edit'])->name('pages.sections.edit');
             Route::match(['put', 'patch'], 'pages/{page:id}/sections/{section:id}', [PageSectionController::class, 'update'])->name('pages.sections.update');
             Route::delete('pages/{page:id}/sections/{section:id}', [PageSectionController::class, 'destroy'])->name('pages.sections.destroy');
+
+            /*
+             * The campaign register. Its own section rather than under
+             * content: a campaign is marketing configuration that nothing
+             * on the public site renders.
+             *
+             * Route::resource — Campaign has no slug, so the default
+             * binding is already the id.
+             */
+            Route::resource('campaigns', CampaignController::class)->except('show');
 
             // --- enquiries ------------------------------------------------
             Route::get('leads', [LeadController::class, 'index'])->name('leads.index');

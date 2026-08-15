@@ -17,6 +17,7 @@
             ['route' => 'dashboard.comments.index', 'label' => __('dashboard.resources.comments'), 'icon' => 'chat'],
             ['route' => 'dashboard.bookings.index', 'label' => __('dashboard.resources.bookings'), 'icon' => 'calendar', 'badge' => 'pendingBookings'],
             ['route' => 'dashboard.orders.index', 'label' => __('dashboard.resources.orders'), 'icon' => 'box', 'badge' => 'openOrders'],
+            ['route' => 'dashboard.campaigns.index', 'label' => __('dashboard.resources.campaigns'), 'icon' => 'megaphone'],
             ['route' => 'dashboard.visitor-sessions.index', 'label' => __('dashboard.resources.visitor_sessions'), 'icon' => 'route'],
         ],
         __('dashboard.nav.content') => [
@@ -58,6 +59,7 @@
         'page' => '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>',
         'image' => '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="m21 16-5-5-9 9"/>',
         'menu' => '<path d="M4 6h16M4 12h16M4 18h16"/>',
+        'megaphone' => '<path d="M4 10v4a1 1 0 0 0 1 1h3l6 4V5L8 9H5a1 1 0 0 0-1 1z"/><path d="M18 9a4 4 0 0 1 0 6"/>',
         'chart' => '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
         'box' => '<path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5"/><path d="M12 13v8"/>',
         'calendar' => '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
