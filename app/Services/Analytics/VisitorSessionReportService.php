@@ -3,6 +3,7 @@
 namespace App\Services\Analytics;
 
 use App\Models\VisitorSession;
+use App\Support\CalendarDate;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
@@ -91,12 +92,16 @@ class VisitorSessionReportService
             unset($filters['device']);
         }
 
-        // The dates reach whereDate(). Anything that is not a plain
-        // Y-m-d is dropped rather than handed to the driver.
+        /*
+         * The dates reach whereDate(), so anything that is not a REAL
+         * calendar date is dropped rather than handed to the driver.
+         *
+         * Strict, not a shape match: "2026-13-45" passes a regex and is
+         * not a date, and it used to reach the query and silently return
+         * an empty list. See CalendarDate.
+         */
         foreach (['date_from', 'date_to'] as $key) {
-            $value = $filters[$key] ?? null;
-
-            if (! is_string($value) || preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) !== 1) {
+            if (! CalendarDate::isValid($filters[$key] ?? null)) {
                 unset($filters[$key]);
             }
         }

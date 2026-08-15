@@ -3,6 +3,7 @@
 namespace App\Services\Booking;
 
 use App\Models\Booking;
+use App\Support\CalendarDate;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -74,8 +75,8 @@ class BookingReportService
             $value = $filters[$key] ?? null;
 
             // Strict: the shape alone would let "2026-13-45" through to
-            // a parse that throws. See BookingDate.
-            if (! BookingDate::isValid($value)) {
+            // a parse that throws. See CalendarDate.
+            if (! CalendarDate::isValid($value)) {
                 unset($filters[$key]);
             }
         }
@@ -96,7 +97,7 @@ class BookingReportService
     {
         $day = $date instanceof CarbonImmutable
             ? $date->setTimezone($this->slots->timezone())->startOfDay()
-            : (BookingDate::parse($date, $this->slots->timezone())
+            : (CalendarDate::parse($date, $this->slots->timezone())
                 ?? CarbonImmutable::now($this->slots->timezone())->startOfDay());
 
         return Booking::query()
@@ -119,11 +120,11 @@ class BookingReportService
 
     private function startOfLocalDay(string $date): CarbonImmutable
     {
-        return BookingDate::parse($date, $this->slots->timezone())->utc();
+        return CalendarDate::parse($date, $this->slots->timezone())->utc();
     }
 
     private function endOfLocalDay(string $date): CarbonImmutable
     {
-        return BookingDate::parse($date, $this->slots->timezone())->endOfDay()->utc();
+        return CalendarDate::parse($date, $this->slots->timezone())->endOfDay()->utc();
     }
 }

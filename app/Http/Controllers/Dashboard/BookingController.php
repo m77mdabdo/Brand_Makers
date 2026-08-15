@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Service;
-use App\Services\Booking\BookingDate;
 use App\Services\Booking\BookingReportService;
 use App\Services\Booking\BookingSlotService;
 use App\Services\Booking\BookingStatusService;
+use App\Support\CalendarDate;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -107,7 +107,7 @@ class BookingController extends Controller
         // Strictly parsed, because "2026-13-45" matches the shape of a
         // date and is not one — and this value arrives from a query string
         // a person may well have typed.
-        return BookingDate::parse($request->query('date'), $this->slots->timezone())
+        return CalendarDate::parse($request->query('date'), $this->slots->timezone())
             ?? CarbonImmutable::now($this->slots->timezone())->startOfDay();
     }
 }

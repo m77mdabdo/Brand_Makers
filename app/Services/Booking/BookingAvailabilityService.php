@@ -5,6 +5,7 @@ namespace App\Services\Booking;
 use App\Models\BookingAvailability;
 use App\Models\BookingBlackoutDate;
 use App\Services\Cms\HtmlSanitizerService;
+use App\Support\CalendarDate;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -102,7 +103,7 @@ class BookingAvailabilityService
     public function blackout(string $date, ?array $reason = null): BookingBlackoutDate
     {
         return BookingBlackoutDate::updateOrCreate(
-            ['date' => BookingDate::parse($date, config('booking.timezone'))?->toDateString() ?? $date],
+            ['date' => CalendarDate::parse($date, config('booking.timezone'))?->toDateString() ?? $date],
             // Plain text, never rich: the reason is a caption on a
             // dashboard row and on nothing else.
             ['reason' => $this->sanitizer->sanitizeTranslations($reason, false)],
