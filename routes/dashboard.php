@@ -13,6 +13,7 @@ use App\Http\Controllers\Dashboard\LeadController;
 use App\Http\Controllers\Dashboard\LocaleController;
 use App\Http\Controllers\Dashboard\MediaController;
 use App\Http\Controllers\Dashboard\MenuItemController;
+use App\Http\Controllers\Dashboard\OrderController;
 use App\Http\Controllers\Dashboard\PageController;
 use App\Http\Controllers\Dashboard\PageSectionController;
 use App\Http\Controllers\Dashboard\ServiceController;
@@ -163,6 +164,31 @@ Route::prefix('dashboard')
             Route::put('booking-availability', [BookingAvailabilityController::class, 'update'])->name('booking-availability.update');
             Route::post('booking-availability/blackouts', [BookingAvailabilityController::class, 'storeBlackout'])->name('booking-availability.blackouts.store');
             Route::delete('booking-availability/blackouts/{blackoutDate}', [BookingAvailabilityController::class, 'destroyBlackout'])->name('booking-availability.blackouts.destroy');
+
+            /*
+             * Client-portal orders.
+             *
+             * Bound by ID here, not by reference. Order::getRouteKeyName()
+             * returns 'reference' for the PUBLIC side; the dashboard binds
+             * on the primary key so an admin correcting a reference cannot
+             * 404 their own bookmarked URL — the same rule the slugged
+             * resources follow.
+             */
+            Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
+            Route::get('orders/create', [OrderController::class, 'create'])->name('orders.create');
+            Route::post('orders', [OrderController::class, 'store'])->name('orders.store');
+            Route::get('orders/{order:id}', [OrderController::class, 'show'])->name('orders.show');
+            Route::get('orders/{order:id}/edit', [OrderController::class, 'edit'])->name('orders.edit');
+            Route::match(['put', 'patch'], 'orders/{order:id}', [OrderController::class, 'update'])->name('orders.update');
+            Route::patch('orders/{order:id}/status', [OrderController::class, 'transition'])->name('orders.status');
+            Route::patch('orders/{order:id}/progress', [OrderController::class, 'updateProgress'])->name('orders.progress');
+            Route::post('orders/{order:id}/code', [OrderController::class, 'reissueCode'])->name('orders.code');
+
+            // The timeline. Nested, so both ids arrive separately — the
+            // controller checks the event belongs to the order.
+            Route::post('orders/{order:id}/events', [OrderController::class, 'storeEvent'])->name('orders.events.store');
+            Route::match(['put', 'patch'], 'orders/{order:id}/events/{event:id}', [OrderController::class, 'updateEvent'])->name('orders.events.update');
+            Route::delete('orders/{order:id}/events/{event:id}', [OrderController::class, 'destroyEvent'])->name('orders.events.destroy');
 
             // --- moderation ---------------------------------------------
             Route::get('comments', [CommentController::class, 'index'])->name('comments.index');

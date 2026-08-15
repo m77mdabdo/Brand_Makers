@@ -16,6 +16,7 @@
             ['route' => 'dashboard.contact-messages.index', 'label' => __('dashboard.resources.contact_messages'), 'icon' => 'mail', 'badge' => 'unhandledContactMessages'],
             ['route' => 'dashboard.comments.index', 'label' => __('dashboard.resources.comments'), 'icon' => 'chat'],
             ['route' => 'dashboard.bookings.index', 'label' => __('dashboard.resources.bookings'), 'icon' => 'calendar', 'badge' => 'pendingBookings'],
+            ['route' => 'dashboard.orders.index', 'label' => __('dashboard.resources.orders'), 'icon' => 'box', 'badge' => 'openOrders'],
             ['route' => 'dashboard.visitor-sessions.index', 'label' => __('dashboard.resources.visitor_sessions'), 'icon' => 'route'],
         ],
         __('dashboard.nav.content') => [
@@ -58,6 +59,7 @@
         'image' => '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="m21 16-5-5-9 9"/>',
         'menu' => '<path d="M4 6h16M4 12h16M4 18h16"/>',
         'chart' => '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+        'box' => '<path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5"/><path d="M12 13v8"/>',
         'calendar' => '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
         'clock' => '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
         'calculator' => '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01"/>',
@@ -175,6 +177,7 @@
                                     $badgeCount = match ($item['badge'] ?? null) {
                                         'unhandledContactMessages' => $unhandledContactMessages ?? 0,
                                         'pendingBookings' => $pendingBookings ?? 0,
+                                        'openOrders' => $openOrders ?? 0,
                                         default => 0,
                                     };
                                 @endphp

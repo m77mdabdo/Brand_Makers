@@ -9,6 +9,7 @@ use App\Http\Controllers\Public\CountryController;
 use App\Http\Controllers\Public\EstimatorController;
 use App\Http\Controllers\Public\FaqController;
 use App\Http\Controllers\Public\HomeController;
+use App\Http\Controllers\Public\OrderTrackerController;
 use App\Http\Controllers\Public\PackageController;
 use App\Http\Controllers\Public\PackageEnquiryController;
 use App\Http\Controllers\Public\PageController;
@@ -91,6 +92,29 @@ $registerPublicRoutes = function (string $nameSuffix = ''): void {
     Route::post('/book', [BookingController::class, 'store'])
         ->middleware('throttle:5,1')
         ->name("booking.store{$nameSuffix}");
+
+    /*
+     * The client portal.
+     *
+     * URL "/track", route NAME "orders.track" — the name MenuItem::ROUTES
+     * already whitelists, so registering it lights up a nav entry an admin
+     * can add without a deployment.
+     *
+     * NO ORDER IDENTIFIER APPEARS IN ANY URL. The verified order lives in
+     * the session and the page is always /track, so there is nothing to
+     * edit — see OrderTrackerController.
+     *
+     * throttle:order-tracking on the lookup, keyed by IP: not what makes
+     * the portal safe (the code carries 256 bits), but it caps probing
+     * references against a held code. See AppServiceProvider.
+     */
+    Route::get('/track', [OrderTrackerController::class, 'show'])->name("orders.track{$nameSuffix}");
+    Route::post('/track', [OrderTrackerController::class, 'lookup'])
+        ->middleware('throttle:order-tracking')
+        ->name("orders.track.lookup{$nameSuffix}");
+    Route::post('/track/forget', [OrderTrackerController::class, 'forget'])
+        ->middleware('throttle:5,1')
+        ->name("orders.track.forget{$nameSuffix}");
 
     Route::get('/countries', [CountryController::class, 'index'])->name("countries.index{$nameSuffix}");
 

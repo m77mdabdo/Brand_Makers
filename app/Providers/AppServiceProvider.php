@@ -12,6 +12,7 @@ use App\Services\Analytics\IpAnonymizer;
 use App\Services\Booking\BookingReportService;
 use App\Services\Cms\SettingsRepository;
 use App\Services\Crm\ContactMessageService;
+use App\Services\Orders\OrderReportService;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Middleware\TrustProxies;
@@ -90,6 +91,22 @@ class AppServiceProvider extends ServiceProvider
      */
     private function configureRateLimiting(): void
     {
+        /*
+         * The client portal's lookup.
+         *
+         * The tracking code carries 256 bits from a CSPRNG, so there is no
+         * brute force to slow down — a limiter here is not what makes the
+         * portal safe. What it does is cap the rate at which somebody can
+         * probe REFERENCES against a code they already hold, and stop the
+         * endpoint being used as a free hashing service.
+         *
+         * Keyed on IP because the caller is anonymous by definition. Ten a
+         * minute is far above a client typing a code off an invoice —
+         * including the two or three attempts a mistyped one takes — and
+         * far below anything worth automating.
+         */
+        RateLimiter::for('order-tracking', fn (Request $request) => Limit::perMinute(10)->by($request->ip()));
+
         RateLimiter::for('dashboard-writes', function (Request $request) {
             if ($request->isMethodSafe()) {
                 return Limit::none();
@@ -148,6 +165,9 @@ class AppServiceProvider extends ServiceProvider
                 // Bookings waiting for a decision. One indexed COUNT,
                 // covered by bookings_status_scheduled_at_index.
                 'pendingBookings' => app(BookingReportService::class)->pendingCount(),
+                // Orders still owed to a client. One indexed COUNT,
+                // covered by orders_status_placed_at_index.
+                'openOrders' => app(OrderReportService::class)->openCount(),
             ]);
         });
     }
