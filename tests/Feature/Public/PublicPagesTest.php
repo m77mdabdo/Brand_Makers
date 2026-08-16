@@ -266,8 +266,13 @@ class PublicPagesTest extends TestCase
 
     public function test_a_package_with_no_price_reads_as_on_request_rather_than_free(): void
     {
-        // Every seeded package ships price = null on purpose.
-        $this->assertSame(Package::count(), Package::whereNull('price')->count());
+        // The seeded tiers carry real figures now, so the unpriced case
+        // is built explicitly. null means "on request", never free.
+        Package::factory()->create([
+            'price' => null,
+            'sort_order' => 99,
+            'name' => ['ar' => 'باقة مخصّصة', 'en' => 'Custom package'],
+        ]);
 
         $this->get(route('packages.index'))
             ->assertSee(__('site.packages.price_on_request'), false)

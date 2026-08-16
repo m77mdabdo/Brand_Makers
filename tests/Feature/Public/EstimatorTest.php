@@ -33,9 +33,9 @@ class EstimatorTest extends TestCase
      */
     private function catalogue(): void
     {
-        EstimatorItem::factory()->create(['key' => 'logo', 'group' => 'identity', 'price' => 6000, 'sort_order' => 1, 'label' => ['ar' => 'شعار', 'en' => 'Logo']]);
-        EstimatorItem::factory()->create(['key' => 'guide', 'group' => 'identity', 'price' => 5000, 'sort_order' => 2, 'label' => ['ar' => 'دليل', 'en' => 'Guide']]);
-        EstimatorItem::factory()->create(['key' => 'cards', 'group' => 'print', 'price' => 900.50, 'sort_order' => 1, 'label' => ['ar' => 'بطاقات', 'en' => 'Cards']]);
+        EstimatorItem::factory()->create(['key' => 'licence', 'group' => 'licensing', 'price' => 6000, 'sort_order' => 1, 'label' => ['ar' => 'رخصة', 'en' => 'Licence']]);
+        EstimatorItem::factory()->create(['key' => 'address', 'group' => 'licensing', 'price' => 5000, 'sort_order' => 2, 'label' => ['ar' => 'عنوان', 'en' => 'Address']]);
+        EstimatorItem::factory()->create(['key' => 'books', 'group' => 'compliance', 'price' => 900.50, 'sort_order' => 1, 'label' => ['ar' => 'دفاتر', 'en' => 'Books']]);
     }
 
     // -----------------------------------------------------------------
@@ -49,10 +49,10 @@ class EstimatorTest extends TestCase
     {
         return [
             'nothing' => [[], null],
-            'one item' => [['logo'], '6000.00'],
-            'two items' => [['logo', 'guide'], '11000.00'],
-            'across groups' => [['logo', 'cards'], '6900.50'],
-            'everything' => [['logo', 'guide', 'cards'], '11900.50'],
+            'one item' => [['licence'], '6000.00'],
+            'two items' => [['licence', 'address'], '11000.00'],
+            'across groups' => [['licence', 'books'], '6900.50'],
+            'everything' => [['licence', 'address', 'books'], '11900.50'],
         ];
     }
 
@@ -84,7 +84,7 @@ class EstimatorTest extends TestCase
 
         // Otherwise a hand-crafted payload could multiply a line by
         // repeating it, and the lead would record a total nobody quoted.
-        $this->assertSame('6000.00', $this->estimator->quote(null, ['logo', 'logo', 'logo'])['total']);
+        $this->assertSame('6000.00', $this->estimator->quote(null, ['licence', 'licence', 'licence'])['total']);
     }
 
     // -----------------------------------------------------------------
@@ -96,7 +96,7 @@ class EstimatorTest extends TestCase
         $this->catalogue();
         EstimatorItem::factory()->inactive()->create(['key' => 'withdrawn', 'price' => 99000]);
 
-        $quote = $this->estimator->quote(null, ['logo', 'withdrawn']);
+        $quote = $this->estimator->quote(null, ['licence', 'withdrawn']);
 
         $this->assertSame('6000.00', $quote['total']);
         $this->assertCount(1, $quote['items']);
@@ -108,7 +108,7 @@ class EstimatorTest extends TestCase
 
         // A stale bookmarked selection should still produce a sensible
         // figure rather than a validation error the visitor cannot act on.
-        $this->assertSame('6000.00', $this->estimator->quote(null, ['logo', 'does-not-exist'])['total']);
+        $this->assertSame('6000.00', $this->estimator->quote(null, ['licence', 'does-not-exist'])['total']);
     }
 
     /**
@@ -118,7 +118,7 @@ class EstimatorTest extends TestCase
     {
         return [
             'non-strings' => [[1, 2.5, true, null]],
-            'nested arrays' => [[['logo']]],
+            'nested arrays' => [[['licence']]],
             'empty strings' => [['', '  ']],
         ];
     }
@@ -143,11 +143,11 @@ class EstimatorTest extends TestCase
 
         $keys = array_merge(
             array_map(fn ($i) => 'filler-'.$i, range(1, EstimatorService::MAX_SELECTED_ITEMS + 50)),
-            ['logo'],
+            ['licence'],
         );
 
         // The keys reach a whereIn, so the array a client sends cannot be
-        // unbounded. 'logo' sits past the cap and is therefore dropped.
+        // unbounded. 'licence' sits past the cap and is therefore dropped.
         $this->assertNull($this->estimator->quote(null, $keys)['total']);
     }
 
@@ -160,7 +160,7 @@ class EstimatorTest extends TestCase
         $this->catalogue();
         Package::factory()->create(['slug' => 'starter', 'price' => 15000, 'is_active' => true]);
 
-        $quote = $this->estimator->quote('starter', ['logo']);
+        $quote = $this->estimator->quote('starter', ['licence']);
 
         $this->assertSame('21000.00', $quote['total']);
         $this->assertFalse($quote['is_partial']);
@@ -171,7 +171,7 @@ class EstimatorTest extends TestCase
         $this->catalogue();
         $package = Package::factory()->create(['slug' => 'bespoke', 'price' => null, 'is_active' => true, 'name' => ['ar' => 'مخصص', 'en' => 'Bespoke']]);
 
-        $quote = $this->estimator->quote('bespoke', ['logo']);
+        $quote = $this->estimator->quote('bespoke', ['licence']);
 
         // The add-ons still total 6000, but the real figure can only be
         // higher — so the quote says so rather than quietly presenting
@@ -188,7 +188,7 @@ class EstimatorTest extends TestCase
         $this->catalogue();
         Package::factory()->create(['slug' => 'retired', 'price' => 99000, 'is_active' => false]);
 
-        $quote = $this->estimator->quote('retired', ['logo']);
+        $quote = $this->estimator->quote('retired', ['licence']);
 
         // A package withdrawn from sale must not be quotable, and a
         // bookmarked slug degrades to "no base package".
@@ -222,9 +222,9 @@ class EstimatorTest extends TestCase
 
             $response->assertOk();
             $response->assertSee(__('site.estimator.title', [], $locale), false);
-            $response->assertSee($locale === 'ar' ? 'شعار' : 'Logo', false);
+            $response->assertSee($locale === 'ar' ? 'رخصة' : 'Licence', false);
             // The group heading, translated from the stable slug.
-            $response->assertSee(__('site.estimator.groups.identity', [], $locale), false);
+            $response->assertSee(__('site.estimator.groups.licensing', [], $locale), false);
         }
     }
 
@@ -247,10 +247,20 @@ class EstimatorTest extends TestCase
 
     public function test_an_empty_catalogue_shows_pricing_in_preparation_rather_than_a_zero_calculator(): void
     {
-        // This is the state of a fresh install: the seeder ships every
-        // item at 0.00 and inactive. A working calculator that adds up to
-        // nothing would be worse than saying so.
+        /*
+         * A calculator that adds up to nothing is worse than saying the
+         * pricing is not ready.
+         *
+         * This used to be the state of a fresh install. It no longer is —
+         * the three package tiers carry real figures, so a seeded install
+         * has a working estimator, which is the point of this whole
+         * change. The genuinely empty state is therefore built here: the
+         * add-ons are already unpriced and inactive out of the seeder, so
+         * only the tiers need unpricing.
+         */
         $this->seed();
+
+        Package::query()->update(['price' => null]);
 
         $response = $this->get('/cost-estimator');
 
@@ -267,7 +277,7 @@ class EstimatorTest extends TestCase
         $this->get('/cost-estimator')->assertSee('data-estimator-catalogue', false);
 
         // …and a submitted price is simply not a field the server reads.
-        $quote = $this->estimator->quote(null, ['logo']);
+        $quote = $this->estimator->quote(null, ['licence']);
         $this->assertSame('6000.00', $quote['total']);
     }
 
@@ -290,14 +300,19 @@ class EstimatorTest extends TestCase
         $this->catalogue();
         Package::factory()->create(['slug' => 'starter', 'price' => 15000, 'is_active' => true, 'name' => ['ar' => 'الأساسية', 'en' => 'Starter']]);
 
-        $snapshot = $this->estimator->snapshot($this->estimator->quote('starter', ['logo', 'cards']));
+        $snapshot = $this->estimator->snapshot($this->estimator->quote('starter', ['licence', 'books']));
 
         $this->assertSame('21900.50', $snapshot['total']);
         $this->assertSame('starter', $snapshot['package']['slug']);
         $this->assertSame('15000.00', $snapshot['package']['price']);
         $this->assertCount(2, $snapshot['items']);
-        $this->assertSame('logo', $snapshot['items'][0]['key']);
-        $this->assertSame('6000.00', $snapshot['items'][0]['price']);
+
+        // Looked up by key rather than by position: the breakdown is
+        // ordered by group, so which item lands at index 0 is a property
+        // of the group names, not of the snapshot contract under test.
+        $licence = collect($snapshot['items'])->firstWhere('key', 'licence');
+        $this->assertNotNull($licence);
+        $this->assertSame('6000.00', $licence['price']);
         $this->assertArrayHasKey('quoted_at', $snapshot);
     }
 
@@ -305,16 +320,16 @@ class EstimatorTest extends TestCase
     {
         $this->catalogue();
 
-        $snapshot = $this->estimator->snapshot($this->estimator->quote(null, ['logo']));
+        $snapshot = $this->estimator->snapshot($this->estimator->quote(null, ['licence']));
 
-        EstimatorItem::where('key', 'logo')->update(['price' => 9000, 'label' => json_encode(['ar' => 'جديد', 'en' => 'Renamed'])]);
+        EstimatorItem::where('key', 'licence')->update(['price' => 9000, 'label' => json_encode(['ar' => 'جديد', 'en' => 'Renamed'])]);
 
         // The stored breakdown is what this visitor was shown, not what
         // the catalogue says today.
         $this->assertSame('6000.00', $snapshot['items'][0]['price']);
         // The full per-locale map, so the breakdown reads correctly for an
         // Arabic-reading and an English-reading admin alike.
-        $this->assertSame('Logo', $snapshot['items'][0]['label']['en']);
-        $this->assertSame('شعار', $snapshot['items'][0]['label']['ar']);
+        $this->assertSame('Licence', $snapshot['items'][0]['label']['en']);
+        $this->assertSame('رخصة', $snapshot['items'][0]['label']['ar']);
     }
 }

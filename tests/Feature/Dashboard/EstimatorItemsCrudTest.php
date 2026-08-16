@@ -383,7 +383,7 @@ class EstimatorItemsCrudTest extends TestCase
     {
         $this->seed();
 
-        $item = EstimatorItem::where('key', 'logo-design')->sole();
+        $item = EstimatorItem::where('key', 'feasibility-study')->sole();
         $item->update(['price' => 8500, 'is_active' => true]);
 
         $this->seed();
