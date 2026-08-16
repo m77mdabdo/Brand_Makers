@@ -56,13 +56,24 @@ class DatabaseSeeder extends Seeder
             CountrySeeder::class,
             FaqSeeder::class,
             ArticleSeeder::class,
-
-            // --- derived from the content above ----------------------
-            SeoMetaSeeder::class,
-            MenuItemSeeder::class,
         ]);
 
         $this->translateToEnglish();
+
+        $this->call([
+            // --- derived from the content above ----------------------
+            //
+            // AFTER the translation, not before. SeoMetaSeeder builds
+            // every meta title and description out of the record it
+            // describes, in both locales — so running it against
+            // Arabic-only content produced Arabic-only metadata, and then
+            // asked the dictionary to translate strings it had just
+            // derived. Ordering it here means the English metadata is
+            // derived from the English content for free, and the
+            // dictionary never has to carry a single generated string.
+            SeoMetaSeeder::class,
+            MenuItemSeeder::class,
+        ]);
     }
 
     /**

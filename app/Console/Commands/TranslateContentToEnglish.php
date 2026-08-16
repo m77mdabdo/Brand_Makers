@@ -74,12 +74,56 @@ class TranslateContentToEnglish extends Command
      * @var array<string, string>
      */
     private array $translations = [
-        //
-        // Entries are added alongside the content that needs them. An
-        // empty dictionary is a valid state: every field then reports as
-        // "no translation available", which is exactly the signal this
-        // command exists to give.
-        //
+        // -------------------------------------------------------------
+        // ServiceSeeder
+        // -------------------------------------------------------------
+        'تأسيس شركة ذات مسؤولية محدودة' => 'Limited Liability Company Formation',
+        'الكيان الأكثر شيوعاً للمستثمرين في السوق السعودي: إجراءات واضحة، ومسؤولية محدودة برأس المال.' => 'The most common entity for investors in the Saudi market: clear procedures, and liability limited to the capital.',
+        '<p>نتولّى مسار تأسيس الشركة ذات المسؤولية المحدودة من أوله إلى آخره: حجز الاسم التجاري، وصياغة عقد التأسيس، واستكمال التوثيق، وصولاً إلى إصدار السجل التجاري والتسجيلات النظامية التي تليه.</p><p>نبدأ بتحديد النشاط والكيان الأنسب لك قبل أي إجراء، لأن النشاط الذي تختاره في البداية هو ما يحدّد التراخيص التي ستحتاجها لاحقاً، وتصحيحه بعد التأسيس أطول وأكلف من ضبطه من البداية.</p>' => '<p>We handle the limited liability company formation route from end to end: reserving the trade name, drafting the articles of association, completing notarisation, and on to issuing the Commercial Registration and the statutory registrations that follow it.</p><p>We begin by settling the most suitable activity and entity for you before any procedure starts, because the activity chosen at the outset is what determines the licences needed later — and correcting it after formation takes longer and costs more than getting it right from the start.</p>',
+        'صور هويات أو جوازات الشركاء، والنشاط التجاري المستهدف، وثلاثة أسماء تجارية مقترحة، ورأس المال ونسب الملكية بين الشركاء.' => 'Copies of the partners\' ID cards or passports, the target business activity, three proposed trade names, and the capital and the ownership split between the partners.',
+        'استشارة نحدّد فيها النشاط والكيان، ثم حجز الاسم التجاري، ثم صياغة عقد التأسيس وتوثيقه، ثم إصدار السجل التجاري واستكمال التسجيلات النظامية.' => 'A consultation to settle the activity and the entity, then reserving the trade name, then drafting and notarising the articles of association, then issuing the Commercial Registration and completing the statutory registrations.',
+
+        'رخصة الاستثمار الأجنبي' => 'Foreign Investment Licence',
+        'الترخيص الذي يمكّن المستثمر غير السعودي من ممارسة نشاطه في المملكة باسمه ومِلكه.' => 'The licence that allows a non-Saudi investor to operate in the Kingdom in their own name and under their own ownership.',
+        '<p>نراجع معك أهلية النشاط الذي تستهدفه للاستثمار الأجنبي، ونجهّز ملف الطلب ومستندات الشركة الأم وتصديقاتها، ثم نقدّم الطلب ونتابعه مع الجهة المختصة حتى صدور الرخصة.</p><p>تختلف المتطلبات باختلاف النشاط وجنسية المستثمر وهيكل الملكية، ولذلك نبدأ دائماً بمراجعة الأهلية قبل تجهيز أي مستند — حتى لا تُصدَّق أوراق لا يقبلها النشاط المطلوب.</p>' => '<p>We review with you whether your target activity is eligible for foreign investment, prepare the application file along with the parent company\'s documents and their attestations, then submit and follow the application with the competent authority until the licence is issued.</p><p>Requirements differ by activity, by investor nationality and by ownership structure, which is why we always start with an eligibility review before preparing any document — so that papers are not attested for an activity that will not accept them.</p>',
+        'مستندات الشركة الأم موثّقة ومصدّقة، والقوائم المالية، وجوازات الملاك، ووصف النشاط المستهدف في المملكة.' => 'The parent company\'s documents, notarised and attested, the financial statements, the owners\' passports, and a description of the target activity in the Kingdom.',
+        'مراجعة أهلية النشاط، ثم تجهيز المستندات وتصديقها، ثم تقديم الطلب ومتابعته مع الجهة المختصة حتى صدور الرخصة.' => 'Reviewing the activity\'s eligibility, then preparing and attesting the documents, then submitting and following the application with the competent authority until the licence is issued.',
+
+        'الاستحواذ على شركة قائمة' => 'Acquisition of an Existing Company',
+        'شراء كيان قائم بسجله ونشاطه بدل التأسيس من الصفر، مع نقل الملكية نظامياً.' => 'Buying an existing entity with its registration and its activity rather than forming one from scratch, with ownership transferred through the proper legal channels.',
+        '<p>نبحث لك عن كيان قائم يناسب نشاطك المستهدف، ونراجع وضعه النظامي والتزاماته قبل الشراء، ثم نتولّى إجراءات نقل الملكية وتعديل عقد التأسيس وتحديث السجل التجاري باسمك.</p><p>الاستحواذ خيار عملي حين يكون للكيان القائم سجل أو ترخيص أو تاريخ تشغيلي تحتاجه، لكنه يحمل التزامات الكيان السابقة معه — ولذلك تسبق المراجعةُ الشراءَ دائماً في مسارنا.</p>' => '<p>We look for an existing entity suited to your target activity, review its legal standing and its liabilities before purchase, then handle the ownership transfer, the amendment of the articles of association, and updating the Commercial Registration into your name.</p><p>Acquisition is the practical choice when an existing entity holds a registration, a licence or an operating history you need — but it carries that entity\'s prior liabilities with it, which is why review always precedes purchase on our route.</p>',
+        'تحديد النشاط والحجم المطلوب، وهويات أو جوازات المشترين، والاتفاق على هيكل الملكية بعد نقلها.' => 'Settling the activity and the size required, the buyers\' ID cards or passports, and agreement on the ownership structure after transfer.',
+        'تحديد الكيان المناسب، ثم مراجعة وضعه النظامي والتزاماته، ثم توقيع نقل الملكية وتوثيقه، ثم تحديث السجل التجاري والتسجيلات باسم المالك الجديد.' => 'Identifying a suitable entity, then reviewing its legal standing and liabilities, then signing and notarising the ownership transfer, then updating the Commercial Registration and the registrations into the new owner\'s name.',
+
+        'السجل التجاري والتوثيق' => 'Commercial Registration and Notarisation',
+        'إصدار السجل التجاري وتوثيق عقد التأسيس، وتحديثهما عند أي تعديل لاحق.' => 'Issuing the Commercial Registration and notarising the articles of association, and updating both whenever anything changes.',
+        '<p>السجل التجاري هو ما يجعل الكيان قائماً فعلياً ويمكّنه من التعاقد وفتح الحساب البنكي والتوظيف. نتولّى إصداره وتوثيق عقد التأسيس المرتبط به.</p><p>ونتولّى كذلك التعديلات اللاحقة: تغيير النشاط، أو إضافة شريك أو خروجه، أو تعديل رأس المال أو العنوان — وكلها تتطلب تحديث السجل والعقد معاً حتى يبقيا متطابقين.</p>' => '<p>The Commercial Registration is what makes the entity real in practice and lets it contract, open a bank account and hire. We handle issuing it and notarising the articles of association attached to it.</p><p>We also handle the changes that follow: changing the activity, adding a partner or removing one, amending the capital or the address — each of which requires updating the registration and the articles together so the two stay consistent.</p>',
+        'عقد التأسيس المعتمد، وبيانات الشركاء، والنشاط المسجّل، وأي قرار شركاء يخصّ التعديل المطلوب.' => 'The approved articles of association, the partners\' details, the registered activity, and any partners\' resolution relating to the change requested.',
+        'مراجعة البيانات المطلوبة، ثم تقديم الطلب، ثم استلام السجل أو نسخته المحدّثة وتسليمها لك.' => 'Reviewing the details required, then submitting the application, then receiving the registration or its updated copy and handing it to you.',
+
+        'العنوان الوطني وفتح الحساب البنكي' => 'National Address and Bank Account Opening',
+        'تسجيل العنوان الوطني للشركة وتجهيز ملف فتح الحساب البنكي ومتابعته.' => 'Registering the company\'s National Address, and preparing and following its bank account application.',
+        '<p>العنوان الوطني متطلب نظامي للشركة، ويُطلب في معظم المعاملات الحكومية والبنكية. نسجّله لك ونربطه بسجل الشركة.</p><p>ثم نجهّز ملف فتح الحساب البنكي بالمستندات التي يطلبها البنك ونتابع الطلب معك. قرار فتح الحساب يعود للبنك وحده ويخضع لإجراءات «اعرف عميلك» لديه، ودورنا أن يصل الملف مكتملاً وصحيحاً من أول مرة.</p>' => '<p>A National Address is a statutory requirement for the company and is asked for in most government and banking transactions. We register it for you and link it to the company\'s registration.</p><p>We then prepare the bank account file with the documents the bank requires and follow the application with you. The decision to open the account rests with the bank alone and is subject to its own Know Your Customer procedures; our part is that the file arrives complete and correct the first time.</p>',
+        'السجل التجاري وعقد التأسيس، وبيانات المفوّض بالتوقيع، وعقد مقر الشركة أو ما يثبت عنوانها.' => 'The Commercial Registration and the articles of association, the authorised signatory\'s details, and the company premises lease or proof of its address.',
+        'تسجيل العنوان الوطني وربطه بالسجل، ثم تجهيز ملف البنك، ثم تقديمه ومتابعته حتى تفعيل الحساب.' => 'Registering the National Address and linking it to the registration, then preparing the bank file, then submitting and following it until the account is active.',
+
+        'الرخص البلدية والقطاعية' => 'Municipal and Sector Licences',
+        'الرخصة البلدية للمقر، وأي ترخيص إضافي يفرضه النشاط نفسه.' => 'The municipal licence for the premises, and any further licence the activity itself imposes.',
+        '<p>معظم الأنشطة تحتاج رخصة بلدية للمقر، وبعضها يحتاج ترخيصاً إضافياً من الجهة المنظِّمة لقطاعه — كالصحة أو السياحة أو النقل أو التعليم.</p><p>نحدّد لك التراخيص التي يفرضها نشاطك تحديداً، ونجهّز اشتراطات المقر ومستندات كل جهة، ونتابع الإصدار حتى يصبح النشاط قابلاً للتشغيل نظامياً.</p>' => '<p>Most activities need a municipal licence for the premises, and some need a further licence from the body regulating their sector — health, tourism, transport and education among them.</p><p>We establish which licences your particular activity requires, prepare the premises conditions and each authority\'s documents, and follow issuance through until the activity can lawfully operate.</p>',
+        'السجل التجاري، وعقد إيجار المقر أو صك ملكيته، ومخطط المقر، وما تفرضه الجهة المنظِّمة للنشاط من اشتراطات.' => 'The Commercial Registration, the premises lease or title deed, the premises layout, and whatever conditions the body regulating the activity imposes.',
+        'حصر التراخيص التي يفرضها النشاط، ثم تجهيز اشتراطات المقر والمستندات، ثم تقديم الطلبات ومتابعتها حتى الإصدار.' => 'Establishing which licences the activity requires, then preparing the premises conditions and the documents, then submitting and following the applications through to issuance.',
+
+        'خدمات ما بعد التأسيس' => 'Post-Formation Services',
+        'محاسبة، وضريبة القيمة المضافة والزكاة، والتأمينات الاجتماعية، والامتثال — بعد أن يبدأ الكيان عمله.' => 'Accounting, VAT and zakat, social insurance and compliance — once the entity is up and running.',
+        '<p>التأسيس بداية وليس نهاية. الكيان القائم عليه التزامات دورية: دفاتر محاسبية منتظمة، وإقرارات ضريبة القيمة المضافة والزكاة في مواعيدها، وتسجيل العاملين في التأمينات الاجتماعية، وتجديدات سنوية للسجل والرخص.</p><p>نتولّى هذه الالتزامات بالنيابة عنك أو نشرف عليها مع فريقك، حتى لا يتحوّل تأخّر إقرار أو تجديد إلى غرامة أو تعليق للنشاط.</p>' => '<p>Formation is a beginning, not an end. A live entity carries recurring obligations: orderly accounting books, VAT and zakat returns filed on time, employees registered with social insurance, and annual renewals of the registration and the licences.</p><p>We take these obligations on for you, or supervise them alongside your own team, so that a late return or a late renewal does not turn into a penalty or a suspension of the activity.</p>',
+        'السجل التجاري وشهادات التسجيل، ومستندات الإيرادات والمصروفات، وبيانات العاملين إن وُجدوا.' => 'The Commercial Registration and the registration certificates, revenue and expenditure records, and employee details where there are any.',
+        'مراجعة وضع الكيان والتزاماته القائمة، ثم تسجيله لدى الجهات المطلوبة، ثم تشغيل دورة شهرية وسنوية للدفاتر والإقرارات والتجديدات.' => 'Reviewing the entity\'s standing and its existing obligations, then registering it with the required authorities, then running a monthly and annual cycle of books, returns and renewals.',
+
+        'الاستشارات والدراسات' => 'Consulting and Feasibility Studies',
+        'اختيار النشاط والكيان المناسبين، ودراسة جدوى تسبق قرار الدخول إلى السوق.' => 'Choosing the right activity and entity, and a feasibility study ahead of the decision to enter the market.',
+        '<p>قبل التأسيس أسئلة تستحق إجابة: أي نشاط تحديداً، وأي شكل قانوني، وما التراخيص التي يفرضها ذلك، وما التكلفة الحقيقية للتشغيل في السنة الأولى.</p><p>نقدّم استشارة تجيب على هذه الأسئلة بالأرقام والأنظمة السارية، ودراسة جدوى عند الحاجة تقيس السوق والتكاليف والإيرادات المتوقعة — لتتخذ قرارك على أساس، لا على تقدير.</p>' => '<p>Formation is preceded by questions worth answering: which activity exactly, which legal form, which licences that imposes, and what operating in the first year genuinely costs.</p><p>We provide a consultation that answers those questions against the figures and the regulations in force, and a feasibility study where one is needed, measuring the market, the costs and the expected revenue — so that your decision rests on a basis rather than an estimate.</p>',
+        'وصف الفكرة أو النشاط المستهدف، والسوق أو المدينة محل الاهتمام، والميزانية المتاحة مبدئياً.' => 'A description of the idea or the target activity, the market or city of interest, and the budget available at this stage.',
+        'جلسة نفهم فيها هدفك، ثم مراجعة الأنشطة والتراخيص والتكاليف المرتبطة، ثم تسليم توصية مكتوبة أو دراسة جدوى حسب النطاق المتفق عليه.' => 'A session to understand your objective, then a review of the activities, licences and associated costs, then delivery of a written recommendation or a feasibility study depending on the scope agreed.',
     ];
 
     /**
@@ -97,6 +141,8 @@ class TranslateContentToEnglish extends Command
         'why-invest-saudi-arabia',
         'activities',
     ];
+
+    private HtmlSanitizerService $sanitizer;
 
     private int $totalTranslated = 0;
 
@@ -120,6 +166,8 @@ class TranslateContentToEnglish extends Command
         $force = (bool) $this->option('force');
 
         $summary = [];
+
+        $this->sanitizer = $sanitizer;
 
         $summary['Page'] = $this->translateModel(Page::class, ['title', 'body', 'meta_title', 'meta_description'], $force, htmlFields: ['body']);
         $summary['PageSection'] = $this->translatePageSections($force);
@@ -177,7 +225,7 @@ class TranslateContentToEnglish extends Command
                 }
 
                 if (in_array($field, $htmlFields, true)) {
-                    $en = app(HtmlSanitizerService::class)->sanitizeRichText($en);
+                    $en = $this->sanitizer->sanitizeRichText($en);
                 }
 
                 $model->setTranslation($field, 'en', $en);
