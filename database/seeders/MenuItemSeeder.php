@@ -119,6 +119,7 @@ class MenuItemSeeder extends Seeder
         return [
             ['key' => 'nav-home', 'route' => 'home', 'label' => ['ar' => 'الرئيسية', 'en' => 'Home']],
             ['key' => 'nav-services', 'route' => 'services.index', 'anchor' => '#services', 'label' => ['ar' => 'خدماتنا', 'en' => 'Services']],
+            ['key' => 'nav-activities', 'route' => 'pages.activities', 'anchor' => '#activities', 'label' => ['ar' => 'الأنشطة', 'en' => 'Activities']],
             ['key' => 'nav-packages', 'route' => 'packages.index', 'anchor' => '#packages', 'label' => ['ar' => 'الباقات', 'en' => 'Packages']],
             ['key' => 'nav-estimator', 'route' => 'estimator', 'anchor' => '#estimator', 'label' => ['ar' => 'حاسبة التكلفة', 'en' => 'Cost Estimator']],
             ['key' => 'nav-about', 'route' => 'pages.about', 'label' => ['ar' => 'من نحن', 'en' => 'About']],

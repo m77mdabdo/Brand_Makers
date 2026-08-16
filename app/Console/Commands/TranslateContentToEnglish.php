@@ -157,6 +157,58 @@ class TranslateContentToEnglish extends Command
         'ضريبة القيمة المضافة والزكاة' => 'VAT and zakat',
         'التأمينات الاجتماعية' => 'Social insurance',
         'دراسة جدوى' => 'Feasibility study',
+
+        // -------------------------------------------------------------
+        // PageContentSeeder — about
+        // -------------------------------------------------------------
+        'من نحن' => 'About Us',
+        '<p>صنّاع العلامات التجارية بيت خبرة سعودي متخصص في تأسيس الشركات وتمكين الاستثمار في المملكة العربية السعودية. نرافق المستثمر من أول استشارة حتى تشغيل كيانه، ونكمل معه بخدمات ما بعد التأسيس.</p><p>نعمل مع المستثمر المحلي والأجنبي على السواء، ونغطّي المسار كاملاً: اختيار النشاط والكيان، والتراخيص، والسجل التجاري، والعنوان الوطني والحساب البنكي، ثم المحاسبة والضريبة والزكاة والتأمينات بعد الانطلاق.</p><p>رسالتنا أن نجعل رحلة التأسيس واضحة وسريعة وبلا تعقيد: خطوات معلومة، وأسعار معلنة، وفريق يتابع معك حتى تكتمل الإجراءات.</p>' => '<p>Creative Mark is a Saudi advisory firm specialising in company formation and investment enablement in the Kingdom of Saudi Arabia. We accompany the investor from the first consultation through to the entity being operational, and stay on with post-formation services.</p><p>We work with local and foreign investors alike, and we cover the whole route: choosing the activity and the entity, the licences, the Commercial Registration, the National Address and the bank account, then accounting, VAT, zakat and social insurance once operations begin.</p><p>Our purpose is to make the formation journey clear, quick and free of complication: known steps, published prices, and a team that stays with you until the procedures are complete.</p>',
+        'من نحن — صنّاع العلامات التجارية' => 'About Us — Creative Mark',
+        'بيت خبرة سعودي متخصص في تأسيس الشركات وتمكين الاستثمار في المملكة، من الاستشارة الأولى حتى ما بعد التأسيس.' => 'A Saudi advisory firm specialising in company formation and investment enablement in the Kingdom, from the first consultation through to post-formation.',
+
+        // --- activities ------------------------------------------------
+        'الأنشطة' => 'Activities',
+        '<p>نؤسّس ونرخّص شركات في كل القطاعات الاقتصادية، ونرشدك إلى النشاط والكيان الأنسب لما تريد أن تعمل فيه. اختيار النشاط ليس تفصيلاً إدارياً — هو ما يحدّد التراخيص المطلوبة ورأس المال والجهة المنظِّمة، ولذلك نبدأ منه دائماً.</p>' => '<p>We form and licence companies across every economic sector, and we guide you to the activity and entity that best fit what you intend to do. Choosing the activity is not an administrative detail — it determines the licences required, the capital and the regulating authority, which is why we always start there.</p>',
+        'الأنشطة — صنّاع العلامات التجارية' => 'Activities — Creative Mark',
+        'الأنشطة التجارية والصناعية والزراعية والخدمية التي نؤسّس ونرخّص شركات فيها في المملكة.' => 'The commercial, industrial, agricultural and service activities we form and licence companies in across the Kingdom.',
+        'تجاري' => 'Commercial',
+        'الجملة والتجزئة، والاستيراد والتصدير، والتجارة الإلكترونية، والوكالات والتوزيع.' => 'Wholesale and retail, import and export, e-commerce, and agencies and distribution.',
+        'صناعي' => 'Industrial',
+        'المصانع والتصنيع والتحويل والتعبئة والتغليف.' => 'Factories, manufacturing, processing, and packing and packaging.',
+        'زراعي' => 'Agricultural',
+        'الإنتاج الزراعي والثروة الحيوانية والسمكية والتقنيات الزراعية.' => 'Crop production, livestock and fisheries, and agricultural technology.',
+        'خدمي' => 'Services',
+        'الاستشارات والمقاولات والتقنية والسياحة والضيافة والخدمات اللوجستية.' => 'Consulting, contracting, technology, tourism and hospitality, and logistics.',
+
+        // --- why invest in Saudi Arabia --------------------------------
+        'لماذا تستثمر في السعودية' => 'Why Invest in Saudi Arabia',
+        '<p>تشهد المملكة تحوّلاً اقتصادياً واسعاً فتح قطاعات جديدة أمام الاستثمار المحلي والأجنبي وبسّط كثيراً من إجراءات التأسيس والترخيص. فيما يلي أبرز ما يجعلها وجهة تستحق الدراسة — والتفاصيل الدقيقة تختلف باختلاف النشاط، فابدأ باستشارة قبل أي قرار.</p>' => '<p>The Kingdom is undergoing a broad economic transformation that has opened new sectors to local and foreign investment and simplified much of the formation and licensing process. What follows are the main reasons it is worth examining — the precise details vary by activity, so start with a consultation before any decision.</p>',
+        'لماذا تستثمر في السعودية — صنّاع العلامات التجارية' => 'Why Invest in Saudi Arabia — Creative Mark',
+        'أبرز عوامل الجذب الاستثماري في المملكة العربية السعودية للمستثمرين المحليين والأجانب.' => 'The main investment drivers in the Kingdom of Saudi Arabia for local and foreign investors.',
+        'اقتصاد متنامٍ' => 'A growing economy',
+        'سوق كبير ومتنوّع تدعمه استثمارات واسعة في البنية التحتية والقطاعات غير النفطية.' => 'A large and diversified market, backed by substantial investment in infrastructure and in non-oil sectors.',
+        'رؤية 2030' => 'Vision 2030',
+        'استراتيجية وطنية تعمل على تنويع الاقتصاد وفتح قطاعات جديدة أمام القطاع الخاص.' => 'A national strategy diversifying the economy and opening new sectors to the private sector.',
+        'تملّك أجنبي كامل في كثير من الأنشطة' => 'Full foreign ownership in many activities',
+        'تتيح الأنظمة للمستثمر الأجنبي تملّك شركته بالكامل في كثير من الأنشطة دون شريك محلي. الأهلية تختلف بحسب النشاط، ونراجعها معك قبل البدء.' => 'The regulations allow a foreign investor to own their company outright in many activities, with no local partner. Eligibility varies by activity, and we review it with you before starting.',
+        'موقع استراتيجي يربط ثلاث قارات' => 'A strategic location joining three continents',
+        'تتوسط المملكة آسيا وأفريقيا وأوروبا، وهو ما يمنحها موقعاً لوجستياً للوصول إلى أسواق إقليمية وعالمية.' => 'The Kingdom sits between Asia, Africa and Europe, giving it a logistical position for reaching regional and global markets.',
+        'حوافز ومناطق اقتصادية' => 'Incentives and economic zones',
+        'برامج ومناطق اقتصادية خاصة تقدّم مزايا للمستثمرين في قطاعات ذات أولوية.' => 'Programmes and special economic zones offering advantages to investors in priority sectors.',
+
+        // --- how we work -----------------------------------------------
+        'كيف نعمل' => 'How We Work',
+        '<p>مسار واحد واضح لكل عميل، من الاستشارة الأولى حتى تشغيل الكيان. تعرف في كل مرحلة أين وصلت الإجراءات وما المطلوب منك.</p>' => '<p>One clear route for every client, from the first consultation through to the entity being operational. At every stage you know how far the procedures have got and what is needed from you.</p>',
+        'كيف نعمل — صنّاع العلامات التجارية' => 'How We Work — Creative Mark',
+        'مراحل التأسيس لدى صنّاع العلامات التجارية، من الاستشارة وتحديد النشاط حتى ما بعد التأسيس.' => 'The formation stages at Creative Mark, from the consultation and choice of activity through to post-formation.',
+        '١. استشارة وتحديد النشاط والكيان' => '1. Consultation, and settling the activity and entity',
+        'نفهم هدفك من الدخول إلى السوق، ونحدّد معك النشاط والشكل القانوني الأنسب والتراخيص التي يفرضها.' => 'We understand your objective in entering the market, and settle with you the most suitable activity and legal form, and the licences these impose.',
+        '٢. تجهيز المستندات والتراخيص' => '2. Preparing the documents and licences',
+        'نحصر ما يلزم من مستندات وتصديقات، ونجهّز ملفات التراخيص ونقدّمها إلى الجهات المختصة.' => 'We establish which documents and attestations are needed, prepare the licence files and submit them to the competent authorities.',
+        '٣. إصدار السجل والتوثيق' => '3. Issuing the registration and notarising',
+        'نصدر السجل التجاري ونوثّق عقد التأسيس، ونستكمل العنوان الوطني وملف الحساب البنكي.' => 'We issue the Commercial Registration and notarise the articles of association, and complete the National Address and the bank account file.',
+        '٤. ما بعد التأسيس والتشغيل' => '4. Post-formation and operating',
+        'نسجّلك لدى الجهات المطلوبة، وندير المحاسبة والإقرارات والتأمينات والتجديدات حتى يعمل الكيان بانتظام.' => 'We register you with the required authorities and run the accounting, the returns, the social insurance and the renewals, so the entity operates in good order.',
     ];
 
     /**

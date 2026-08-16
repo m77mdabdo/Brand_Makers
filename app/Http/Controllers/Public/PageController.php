@@ -22,6 +22,22 @@ class PageController extends Controller
         return $this->show('about');
     }
 
+    /**
+     * The four economic sectors this company forms and licences
+     * companies in. A page of its own as well as a homepage section,
+     * because "which activity?" is the first question a formation client
+     * has and the answer is longer than a card.
+     */
+    public function activities(): View
+    {
+        return $this->show('activities');
+    }
+
+    public function whySaudi(): View
+    {
+        return $this->show('why-invest-saudi-arabia');
+    }
+
     public function ourProcess(): View
     {
         return $this->show('our-process');

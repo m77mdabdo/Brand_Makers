@@ -44,6 +44,8 @@ class MenuItem extends Model
         'faqs.index' => 'dashboard.menu.routes.faqs',
         'articles.index' => 'dashboard.menu.routes.articles',
         'pages.about' => 'dashboard.menu.routes.about',
+        'pages.activities' => 'dashboard.menu.routes.activities',
+        'pages.why-saudi' => 'dashboard.menu.routes.why_saudi',
         'pages.our-process' => 'dashboard.menu.routes.our_process',
         'pages.privacy-policy' => 'dashboard.menu.routes.privacy_policy',
         'pages.terms-and-conditions' => 'dashboard.menu.routes.terms',
