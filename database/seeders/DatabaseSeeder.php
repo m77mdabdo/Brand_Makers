@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Artisan;
 
 /**
  * PRODUCTION seed. Everything called from here is real, shippable content
@@ -60,5 +61,29 @@ class DatabaseSeeder extends Seeder
             SeoMetaSeeder::class,
             MenuItemSeeder::class,
         ]);
+
+        $this->translateToEnglish();
+    }
+
+    /**
+     * Fills the English side of everything seeded above.
+     *
+     * THE CONTENT SEEDERS WRITE ARABIC ONLY. English lives in one place —
+     * the dictionary inside content:translate-to-english — so the two
+     * languages can be read against each other instead of drifting apart
+     * across nine seeder files. Calling it here is what keeps
+     * `migrate:fresh --seed` a single step that yields a bilingual site.
+     *
+     * Silent by default so the seed output stays readable; run the command
+     * directly to see the per-model table and, more importantly, the list
+     * of Arabic strings with no translation available.
+     *
+     * A missing entry degrades rather than breaks: the English field stays
+     * empty and spatie/laravel-translatable falls back to the Arabic, so
+     * the page renders. The gap is reported, not hidden.
+     */
+    private function translateToEnglish(): void
+    {
+        Artisan::call('content:translate-to-english');
     }
 }
