@@ -99,6 +99,19 @@ class MenuItemSeeder extends Seeder
      * resolves it against the current locale's homepage, so it works from
      * /en as well as /.
      *
+     * THE ORDER OF THIS ARRAY IS THE ORDER OF THE NAVBAR — sort_order is
+     * the array index. It runs from what most visitors want (home, then
+     * what we do, then what it costs) to what fewest do (who we are, what
+     * we write), ending on contact.
+     *
+     * THERE IS NO BOOKING ENTRY, deliberately. "احجز استشارة" is the
+     * orange CTA button in x-public.navbar, which sits after this list in
+     * both the desktop bar and the mobile drawer and points at the same
+     * /book page. A menu row for it as well put the same call to action in
+     * the bar twice, competing with itself — the one thing a CTA must not
+     * do. See the 2026_08_16_000200 data migration, which removes the row
+     * from installs that already have it.
+     *
      * @return array<int, array{key: string, route: string, anchor?: string, label: array<string, string>}>
      */
     private function items(): array
@@ -108,13 +121,17 @@ class MenuItemSeeder extends Seeder
             ['key' => 'nav-services', 'route' => 'services.index', 'anchor' => '#services', 'label' => ['ar' => 'خدماتنا', 'en' => 'Services']],
             ['key' => 'nav-packages', 'route' => 'packages.index', 'anchor' => '#packages', 'label' => ['ar' => 'الباقات', 'en' => 'Packages']],
             ['key' => 'nav-estimator', 'route' => 'estimator', 'anchor' => '#estimator', 'label' => ['ar' => 'حاسبة التكلفة', 'en' => 'Cost Estimator']],
-            ['key' => 'nav-articles', 'route' => 'articles.index', 'anchor' => '#articles', 'label' => ['ar' => 'المدونة', 'en' => 'Blog']],
             ['key' => 'nav-about', 'route' => 'pages.about', 'label' => ['ar' => 'من نحن', 'en' => 'About']],
-            ['key' => 'nav-booking', 'route' => 'booking', 'anchor' => '#booking', 'label' => ['ar' => 'احجز استشارة', 'en' => 'Book a Consultation']],
-            // No anchor: the booking CTA is already its own entry, so pointing
-            // Contact at the same section would give the navbar two links to
-            // one place. This stays dormant until the contact route exists.
-            ['key' => 'nav-contact', 'route' => 'contact', 'anchor' => null, 'label' => ['ar' => 'اتصل بنا', 'en' => 'Contact']],
+            ['key' => 'nav-articles', 'route' => 'articles.index', 'anchor' => '#articles', 'label' => ['ar' => 'المدونة', 'en' => 'Blog']],
+            // No anchor. The contact route is registered now, so this is a
+            // route link; the fallback would have pointed at the homepage
+            // booking section, which is the CTA's destination, not this
+            // item's.
+            //
+            // Labelled to match the contact page's own title
+            // (site.contact.title) rather than its short form, so the bar
+            // and the page a click lands on say the same thing.
+            ['key' => 'nav-contact', 'route' => 'contact', 'anchor' => null, 'label' => ['ar' => 'تواصل معنا', 'en' => 'Contact us']],
         ];
     }
 }
