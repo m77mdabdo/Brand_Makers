@@ -132,6 +132,8 @@ $registerPublicRoutes = function (string $nameSuffix = ''): void {
         ->name("contact.store{$nameSuffix}");
 
     Route::get('/about', [PageController::class, 'about'])->name("pages.about{$nameSuffix}");
+    Route::get('/activities', [PageController::class, 'activities'])->name("pages.activities{$nameSuffix}");
+    Route::get('/why-saudi', [PageController::class, 'whySaudi'])->name("pages.why-saudi{$nameSuffix}");
     Route::get('/our-process', [PageController::class, 'ourProcess'])->name("pages.our-process{$nameSuffix}");
     Route::get('/privacy-policy', [PageController::class, 'privacyPolicy'])->name("pages.privacy-policy{$nameSuffix}");
     Route::get('/terms-and-conditions', [PageController::class, 'termsAndConditions'])->name("pages.terms-and-conditions{$nameSuffix}");

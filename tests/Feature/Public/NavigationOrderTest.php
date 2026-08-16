@@ -35,6 +35,7 @@ class NavigationOrderTest extends TestCase
     private const EXPECTED_ORDER = [
         'nav-home',
         'nav-services',
+        'nav-activities',
         'nav-packages',
         'nav-estimator',
         'nav-about',
@@ -295,13 +296,23 @@ class NavigationOrderTest extends TestCase
     }
 
     /**
-     * Puts the database back the way the OLD seeder left it: the booking
-     * row present, and the previous sort order.
+     * Puts the database back the way the seeder left it AT THE TIME that
+     * migration shipped: the booking row present, the previous sort
+     * order, and nothing the seeder has gained since.
+     *
+     * That last part is what keeps these tests honest as the navigation
+     * grows. The migration reorders only an arrangement it recognises, so
+     * a menu item added later — nav-activities, and whatever follows —
+     * has to be removed here, or the fixture is not the state the
+     * migration was written against and the test would be asserting
+     * against a situation that never existed.
      */
     private function restorePreMigrationState(): void
     {
         /** @var array<string, int> $previous */
         $previous = $this->migrationConstant('PREVIOUS_ORDER');
+
+        MenuItem::topLevel()->system()->whereNotIn('key', array_keys($previous))->delete();
 
         $booking = MenuItem::create([
             'key' => 'nav-booking',
@@ -332,19 +343,37 @@ class NavigationOrderTest extends TestCase
             ->getTranslation('label', $locale, false);
     }
 
-    public function test_the_seeder_and_the_migration_agree_on_the_order(): void
+    /**
+     * Two places encode the sequence — the seeder for fresh installs, a
+     * data migration for existing ones — and they must not contradict
+     * each other.
+     *
+     * NOT equality. The migration is a historical record of one specific
+     * rearrangement and must never be edited once it has run somewhere;
+     * the seeder goes on gaining items. So the invariant that survives
+     * growth is that the migration's sequence is a SUBSEQUENCE of the
+     * seeder's — every item it placed is still present, and still in the
+     * same relative order. An item inserted in the middle (nav-activities
+     * was) satisfies that; two items swapped would not.
+     */
+    public function test_the_migration_order_is_a_subsequence_of_the_seeded_order(): void
     {
-        // Two places encode the sequence — the seeder for fresh installs,
-        // the migration for existing ones. They drift silently otherwise.
-        $this->assertSame(
-            self::EXPECTED_ORDER,
-            array_keys($this->migrationConstant('ORDER'))
-        );
+        $migrationOrder = array_keys($this->migrationConstant('ORDER'));
 
         $this->assertSame(
-            array_values($this->migrationConstant('ORDER')),
+            $migrationOrder,
+            array_values(array_intersect(self::EXPECTED_ORDER, $migrationOrder)),
+            'The seeder has reordered items the migration placed, so the two now disagree.'
+        );
+    }
+
+    public function test_the_seeded_sort_order_is_contiguous_from_zero(): void
+    {
+        $this->seed();
+
+        $this->assertSame(
             range(0, count(self::EXPECTED_ORDER) - 1),
-            'sort_order must be contiguous from zero, as the seeder produces it.'
+            MenuItem::topLevel()->system()->ordered()->pluck('sort_order')->all()
         );
     }
 
@@ -361,8 +390,10 @@ class NavigationOrderTest extends TestCase
             'The duplicate booking row survived the migration.'
         );
 
+        // The arrangement THAT migration installs, which is a prefix of
+        // what the seeder ships today — see the subsequence test below.
         $this->assertSame(
-            self::EXPECTED_ORDER,
+            array_keys($this->migrationConstant('ORDER')),
             MenuItem::topLevel()->system()->ordered()->pluck('key')->all()
         );
 
@@ -418,7 +449,7 @@ class NavigationOrderTest extends TestCase
 
         $this->assertFalse(MenuItem::where('key', 'nav-booking')->exists());
         $this->assertSame(
-            self::EXPECTED_ORDER,
+            array_keys($this->migrationConstant('ORDER')),
             MenuItem::topLevel()->system()->ordered()->pluck('key')->all()
         );
     }
@@ -431,7 +462,7 @@ class NavigationOrderTest extends TestCase
         $this->migration()->up();
 
         $this->assertSame(
-            self::EXPECTED_ORDER,
+            array_keys($this->migrationConstant('ORDER')),
             MenuItem::topLevel()->system()->ordered()->pluck('key')->all()
         );
     }
@@ -440,6 +471,25 @@ class NavigationOrderTest extends TestCase
     {
         /** @var array<string, int> $previous */
         $previous = $this->migrationConstant('PREVIOUS_ORDER');
+
+        /*
+         * Wind the menu back to the exact arrangement that migration
+         * installed: its keys, at its sort_order values.
+         *
+         * Deleting the later additions is not enough on its own —
+         * removing nav-activities from position 2 leaves a hole, and the
+         * migration's guard compares sort_order values, not just the set
+         * of keys. A gapped sequence is not an arrangement it recognises,
+         * so down() would correctly decline to touch it and the test
+         * would be reporting a refusal as a failure.
+         */
+        $order = $this->migrationConstant('ORDER');
+
+        MenuItem::topLevel()->system()->whereNotIn('key', array_keys($order))->delete();
+
+        foreach ($order as $key => $sortOrder) {
+            MenuItem::topLevel()->where('key', $key)->update(['sort_order' => $sortOrder]);
+        }
 
         $migration = $this->migration();
 
@@ -459,7 +509,7 @@ class NavigationOrderTest extends TestCase
         $migration->up();
 
         $this->assertSame(
-            self::EXPECTED_ORDER,
+            array_keys($this->migrationConstant('ORDER')),
             MenuItem::topLevel()->system()->ordered()->pluck('key')->all()
         );
 

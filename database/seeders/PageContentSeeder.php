@@ -34,6 +34,8 @@ class PageContentSeeder extends Seeder
     public function run(): void
     {
         $this->seedAbout();
+        $this->seedActivities();
+        $this->seedWhySaudi();
         $this->seedProcess();
         $this->seedPrivacyPolicy();
         $this->seedTerms();
@@ -42,35 +44,37 @@ class PageContentSeeder extends Seeder
     private function seedAbout(): void
     {
         $this->seedPage('about', [
-            'title' => ['ar' => 'من نحن', 'en' => 'About Us'],
+            'title' => ['ar' => 'من نحن'],
             'body' => [
-                'ar' => '<p>صنّاع العلامات التجارية استوديو متخصص في بناء الهويات البصرية واستراتيجيات العلامات التجارية. نعمل مع الشركات الناشئة والمؤسسات القائمة على تحويل ما تمثّله من فكرة إلى نظام بصري متماسك يعمل في كل مكان تظهر فيه العلامة.</p>'
-                    .'<p>نبدأ كل مشروع بالفهم قبل التصميم: من الجمهور، وما الذي يميّز هذه العلامة، وأين ستُستخدم. ننتهي بنظام كامل ودليل استخدام يمكّن فريقك من تطبيقه بثقة بعد انتهاء تعاوننا.</p>'
-                    .'<p>نصمم بالعربية والإنجليزية معاً، ونتعامل مع النسخة العربية كتصميم قائم بذاته لا كترجمة لاحقة.</p>',
-                'en' => '<p>Creative Mark is a studio specialising in visual identity and brand strategy. We work with startups and established companies to turn what they stand for into a coherent visual system that holds up everywhere the brand appears.</p>'
-                    .'<p>Every project starts with understanding rather than designing: who the audience is, what distinguishes this brand, and where it will be used. Every project ends with a complete system and a usage guide, so your team can apply it confidently after our work together is done.</p>'
-                    .'<p>We design in Arabic and English together, and we treat the Arabic version as a design in its own right rather than a translation added afterwards.</p>',
+                'ar' => '<p>صنّاع العلامات التجارية بيت خبرة سعودي متخصص في تأسيس الشركات وتمكين الاستثمار في المملكة العربية السعودية. نرافق المستثمر من أول استشارة حتى تشغيل كيانه، ونكمل معه بخدمات ما بعد التأسيس.</p>'
+                    .'<p>نعمل مع المستثمر المحلي والأجنبي على السواء، ونغطّي المسار كاملاً: اختيار النشاط والكيان، والتراخيص، والسجل التجاري، والعنوان الوطني والحساب البنكي، ثم المحاسبة والضريبة والزكاة والتأمينات بعد الانطلاق.</p>'
+                    .'<p>رسالتنا أن نجعل رحلة التأسيس واضحة وسريعة وبلا تعقيد: خطوات معلومة، وأسعار معلنة، وفريق يتابع معك حتى تكتمل الإجراءات.</p>',
             ],
-            'meta_title' => ['ar' => 'من نحن — صنّاع العلامات التجارية', 'en' => 'About Us — Creative Mark'],
+            'meta_title' => ['ar' => 'من نحن — صنّاع العلامات التجارية'],
             'meta_description' => [
-                'ar' => 'استوديو متخصص في بناء الهويات البصرية واستراتيجيات العلامات التجارية للشركات الناشئة والمؤسسات.',
-                'en' => 'A studio specialising in visual identity and brand strategy for startups and established companies.',
+                'ar' => 'بيت خبرة سعودي متخصص في تأسيس الشركات وتمكين الاستثمار في المملكة، من الاستشارة الأولى حتى ما بعد التأسيس.',
             ],
         ]);
     }
 
-    private function seedProcess(): void
+    /**
+     * The four economic sectors, as a page of its own.
+     *
+     * "Which activity?" is the first question a formation client has, and
+     * the answer decides the entity, the licences and the cost — so it
+     * gets a page rather than a paragraph. The homepage renders these same
+     * four sections, so the answer is never more than one click away.
+     */
+    private function seedActivities(): void
     {
-        $page = $this->seedPage('our-process', [
-            'title' => ['ar' => 'كيف نعمل', 'en' => 'How We Work'],
+        $page = $this->seedPage('activities', [
+            'title' => ['ar' => 'الأنشطة'],
             'body' => [
-                'ar' => '<p>مسار واحد واضح لكل مشروع، من الاستشارة الأولى حتى تسليم الملفات. تعرف في كل مرحلة أين وصلنا وما المطلوب منك.</p>',
-                'en' => '<p>One clear path for every project, from the first consultation to final handover. At every stage you know where we are and what is needed from you.</p>',
+                'ar' => '<p>نؤسّس ونرخّص شركات في كل القطاعات الاقتصادية، ونرشدك إلى النشاط والكيان الأنسب لما تريد أن تعمل فيه. اختيار النشاط ليس تفصيلاً إدارياً — هو ما يحدّد التراخيص المطلوبة ورأس المال والجهة المنظِّمة، ولذلك نبدأ منه دائماً.</p>',
             ],
-            'meta_title' => ['ar' => 'كيف نعمل — صنّاع العلامات التجارية', 'en' => 'How We Work — Creative Mark'],
+            'meta_title' => ['ar' => 'الأنشطة — صنّاع العلامات التجارية'],
             'meta_description' => [
-                'ar' => 'مراحل العمل في مشاريع الهوية البصرية لدى صنّاع العلامات التجارية، من الاستشارة حتى التسليم.',
-                'en' => 'The stages of a branding project at Creative Mark, from consultation through to handover.',
+                'ar' => 'الأنشطة التجارية والصناعية والزراعية والخدمية التي نؤسّس ونرخّص شركات فيها في المملكة.',
             ],
         ]);
 
@@ -79,11 +83,73 @@ class PageContentSeeder extends Seeder
         }
 
         $this->seedSections($page, [
-            ['key' => 'discovery', 'icon' => 'compass', 'title' => ['ar' => '١. الاكتشاف', 'en' => '1. Discovery'], 'description' => ['ar' => 'جلسة نفهم فيها نشاطك وجمهورك ومنافسيك، ونتفق على نطاق العمل والجدول الزمني.', 'en' => 'A session to understand your business, audience and competitors, and to agree the scope and timeline.']],
-            ['key' => 'strategy', 'icon' => 'map', 'title' => ['ar' => '٢. الاستراتيجية', 'en' => '2. Strategy'], 'description' => ['ar' => 'نصوغ موقع العلامة ونبرة صوتها ورسائلها الأساسية في وثيقة مكتوبة تصبح مرجع المشروع.', 'en' => 'We shape the positioning, tone of voice and core messages into a written document that becomes the project reference.']],
-            ['key' => 'exploration', 'icon' => 'pencil', 'title' => ['ar' => '٣. الاستكشاف', 'en' => '3. Exploration'], 'description' => ['ar' => 'نقدّم اتجاهات بصرية متعددة مبنية على الاستراتيجية، وتختار الاتجاه الذي نطوّره.', 'en' => 'We present several visual directions grounded in the strategy, and you choose the one we develop.']],
-            ['key' => 'development', 'icon' => 'palette', 'title' => ['ar' => '٤. التطوير', 'en' => '4. Development'], 'description' => ['ar' => 'نطوّر الاتجاه المختار إلى نظام كامل: الشعار وتنويعاته، الألوان، الخطوط، وأسلوب الصور.', 'en' => 'We develop the chosen direction into a full system: the logo and its variants, colour, typography and image style.']],
-            ['key' => 'delivery', 'icon' => 'package', 'title' => ['ar' => '٥. التسليم', 'en' => '5. Handover'], 'description' => ['ar' => 'تستلم الملفات المفتوحة والجاهزة للاستخدام، مع دليل الهوية الذي يشرح قواعد التطبيق.', 'en' => 'You receive editable and ready-to-use files, with the brand guide setting out the application rules.']],
+            ['key' => 'commercial', 'icon' => 'cart', 'title' => ['ar' => 'تجاري'], 'description' => ['ar' => 'الجملة والتجزئة، والاستيراد والتصدير، والتجارة الإلكترونية، والوكالات والتوزيع.']],
+            ['key' => 'industrial', 'icon' => 'factory', 'title' => ['ar' => 'صناعي'], 'description' => ['ar' => 'المصانع والتصنيع والتحويل والتعبئة والتغليف.']],
+            ['key' => 'agricultural', 'icon' => 'leaf', 'title' => ['ar' => 'زراعي'], 'description' => ['ar' => 'الإنتاج الزراعي والثروة الحيوانية والسمكية والتقنيات الزراعية.']],
+            ['key' => 'services', 'icon' => 'concierge', 'title' => ['ar' => 'خدمي'], 'description' => ['ar' => 'الاستشارات والمقاولات والتقنية والسياحة والضيافة والخدمات اللوجستية.']],
+        ]);
+    }
+
+    /**
+     * The investment case for the market.
+     *
+     * DELIBERATELY UNQUANTIFIED. Every point here is a statement about the
+     * regulatory and economic direction of the market, and not one of them
+     * carries a growth figure, a ranking or a percentage. Those change,
+     * they date badly, and a stale number on a page that exists to build
+     * confidence does the opposite. The ownership point is stated with its
+     * condition attached — "في كثير من الأنشطة" — because it is not
+     * universal and a page that implies otherwise would mislead exactly
+     * the reader it is aimed at.
+     */
+    private function seedWhySaudi(): void
+    {
+        $page = $this->seedPage('why-invest-saudi-arabia', [
+            'title' => ['ar' => 'لماذا تستثمر في السعودية'],
+            'body' => [
+                'ar' => '<p>تشهد المملكة تحوّلاً اقتصادياً واسعاً فتح قطاعات جديدة أمام الاستثمار المحلي والأجنبي وبسّط كثيراً من إجراءات التأسيس والترخيص. فيما يلي أبرز ما يجعلها وجهة تستحق الدراسة — والتفاصيل الدقيقة تختلف باختلاف النشاط، فابدأ باستشارة قبل أي قرار.</p>',
+            ],
+            'meta_title' => ['ar' => 'لماذا تستثمر في السعودية — صنّاع العلامات التجارية'],
+            'meta_description' => [
+                'ar' => 'أبرز عوامل الجذب الاستثماري في المملكة العربية السعودية للمستثمرين المحليين والأجانب.',
+            ],
+        ]);
+
+        if ($page === null) {
+            return;
+        }
+
+        $this->seedSections($page, [
+            ['key' => 'growing-economy', 'icon' => 'chart', 'title' => ['ar' => 'اقتصاد متنامٍ'], 'description' => ['ar' => 'سوق كبير ومتنوّع تدعمه استثمارات واسعة في البنية التحتية والقطاعات غير النفطية.']],
+            ['key' => 'vision-2030', 'icon' => 'compass', 'title' => ['ar' => 'رؤية 2030'], 'description' => ['ar' => 'استراتيجية وطنية تعمل على تنويع الاقتصاد وفتح قطاعات جديدة أمام القطاع الخاص.']],
+            ['key' => 'foreign-ownership', 'icon' => 'globe', 'title' => ['ar' => 'تملّك أجنبي كامل في كثير من الأنشطة'], 'description' => ['ar' => 'تتيح الأنظمة للمستثمر الأجنبي تملّك شركته بالكامل في كثير من الأنشطة دون شريك محلي. الأهلية تختلف بحسب النشاط، ونراجعها معك قبل البدء.']],
+            ['key' => 'location', 'icon' => 'globe', 'title' => ['ar' => 'موقع استراتيجي يربط ثلاث قارات'], 'description' => ['ar' => 'تتوسط المملكة آسيا وأفريقيا وأوروبا، وهو ما يمنحها موقعاً لوجستياً للوصول إلى أسواق إقليمية وعالمية.']],
+            ['key' => 'incentives', 'icon' => 'stamp', 'title' => ['ar' => 'حوافز ومناطق اقتصادية'], 'description' => ['ar' => 'برامج ومناطق اقتصادية خاصة تقدّم مزايا للمستثمرين في قطاعات ذات أولوية.']],
+        ]);
+    }
+
+    private function seedProcess(): void
+    {
+        $page = $this->seedPage('our-process', [
+            'title' => ['ar' => 'كيف نعمل'],
+            'body' => [
+                'ar' => '<p>مسار واحد واضح لكل عميل، من الاستشارة الأولى حتى تشغيل الكيان. تعرف في كل مرحلة أين وصلت الإجراءات وما المطلوب منك.</p>',
+            ],
+            'meta_title' => ['ar' => 'كيف نعمل — صنّاع العلامات التجارية'],
+            'meta_description' => [
+                'ar' => 'مراحل التأسيس لدى صنّاع العلامات التجارية، من الاستشارة وتحديد النشاط حتى ما بعد التأسيس.',
+            ],
+        ]);
+
+        if ($page === null) {
+            return;
+        }
+
+        $this->seedSections($page, [
+            ['key' => 'consultation', 'icon' => 'compass', 'title' => ['ar' => '١. استشارة وتحديد النشاط والكيان'], 'description' => ['ar' => 'نفهم هدفك من الدخول إلى السوق، ونحدّد معك النشاط والشكل القانوني الأنسب والتراخيص التي يفرضها.']],
+            ['key' => 'documents', 'icon' => 'document', 'title' => ['ar' => '٢. تجهيز المستندات والتراخيص'], 'description' => ['ar' => 'نحصر ما يلزم من مستندات وتصديقات، ونجهّز ملفات التراخيص ونقدّمها إلى الجهات المختصة.']],
+            ['key' => 'registration', 'icon' => 'stamp', 'title' => ['ar' => '٣. إصدار السجل والتوثيق'], 'description' => ['ar' => 'نصدر السجل التجاري ونوثّق عقد التأسيس، ونستكمل العنوان الوطني وملف الحساب البنكي.']],
+            ['key' => 'post-formation', 'icon' => 'calculator', 'title' => ['ar' => '٤. ما بعد التأسيس والتشغيل'], 'description' => ['ar' => 'نسجّلك لدى الجهات المطلوبة، وندير المحاسبة والإقرارات والتأمينات والتجديدات حتى يعمل الكيان بانتظام.']],
         ]);
     }
 
