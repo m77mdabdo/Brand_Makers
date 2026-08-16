@@ -6,28 +6,47 @@ use App\Models\Package;
 use Illuminate\Database\Seeder;
 
 /**
- * The real package tiers this studio offers.
+ * The three formation packages, with the prices the business set.
  *
- * EVERY PACKAGE IS SEEDED WITH price = NULL, ON PURPOSE.
+ * THESE FIGURES ARE REAL AND THAT IS WHY THEY ARE HERE. This seeder used
+ * to ship price = null on purpose, because the branding tiers it carried
+ * had no agreed pricing and a seeded number would have put a figure on the
+ * public pricing page that nobody had approved. That reasoning has not
+ * changed — it has been satisfied. 13,000 / 22,000 / 30,000 SAR came from
+ * the business, so seeding them invents nothing.
  *
- * The tier names, descriptions and feature lists are genuine: they
- * describe what is actually included at each level, so they are
- * production content and belong here. The PRICES are not — nobody has
- * agreed them, and a seeded number would go straight onto the public
- * pricing page as a figure the business never set. That is exactly the
- * failure the production/demo split exists to prevent.
+ * The no-overwrite rule stays, and matters more now than it did: price is
+ * set when the row is CREATED and never re-applied on an existing row, so
+ * re-seeding to pick up a wording change cannot roll a live price back to
+ * the number in this file.
  *
- * NULL is not a placeholder here, it is a meaning: `price` is nullable
- * precisely so a package can be "على الطلب / on request" rather than free
- * (which 0.00 would say). A fresh install therefore ships a complete,
- * truthful pricing page, and an admin sets real figures in the dashboard.
+ * ARABIC ONLY. English comes from content:translate-to-english, including
+ * every entry in the `features` arrays — see that command's
+ * translatePackages(), which walks that JSON shape by hand because spatie
+ * knows nothing about it.
  *
- * Slugs are explicit so re-running matches instead of duplicating, and
- * prices are NOT re-applied on an existing row — re-seeding must never
- * blank a price an admin has entered.
+ * THE FEATURE LISTS ARE A STARTING POINT. They are drawn from the service
+ * catalogue and describe the shape of each tier honestly, but the exact
+ * inclusions are a commercial decision that belongs to whoever sells them.
+ * The admin refines them in Dashboard → الباقات, which is why they are
+ * data rather than markup.
  */
 class PackageSeeder extends Seeder
 {
+    /**
+     * The branding tiers this replaced.
+     *
+     * Named explicitly rather than removed by "anything not in my list",
+     * so a package an admin created survives. Soft-deleted rather than
+     * force-deleted, unlike the retired services: orders and leads carry a
+     * package_id, and a hard delete would leave those rows pointing at
+     * nothing. The models already read through withTrashed() for exactly
+     * this reason.
+     *
+     * @var list<string>
+     */
+    private const RETIRED_SLUGS = ['starter', 'growth', 'complete', 'enterprise'];
+
     public function run(): void
     {
         foreach ($this->packages() as $sortOrder => $package) {
@@ -46,12 +65,18 @@ class PackageSeeder extends Seeder
             if ($existing) {
                 // price deliberately omitted: never overwrite a real figure.
                 $existing->update($attributes);
+                $existing->restore();
 
                 continue;
             }
 
-            Package::create($attributes + ['slug' => $package['slug'], 'price' => null]);
+            Package::create($attributes + [
+                'slug' => $package['slug'],
+                'price' => $package['price'],
+            ]);
         }
+
+        Package::whereIn('slug', self::RETIRED_SLUGS)->delete();
     }
 
     /**
@@ -61,69 +86,40 @@ class PackageSeeder extends Seeder
     {
         return [
             [
-                'slug' => 'starter',
-                'name' => ['ar' => 'الباقة الأساسية', 'en' => 'Starter'],
-                'description' => [
-                    'ar' => 'للمشاريع الجديدة التي تحتاج شعاراً وأساسيات بصرية للانطلاق.',
-                    'en' => 'For new ventures that need a logo and the visual basics to launch.',
-                ],
+                'slug' => 'formation-basic',
+                'price' => 13000,
+                'name' => ['ar' => 'الباقة الأساسية'],
+                'description' => ['ar' => 'تأسيس بدون استحواذ — كيان جديد بسجل تجاري وعقد تأسيس، لمن يبدأ من الصفر.'],
                 'features' => [
-                    ['ar' => 'تصميم الشعار بثلاثة اتجاهات', 'en' => 'Logo design across three directions'],
-                    ['ar' => 'تنويعات الشعار (أفقي، عمودي، مختصر)', 'en' => 'Logo variants (horizontal, vertical, compact)'],
-                    ['ar' => 'لوحة الألوان الأساسية', 'en' => 'Core colour palette'],
-                    ['ar' => 'اختيار الخطوط العربية واللاتينية', 'en' => 'Arabic and Latin typeface selection'],
-                    ['ar' => 'تصميم بطاقة الأعمال', 'en' => 'Business card design'],
-                    ['ar' => 'الملفات المفتوحة والجاهزة للاستخدام', 'en' => 'Editable source and ready-to-use files'],
+                    ['ar' => 'تأسيس الشركة'],
+                    ['ar' => 'السجل التجاري'],
+                    ['ar' => 'عقد التأسيس'],
+                    ['ar' => 'استشارة تحديد النشاط والكيان'],
                 ],
             ],
             [
-                'slug' => 'growth',
+                'slug' => 'formation-acquisition',
+                'price' => 22000,
                 'is_popular' => true,
-                'name' => ['ar' => 'باقة النمو', 'en' => 'Growth'],
-                'description' => [
-                    'ar' => 'هوية بصرية كاملة مع دليل استخدام، للشركات التي تحتاج نظاماً متماسكاً لا شعاراً فقط.',
-                    'en' => 'A complete visual identity with a usage guide, for companies that need a coherent system rather than a logo alone.',
-                ],
+                'name' => ['ar' => 'الباقة المتكاملة'],
+                'description' => ['ar' => 'تأسيس بالاستحواذ — كيان قائم يُنقل إليك، مع رخصة الاستثمار ومتابعة حكومية.'],
                 'features' => [
-                    ['ar' => 'كل ما في الباقة الأساسية', 'en' => 'Everything in Starter'],
-                    ['ar' => 'جلسة اكتشاف وتحديد الموقع', 'en' => 'Discovery and positioning session'],
-                    ['ar' => 'نظام هوية بصرية كامل', 'en' => 'Full visual identity system'],
-                    ['ar' => 'أسلوب الصور والرسومات', 'en' => 'Image and illustration style'],
-                    ['ar' => 'دليل استخدام الهوية', 'en' => 'Brand usage guide'],
-                    ['ar' => 'الأوراق الرسمية والمطبوعات الأساسية', 'en' => 'Stationery and core print collateral'],
-                    ['ar' => 'قوالب السوشيال ميديا', 'en' => 'Social media templates'],
+                    ['ar' => 'كل ما في الباقة الأساسية'],
+                    ['ar' => 'الاستحواذ على شركة قائمة'],
+                    ['ar' => 'رخصة الاستثمار الأجنبي'],
+                    ['ar' => 'متابعة حكومية حتى اكتمال الإجراءات'],
                 ],
             ],
             [
-                'slug' => 'complete',
-                'name' => ['ar' => 'الباقة المتكاملة', 'en' => 'Complete'],
-                'description' => [
-                    'ar' => 'استراتيجية وهوية وتطبيقات رقمية ومطبوعة، لعلامة تُطلق أو تُعاد بناؤها بالكامل.',
-                    'en' => 'Strategy, identity and both digital and print applications, for a brand launching or rebuilding entirely.',
-                ],
+                'slug' => 'formation-complete',
+                'price' => 30000,
+                'name' => ['ar' => 'الباقة الشاملة'],
+                'description' => ['ar' => 'تأسيس بالاستحواذ مع خدمات ما بعد التأسيس لمدة ستة أشهر.'],
                 'features' => [
-                    ['ar' => 'كل ما في باقة النمو', 'en' => 'Everything in Growth'],
-                    ['ar' => 'وثيقة استراتيجية العلامة التجارية', 'en' => 'Written brand strategy document'],
-                    ['ar' => 'بحث السوق والمنافسين', 'en' => 'Market and competitor research'],
-                    ['ar' => 'نبرة الصوت والرسائل الأساسية', 'en' => 'Tone of voice and core messaging'],
-                    ['ar' => 'شعار متحرك', 'en' => 'Animated logo'],
-                    ['ar' => 'تصميم واجهات الموقع', 'en' => 'Website interface design'],
-                    ['ar' => 'تصميم التغليف عند الحاجة', 'en' => 'Packaging design where relevant'],
-                ],
-            ],
-            [
-                'slug' => 'enterprise',
-                'name' => ['ar' => 'باقة المؤسسات', 'en' => 'Enterprise'],
-                'description' => [
-                    'ar' => 'نطاق يُفصَّل حسب حجم المؤسسة وعدد وحداتها وأسواقها. تبدأ دائماً بجلسة استشارة.',
-                    'en' => 'Scope tailored to the size of the organisation, its business units and its markets. Always begins with a consultation.',
-                ],
-                'features' => [
-                    ['ar' => 'كل ما في الباقة المتكاملة', 'en' => 'Everything in Complete'],
-                    ['ar' => 'هوية لعدة علامات أو وحدات أعمال', 'en' => 'Identity across multiple brands or business units'],
-                    ['ar' => 'نظام هوية موسّع مع حالات استخدام متعددة', 'en' => 'Extended identity system with multiple use cases'],
-                    ['ar' => 'ورش عمل مع فرق العميل', 'en' => 'Workshops with the client\'s teams'],
-                    ['ar' => 'دعم التطبيق بعد التسليم', 'en' => 'Post-handover implementation support'],
+                    ['ar' => 'كل ما في الباقة المتكاملة'],
+                    ['ar' => 'محاسبة لمدة ٦ أشهر'],
+                    ['ar' => 'ضريبة القيمة المضافة والزكاة لمدة ٦ أشهر'],
+                    ['ar' => 'التأمينات الاجتماعية لمدة ٦ أشهر'],
                 ],
             ],
         ];

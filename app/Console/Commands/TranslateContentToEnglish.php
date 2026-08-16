@@ -124,6 +124,39 @@ class TranslateContentToEnglish extends Command
         '<p>قبل التأسيس أسئلة تستحق إجابة: أي نشاط تحديداً، وأي شكل قانوني، وما التراخيص التي يفرضها ذلك، وما التكلفة الحقيقية للتشغيل في السنة الأولى.</p><p>نقدّم استشارة تجيب على هذه الأسئلة بالأرقام والأنظمة السارية، ودراسة جدوى عند الحاجة تقيس السوق والتكاليف والإيرادات المتوقعة — لتتخذ قرارك على أساس، لا على تقدير.</p>' => '<p>Formation is preceded by questions worth answering: which activity exactly, which legal form, which licences that imposes, and what operating in the first year genuinely costs.</p><p>We provide a consultation that answers those questions against the figures and the regulations in force, and a feasibility study where one is needed, measuring the market, the costs and the expected revenue — so that your decision rests on a basis rather than an estimate.</p>',
         'وصف الفكرة أو النشاط المستهدف، والسوق أو المدينة محل الاهتمام، والميزانية المتاحة مبدئياً.' => 'A description of the idea or the target activity, the market or city of interest, and the budget available at this stage.',
         'جلسة نفهم فيها هدفك، ثم مراجعة الأنشطة والتراخيص والتكاليف المرتبطة، ثم تسليم توصية مكتوبة أو دراسة جدوى حسب النطاق المتفق عليه.' => 'A session to understand your objective, then a review of the activities, licences and associated costs, then delivery of a written recommendation or a feasibility study depending on the scope agreed.',
+
+        // -------------------------------------------------------------
+        // PackageSeeder — names, descriptions and every `features` entry
+        // -------------------------------------------------------------
+        'الباقة الأساسية' => 'Basic Package',
+        'تأسيس بدون استحواذ — كيان جديد بسجل تجاري وعقد تأسيس، لمن يبدأ من الصفر.' => 'Formation without acquisition — a new entity with a Commercial Registration and articles of association, for starting from scratch.',
+        'تأسيس الشركة' => 'Company formation',
+        'السجل التجاري' => 'Commercial Registration',
+        'عقد التأسيس' => 'Articles of association',
+        'استشارة تحديد النشاط والكيان' => 'A consultation to settle the activity and the entity',
+
+        'الباقة المتكاملة' => 'Integrated Package',
+        'تأسيس بالاستحواذ — كيان قائم يُنقل إليك، مع رخصة الاستثمار ومتابعة حكومية.' => 'Formation by acquisition — an existing entity transferred to you, with the investment licence and government follow-up.',
+        'كل ما في الباقة الأساسية' => 'Everything in the Basic Package',
+        'متابعة حكومية حتى اكتمال الإجراءات' => 'Government follow-up until the procedures are complete',
+
+        'الباقة الشاملة' => 'Comprehensive Package',
+        'تأسيس بالاستحواذ مع خدمات ما بعد التأسيس لمدة ستة أشهر.' => 'Formation by acquisition, with six months of post-formation services.',
+        'كل ما في الباقة المتكاملة' => 'Everything in the Integrated Package',
+        'محاسبة لمدة ٦ أشهر' => 'Accounting for 6 months',
+        'ضريبة القيمة المضافة والزكاة لمدة ٦ أشهر' => 'VAT and zakat for 6 months',
+        'التأمينات الاجتماعية لمدة ٦ أشهر' => 'Social insurance for 6 months',
+
+        // -------------------------------------------------------------
+        // EstimatorItemSeeder
+        // -------------------------------------------------------------
+        'رخصة بلدية أو قطاعية' => 'Municipal or sector licence',
+        'فتح حساب بنكي' => 'Bank account opening',
+        'العنوان الوطني' => 'National Address',
+        'باقة محاسبة سنوية' => 'Annual accounting package',
+        'ضريبة القيمة المضافة والزكاة' => 'VAT and zakat',
+        'التأمينات الاجتماعية' => 'Social insurance',
+        'دراسة جدوى' => 'Feasibility study',
     ];
 
     /**

@@ -242,11 +242,10 @@ return [
         'unpriced_hint' => 'The estimator is not open yet — our rates are being finalised. Get in touch and we will price your project directly.',
         'unpriced_cta' => 'Contact us',
         'groups' => [
-            'identity' => 'Visual identity',
-            'strategy' => 'Brand strategy',
-            'print' => 'Print',
-            'digital' => 'Digital',
-            'content' => 'Content',
+            'licensing' => 'Licensing',
+            'banking' => 'Banking and address',
+            'compliance' => 'Accounting and compliance',
+            'advisory' => 'Advisory',
         ],
     ],
 

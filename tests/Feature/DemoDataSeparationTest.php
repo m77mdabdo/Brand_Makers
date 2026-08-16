@@ -104,16 +104,48 @@ class DemoDataSeparationTest extends TestCase
         $this->assertSame([], $found, 'Production content must never be labelled sample data: '.implode(', ', $found));
     }
 
-    public function test_the_production_seed_quotes_no_price_anywhere(): void
+    /**
+     * The production seed once carried no price at all. It now carries
+     * exactly three, because the business set them — which does not
+     * weaken the rule, it narrows it: a figure may ship only if someone
+     * agreed it.
+     *
+     * The estimator's ADD-ON catalogue is still entirely unpriced and
+     * inactive, and that is what this guards. The three tiers reach the
+     * estimator as its optional package base (EstimatorService::quote),
+     * not as line items — so ticking every add-on still adds nothing.
+     */
+    public function test_the_production_seed_prices_only_what_the_business_agreed(): void
     {
         $this->seed();
 
-        $this->assertSame(0, Package::whereNotNull('price')->count());
-        $this->assertSame(0, EstimatorItem::active()->count());
+        $this->assertSame(3, Package::whereNotNull('price')->count());
+
+        $this->assertSame(
+            0,
+            EstimatorItem::active()->count(),
+            'An add-on may not go live until someone prices it.'
+        );
+
         $this->assertSame(
             '0.00',
             EstimatorItem::estimateFor(EstimatorItem::pluck('key')->all()),
-            'A visitor who ticked every box must not be quoted an invented total.'
+            'A visitor who ticked every add-on must not be quoted an invented total.'
+        );
+    }
+
+    /**
+     * The three tiers must not ALSO exist as estimator line items — a
+     * visitor could then pick the package and its twin item and be
+     * charged for the tier twice.
+     */
+    public function test_the_package_tiers_are_not_duplicated_as_estimator_items(): void
+    {
+        $this->seed();
+
+        $this->assertSame(
+            [],
+            EstimatorItem::whereIn('key', Package::pluck('slug')->all())->pluck('key')->all()
         );
     }
 

@@ -167,16 +167,37 @@ class SeedersTest extends TestCase
         }
     }
 
-    public function test_seeded_packages_carry_no_invented_price(): void
+    /**
+     * The packages used to ship price = null because nobody had agreed a
+     * figure. The business has since set all three, so the rule under
+     * test is no longer "no prices" — it is "ONLY these prices".
+     *
+     * Pinned to the exact figures rather than merely "not null": that is
+     * what makes an accidental edit to the seeder visible here instead of
+     * on the public pricing page.
+     */
+    public function test_seeded_packages_carry_only_the_prices_the_business_set(): void
     {
         $this->seed();
 
-        $this->assertGreaterThan(0, Package::count());
         $this->assertSame(
-            Package::count(),
-            Package::whereNull('price')->count(),
-            'A seeded price would put a figure the studio never agreed on the public pricing page.'
+            [
+                'formation-basic' => '13000.00',
+                'formation-acquisition' => '22000.00',
+                'formation-complete' => '30000.00',
+            ],
+            Package::query()->active()->ordered()->pluck('price', 'slug')->all()
         );
+    }
+
+    public function test_exactly_one_package_is_flagged_most_popular(): void
+    {
+        $this->seed();
+
+        $popular = Package::query()->active()->where('is_popular', true)->get();
+
+        $this->assertCount(1, $popular, 'Two "most popular" badges make the label meaningless.');
+        $this->assertSame('formation-acquisition', $popular->first()->slug);
     }
 
     public function test_seeded_estimator_items_ship_inactive_until_someone_prices_them(): void

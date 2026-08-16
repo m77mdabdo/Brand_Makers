@@ -314,12 +314,22 @@ class HomepageTest extends TestCase
         $response->assertDontSee('99,999', false);
     }
 
+    /**
+     * price = null means "on request", which is a different fact from
+     * 0.00 (free). The seeded tiers all carry a real figure now, so the
+     * unpriced case is built explicitly rather than borrowed from the
+     * seed — which is what stops this test quietly passing for the wrong
+     * reason the next time pricing changes.
+     */
     public function test_a_package_with_no_price_reads_as_on_request_not_as_free(): void
     {
         $this->seed();
 
-        // Every seeded package ships price = null.
-        $this->assertSame(Package::count(), Package::whereNull('price')->count());
+        Package::factory()->create([
+            'price' => null,
+            'sort_order' => 99,
+            'name' => ['ar' => 'باقة مخصّصة', 'en' => 'Custom package'],
+        ]);
 
         $response = $this->get('/');
         $response->assertSee(__('site.packages.price_on_request'), false);

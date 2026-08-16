@@ -31,34 +31,17 @@ class DemoEstimatorPricingSeeder extends Seeder
     private function prices(): array
     {
         return [
-            'logo-design' => 6000,
-            'logo-variants' => 1500,
-            'colour-palette' => 1200,
-            'typography-system' => 1800,
-            'brand-guidelines' => 5000,
+            'foreign-investment-licence' => 12000,
+            'municipal-sector-licence' => 3500,
 
-            'discovery-session' => 2500,
-            'market-research' => 7000,
-            'positioning' => 5500,
-            'tone-of-voice' => 3500,
+            'bank-account' => 2500,
+            'national-address' => 800,
 
-            'business-cards' => 900,
-            'stationery' => 1800,
-            'company-profile' => 6500,
-            'brochure' => 3200,
-            'signage' => 2800,
-            'packaging' => 9000,
+            'accounting-annual' => 9000,
+            'vat-and-zakat' => 6000,
+            'social-insurance' => 2400,
 
-            'website-design' => 18000,
-            'landing-page' => 4500,
-            'email-templates' => 2200,
-            'presentation-template' => 3000,
-
-            'social-templates' => 4000,
-            'social-monthly' => 5500,
-            'animated-logo' => 3800,
-            'explainer-video' => 12000,
-            'photography-direction' => 6800,
+            'feasibility-study' => 15000,
         ];
     }
 
