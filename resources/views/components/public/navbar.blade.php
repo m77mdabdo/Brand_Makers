@@ -1,5 +1,17 @@
 @props(['menu', 'siteName'])
 
+@php
+    /*
+     * The booking CTA is the ONLY thing in the bar pointing at /book —
+     * there is no menu row for it — so nothing else can carry the current
+     * -page marker on the booking page. Without this, a screen-reader user
+     * on /book hears no indication of where they are.
+     *
+     * The base name, so the marker is identical on /book and /en/book.
+     */
+    $bookingIsCurrent = current_route_base_name() === 'booking';
+@endphp
+
 {{--
     Translucent, blurred, sticky.
 
@@ -77,7 +89,21 @@
                     {{ app()->getLocale() === 'ar' ? __('site.nav.switch_to_english') : __('site.nav.switch_to_arabic') }}
                 </a>
 
-                <a href="#booking" class="btn btn-primary hidden !px-5 !py-2.5 !text-sm sm:inline-flex">
+                {{--
+                    THE ONE booking call to action in the bar. There is no
+                    menu row for it — a plain link and a CTA button to the
+                    same page put the same ask twice in one bar, competing
+                    for the same click. See MenuItemSeeder::items().
+
+                    lroute('booking'), not "#booking": the bar renders on
+                    every page, and a fragment pointing at a homepage
+                    section did nothing at all from the other thirty.
+                --}}
+                <a
+                    href="{{ lroute('booking') }}"
+                    @if ($bookingIsCurrent) aria-current="page" @endif
+                    class="btn btn-primary hidden !px-5 !py-2.5 !text-sm sm:inline-flex"
+                >
                     {{ __('site.nav.book_consultation') }}
                 </a>
 
@@ -160,7 +186,14 @@
             @endforelse
         </nav>
 
-        <a href="#booking" @click="mobileOpen = false" class="btn btn-primary mt-5 w-full">
+        {{-- The drawer's copy of the CTA, last, after the menu — same
+             destination and same "only once" rule as the desktop bar. --}}
+        <a
+            href="{{ lroute('booking') }}"
+            @click="mobileOpen = false"
+            @if ($bookingIsCurrent) aria-current="page" @endif
+            class="btn btn-primary mt-5 w-full"
+        >
             {{ __('site.nav.book_consultation') }}
         </a>
     </div>
