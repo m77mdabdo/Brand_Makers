@@ -198,7 +198,6 @@ class EstimatorItemsCrudTest extends TestCase
             'no Arabic label' => [['label' => ['ar' => '', 'en' => 'English only']], 'label.ar'],
             'no group' => [['group' => ''], 'group'],
             'a group with spaces' => [['group' => 'not a slug'], 'group'],
-            'no price' => [['price' => ''], 'price'],
             'a non-numeric price' => [['price' => 'free'], 'price'],
             'a negative price' => [['price' => '-1'], 'price'],
             'a price past the column' => [['price' => '99999999999999'], 'price'],
@@ -220,16 +219,42 @@ class EstimatorItemsCrudTest extends TestCase
         $this->assertSame(0, EstimatorItem::count());
     }
 
-    public function test_an_item_priced_at_zero_cannot_be_switched_on(): void
+    /**
+     * This asserted the opposite until price became nullable.
+     *
+     * The old rule — an active item must carry a price above zero —
+     * existed only because there was no way to say "not priced yet"
+     * except is_active = false. Now null says it, so an active line
+     * without a price is a legitimate state: it renders as "على الطلب"
+     * and turns the quote into a floor instead of adding nothing silently.
+     */
+    public function test_a_blank_price_saves_as_on_request_and_may_be_live(): void
+    {
+        $this->actingAs($this->admin)
+            ->post(route('dashboard.estimator-items.store'), $this->payload(['price' => '', 'is_active' => '1']))
+            ->assertSessionHasNoErrors();
+
+        $item = EstimatorItem::sole();
+
+        // null, NOT 0.00 — "on request" is a different fact from free, and
+        // coercing a cleared box to zero would say the wrong one.
+        $this->assertNull($item->price);
+        $this->assertTrue($item->is_active);
+        $this->assertTrue($item->isPriceOnRequest());
+    }
+
+    public function test_an_explicit_zero_is_stored_as_free_rather_than_as_on_request(): void
     {
         $this->actingAs($this->admin)
             ->post(route('dashboard.estimator-items.store'), $this->payload(['price' => '0', 'is_active' => '1']))
-            ->assertSessionHasErrors('price');
+            ->assertSessionHasNoErrors();
 
-        // price is NOT NULL, so 0.00 + inactive is how "no price yet" is
-        // stored. Activating one would publish a line that silently adds
-        // nothing to a visitor's quote.
-        $this->assertSame(0, EstimatorItem::count());
+        $item = EstimatorItem::sole();
+
+        // Typing 0 is an answer: this line costs nothing. It must not be
+        // confused with the blank box above.
+        $this->assertSame('0.00', $item->price);
+        $this->assertFalse($item->isPriceOnRequest());
     }
 
     public function test_an_item_priced_at_zero_may_be_saved_while_inactive(): void

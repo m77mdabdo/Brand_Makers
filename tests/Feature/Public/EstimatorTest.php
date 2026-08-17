@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Public;
 
+use App\Models\EstimatorGroup;
 use App\Models\EstimatorItem;
 use App\Models\Package;
 use App\Services\Estimator\EstimatorService;
@@ -149,6 +150,79 @@ class EstimatorTest extends TestCase
         // The keys reach a whereIn, so the array a client sends cannot be
         // unbounded. 'licence' sits past the cap and is therefore dropped.
         $this->assertNull($this->estimator->quote(null, $keys)['total']);
+    }
+
+    // -----------------------------------------------------------------
+    // Grouped selectors, and on-request lines
+    // -----------------------------------------------------------------
+
+    public function test_the_catalogue_is_returned_as_ordered_groups_with_their_selection_mode(): void
+    {
+        $multi = EstimatorGroup::factory()->create(['key' => 'g-multi', 'sort_order' => 1]);
+        $single = EstimatorGroup::factory()->single()->create(['key' => 'g-single', 'sort_order' => 0]);
+
+        EstimatorItem::factory()->create(['key' => 'm1', 'group' => 'g-multi', 'price' => 100]);
+        EstimatorItem::factory()->create(['key' => 's1', 'group' => 'g-single', 'price' => 200]);
+
+        $groups = $this->estimator->catalogue()['groups'];
+
+        $this->assertSame(['g-single', 'g-multi'], $groups->pluck('key')->all());
+        $this->assertFalse($groups->firstWhere('key', 'g-single')['multiple']);
+        $this->assertTrue($groups->firstWhere('key', 'g-multi')['multiple']);
+    }
+
+    public function test_an_item_whose_group_has_no_row_still_reaches_the_form(): void
+    {
+        EstimatorItem::factory()->create(['key' => 'stray', 'group' => 'no-such-group', 'price' => 300]);
+
+        $groups = $this->estimator->catalogue()['groups'];
+
+        // Mid-rename is a normal state. Losing priced items because their
+        // heading is missing would be the wrong trade.
+        $this->assertSame(['no-such-group'], $groups->pluck('key')->all());
+        $this->assertSame('no-such-group', $groups->first()['label']);
+    }
+
+    public function test_an_on_request_item_is_named_rather_than_summed(): void
+    {
+        EstimatorItem::factory()->create(['key' => 'priced', 'price' => 5000, 'label' => ['ar' => 'مسعّر', 'en' => 'Priced']]);
+        EstimatorItem::factory()->create(['key' => 'ask', 'price' => null, 'label' => ['ar' => 'على الطلب', 'en' => 'On request']]);
+
+        $quote = $this->estimator->quote(null, ['priced', 'ask']);
+
+        // The figure is a FLOOR: the on-request line adds nothing to it
+        // and is named, so the visitor can see which part is missing.
+        $this->assertSame('5000.00', $quote['total']);
+        $this->assertTrue($quote['is_partial']);
+        $this->assertContains('على الطلب', $quote['on_request']);
+    }
+
+    public function test_a_selection_made_only_of_on_request_items_produces_no_total(): void
+    {
+        EstimatorItem::factory()->create(['key' => 'ask-a', 'price' => null]);
+        EstimatorItem::factory()->create(['key' => 'ask-b', 'price' => null]);
+
+        $quote = $this->estimator->quote(null, ['ask-a', 'ask-b']);
+
+        // "on request", not "0.00" — a zero here would read as free.
+        $this->assertNull($quote['total']);
+        $this->assertTrue($quote['has_selection']);
+        $this->assertTrue($quote['is_partial']);
+    }
+
+    public function test_an_on_request_item_does_not_open_the_estimator_on_its_own(): void
+    {
+        // has_pricing has to mean "there is a real figure somewhere", not
+        // "there are rows": a calculator whose every line says على الطلب
+        // and whose total is always zero is the lie this gate exists to
+        // prevent.
+        EstimatorItem::factory()->create(['key' => 'ask-only', 'price' => null, 'is_active' => true]);
+
+        $this->assertFalse($this->estimator->catalogue()['has_pricing']);
+
+        Package::factory()->create(['price' => 13000, 'is_active' => true]);
+
+        $this->assertTrue($this->estimator->catalogue()['has_pricing']);
     }
 
     // -----------------------------------------------------------------

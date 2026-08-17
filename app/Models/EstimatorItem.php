@@ -50,6 +50,24 @@ class EstimatorItem extends Model
         return $query->orderBy('group')->orderBy('sort_order')->orderBy('id');
     }
 
+    /**
+     * True when this line has no agreed figure yet.
+     *
+     * Same meaning as Package::isPriceOnRequest(): null is "on request",
+     * which is a different fact from 0.00 (free). An on-request item is
+     * still selectable — it turns the quote into a floor rather than
+     * contributing a number.
+     */
+    public function isPriceOnRequest(): bool
+    {
+        return $this->price === null;
+    }
+
+    public function scopePriced(Builder $query): Builder
+    {
+        return $query->whereNotNull('price')->where('price', '>', 0);
+    }
+
     public function scopeInGroup(Builder $query, string $group): Builder
     {
         return $query->where('group', $group);
@@ -95,6 +113,10 @@ class EstimatorItem extends Model
      */
     public static function estimateFor(array $keys): string
     {
+        // sum() ignores NULL, so on-request lines contribute nothing to
+        // the figure — which is what makes it a floor rather than a wrong
+        // total. Callers that need to KNOW the figure is partial ask
+        // EstimatorService::quote(), which reports it explicitly.
         $total = static::query()
             ->active()
             ->whereIn('key', array_filter($keys, 'is_string'))

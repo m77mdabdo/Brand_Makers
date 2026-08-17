@@ -108,6 +108,7 @@ return [
         'orders' => 'Orders',
         'bookings' => 'Bookings',
         'booking_availability' => 'Booking availability',
+        'estimator_groups' => 'Estimator groups',
         'estimator_items' => 'Cost estimator',
         'tracking' => 'Tracking codes',
         'visitor_sessions' => 'Visitor sessions',
@@ -617,5 +618,21 @@ return [
             'visitor_sessions_retention_days' => 'Retention (days)',
         ],
         'logo_help' => 'Replaces the default logo in the footer. JPG, PNG or WebP, up to 2 MB.',
+    ],
+
+    'estimator_groups' => [
+        'intro' => 'Each group appears to the visitor as one selector in the cost estimator. Order them, and decide whether a visitor picks one option or several.',
+        'empty' => 'No groups have been added yet.',
+        'label_ar' => 'Name (Arabic)',
+        'label_en' => 'Name (English)',
+        'selection' => 'Selection type',
+        'selection_help' => '"Single" renders a dropdown that accepts one answer; "multiple" lets the visitor pick more than one option.',
+        'selections' => [
+            'single' => 'Single choice',
+            'multi' => 'Multiple choice',
+        ],
+        'key_help' => 'A stable English identifier that estimator items point at. Leave blank to derive it from the name; it cannot be changed after saving.',
+        'item_count' => ':active active of :total',
+        'confirm_delete' => 'Only the group heading is deleted. Its items are kept and will keep appearing in the estimator under their raw identifier until you move them to another group. Continue?',
     ],
 ];

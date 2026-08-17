@@ -52,6 +52,9 @@ Alpine.data('costEstimator', (config = {}) => ({
     packages: config.packages || {},
     locale: config.locale || 'ar',
 
+    /** Rendered strings from the server; the client formats no copy. */
+    labels: config.labels || { none: '', selected: '' },
+
     selectedItems: [],
     selectedPackage: '',
 
@@ -74,7 +77,47 @@ Alpine.data('costEstimator', (config = {}) => ({
         return lines;
     },
 
-    /** Selected lines that carry no price — a package on request. */
+    /**
+     * The button text for a multi-select group: what is chosen from it,
+     * or a prompt when nothing is.
+     *
+     * The group's own keys are passed in rather than read from a group
+     * map, because the template already knows them and threading a second
+     * copy of the catalogue through the payload would give two places for
+     * the grouping to drift.
+     *
+     * @param {string[]} keys
+     */
+    groupSummary(keys) {
+        const chosen = keys.filter((key) => this.selectedItems.includes(key));
+
+        if (chosen.length === 0) {
+            return this.labels.none;
+        }
+
+        if (chosen.length === 1) {
+            return this.items[chosen[0]]?.label ?? this.labels.none;
+        }
+
+        return this.labels.selected.replace(':count', String(chosen.length));
+    },
+
+    /**
+     * Single-answer groups: choosing one option clears the others in that
+     * group, so a <select> cannot leave a previous answer counted.
+     *
+     * @param {string[]} keys
+     * @param {string} chosen
+     */
+    chooseOne(keys, chosen) {
+        this.selectedItems = this.selectedItems.filter((key) => ! keys.includes(key));
+
+        if (chosen) {
+            this.selectedItems.push(chosen);
+        }
+    },
+
+    /** Selected lines that carry no price — on request. */
     get onRequestLines() {
         return this.selectedLines.filter((line) => line.price === null);
     },

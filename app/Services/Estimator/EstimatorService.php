@@ -2,6 +2,7 @@
 
 namespace App\Services\Estimator;
 
+use App\Models\EstimatorGroup;
 use App\Models\EstimatorItem;
 use App\Models\Package;
 use Illuminate\Support\Collection;
@@ -67,25 +68,74 @@ class EstimatorService
      * having no estimator, so the page needs at least one line carrying a
      * real figure before it shows a calculator at all.
      *
+     * GROUPS ARE ROWS NOW, not just a column value. Each carries its own
+     * label and whether it admits one answer or several, so the public
+     * form can render a selector per group without the view knowing
+     * anything about which groups exist. A group with no active items is
+     * dropped — an empty dropdown is worse than no dropdown.
+     *
+     * Items whose group has no row still appear, gathered under a
+     * synthesised group labelled from the raw slug. That is the normal
+     * state midway through a rename, and losing priced items from the
+     * page because their heading is missing would be the wrong trade.
+     *
      * @return array{
-     *     groups: Collection<string, Collection<int, EstimatorItem>>,
+     *     groups: Collection<int, array{key: string, label: string, multiple: bool, items: Collection<int, EstimatorItem>}>,
      *     packages: Collection<int, Package>,
      *     has_pricing: bool
      * }
      */
     public function catalogue(): array
     {
-        $groups = EstimatorItem::grouped();
+        $itemsByGroup = EstimatorItem::grouped();
         $packages = Package::query()->active()->ordered()->get();
+
+        $defined = EstimatorGroup::query()->ordered()->get();
+
+        $groups = $defined
+            ->where('is_active', true)
+            ->map(fn (EstimatorGroup $group) => [
+                'key' => $group->key,
+                'label' => $group->label,
+                'multiple' => $group->allowsMultiple(),
+                'items' => $itemsByGroup->get($group->key, collect()),
+            ])
+            ->concat(
+                /*
+                 * Orphans last, in the order the items themselves define.
+                 *
+                 * Rejected against EVERY group row, not just the active
+                 * ones. Filtering on the active set instead let a group an
+                 * admin had switched OFF reappear here as an orphan — its
+                 * items rendered under a heading resolved from the very row
+                 * that said to hide them. A group with a row is that row's
+                 * business, active or not; only a group nobody has created
+                 * is an orphan.
+                 */
+                $itemsByGroup
+                    ->reject(fn ($items, string $key) => $defined->contains('key', $key))
+                    ->map(fn ($items, string $key) => [
+                        'key' => $key,
+                        'label' => EstimatorGroup::labelFor($key),
+                        'multiple' => true,
+                        'items' => $items,
+                    ])
+                    ->values()
+            )
+            ->reject(fn (array $group) => $group['items']->isEmpty())
+            ->values();
 
         return [
             'groups' => $groups,
             'packages' => $packages,
-            // An active estimator item always carries a price above zero
-            // (the dashboard refuses to activate one that does not), so
-            // its mere presence is enough. A package has to be checked,
-            // because an active one can still be priced-on-request.
-            'has_pricing' => $groups->isNotEmpty()
+            /*
+             * An active item no longer proves a real figure exists: since
+             * price became nullable an item can be live and on-request, so
+             * its presence alone would open a calculator where every line
+             * says "على الطلب" and the total is always zero. Both sides are
+             * therefore checked for an actual number.
+             */
+            'has_pricing' => $itemsByGroup->flatten()->contains(fn (EstimatorItem $item) => ! $item->isPriceOnRequest() && (float) $item->price > 0)
                 || $packages->contains(fn (Package $package) => ! $package->isPriceOnRequest()),
         ];
     }
@@ -114,11 +164,19 @@ class EstimatorService
         // Rendered strings, deliberately, unlike the snapshot's label maps
         // below: this list is a human-readable note ("X is priced on
         // request") shown next to the figure, not data anything reads back.
-        $onRequest = $package !== null && $package->isPriceOnRequest()
-            ? [$package->name]
-            : [];
+        $onRequest = collect()
+            ->when(
+                $package !== null && $package->isPriceOnRequest(),
+                fn (Collection $names) => $names->push($package->name)
+            )
+            // Items can be on-request too now. Naming each one is what
+            // lets the visitor see WHICH part of their selection is
+            // missing from the figure, rather than just that some of it is.
+            ->concat($items->filter->isPriceOnRequest()->map->label)
+            ->values()
+            ->all();
 
-        $currencies = $items->pluck('currency')
+        $currencies = $items->reject->isPriceOnRequest()->pluck('currency')
             ->when($package?->price !== null, fn (Collection $c) => $c->push($package->currency))
             ->filter()
             ->unique();
@@ -131,10 +189,14 @@ class EstimatorService
          */
         $summable = $currencies->count() <= 1;
 
-        $total = $items->sum(fn (EstimatorItem $item) => (float) $item->price)
+        $total = $items->reject->isPriceOnRequest()->sum(fn (EstimatorItem $item) => (float) $item->price)
             + ($package?->price !== null ? (float) $package->price : 0.0);
 
-        $hasPricedLine = $items->isNotEmpty() || $package?->price !== null;
+        // At least one line has to carry a real number, or there is no
+        // figure to show — a selection made entirely of on-request lines
+        // produces "on request", not "0.00".
+        $hasPricedLine = $items->contains(fn (EstimatorItem $item) => ! $item->isPriceOnRequest())
+            || $package?->price !== null;
 
         return [
             'package' => $package,

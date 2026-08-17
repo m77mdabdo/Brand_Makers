@@ -141,7 +141,7 @@ class MigrationCycleTest extends TestCase
             'campaigns', 'conversion_events', 'lead_sources', 'leads', 'visitor_sessions',
             // the four new features
             'booking_availability', 'booking_blackout_dates', 'bookings',
-            'estimator_items', 'order_events', 'orders', 'packages',
+            'estimator_groups', 'estimator_items', 'order_events', 'orders', 'packages',
         ];
 
         sort($expected);

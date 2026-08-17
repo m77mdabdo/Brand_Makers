@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Article;
 use App\Models\Country;
+use App\Models\EstimatorGroup;
 use App\Models\EstimatorItem;
 use App\Models\Faq;
 use App\Models\Package;
@@ -210,6 +211,16 @@ class TranslateContentToEnglish extends Command
         '٤. ما بعد التأسيس والتشغيل' => '4. Post-formation and operating',
         'نسجّلك لدى الجهات المطلوبة، وندير المحاسبة والإقرارات والتأمينات والتجديدات حتى يعمل الكيان بانتظام.' => 'We register you with the required authorities and run the accounting, the returns, the social insurance and the renewals, so the entity operates in good order.',
 
+        // --- EstimatorGroupSeeder --------------------------------------
+        'الخدمات' => 'Services',
+        'الاستحواذ على شركة خارجية' => 'Acquiring a company abroad',
+        'خدمات أخرى' => 'Other services',
+
+        // --- EstimatorItemSeeder, new lines ----------------------------
+        'التصديقات' => 'Attestations',
+        'صحيفة الاستثمار (السجل الاستثماري)' => 'Investment record (investment registration)',
+        'القوائم المالية' => 'Financial statements',
+
         // -------------------------------------------------------------
         // CountrySeeder — notes only. Country NAMES keep their English in
         // the seeder: they are proper nouns, not copy, and routing them
@@ -334,6 +345,7 @@ class TranslateContentToEnglish extends Command
         $summary['PageSection'] = $this->translatePageSections($force);
         $summary['Service'] = $this->translateModel(Service::class, ['name', 'summary', 'body', 'requirements', 'process'], $force, htmlFields: ['body']);
         $summary['Package'] = $this->translatePackages($force);
+        $summary['EstimatorGroup'] = $this->translateModel(EstimatorGroup::class, ['label'], $force);
         $summary['EstimatorItem'] = $this->translateModel(EstimatorItem::class, ['label'], $force);
         $summary['Country'] = $this->translateModel(Country::class, ['name', 'notes'], $force);
         $summary['Faq'] = $this->translateModel(Faq::class, ['question', 'answer'], $force);

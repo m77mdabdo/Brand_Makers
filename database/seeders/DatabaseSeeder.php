@@ -52,6 +52,7 @@ class DatabaseSeeder extends Seeder
             PageContentSeeder::class,
             ServiceSeeder::class,
             PackageSeeder::class,
+            EstimatorGroupSeeder::class,
             EstimatorItemSeeder::class,
             CountrySeeder::class,
             FaqSeeder::class,

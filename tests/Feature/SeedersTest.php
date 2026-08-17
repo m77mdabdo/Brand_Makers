@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Article;
 use App\Models\BookingAvailability;
 use App\Models\Country;
+use App\Models\EstimatorGroup;
 use App\Models\EstimatorItem;
 use App\Models\Faq;
 use App\Models\LeadSource;
@@ -200,13 +201,45 @@ class SeedersTest extends TestCase
         $this->assertSame('formation-acquisition', $popular->first()->slug);
     }
 
-    public function test_seeded_estimator_items_ship_inactive_until_someone_prices_them(): void
+    /**
+     * This asserted the items ship INACTIVE, which was the only way to
+     * say "not priced yet" while price was NOT NULL. Now null says it
+     * directly, so they ship visible and labelled على الطلب — the visitor
+     * sees the full menu of what can be added, and nothing is invented.
+     *
+     * The invariant that matters is unchanged and is still asserted:
+     * selecting every seeded line adds up to nothing.
+     */
+    public function test_seeded_estimator_items_ship_on_request_until_someone_prices_them(): void
     {
         $this->seed();
 
         $this->assertGreaterThan(0, EstimatorItem::count());
-        $this->assertSame(0, EstimatorItem::active()->count());
+
+        $this->assertSame(
+            EstimatorItem::count(),
+            EstimatorItem::whereNull('price')->count(),
+            'A seeded price would quote a figure the business never agreed.'
+        );
+
+        // Visible, so the estimator is usable on a fresh install …
+        $this->assertSame(EstimatorItem::count(), EstimatorItem::active()->count());
+
+        // … and worth nothing, so it quotes no invented number.
         $this->assertSame('0.00', EstimatorItem::estimateFor(EstimatorItem::pluck('key')->all()));
+    }
+
+    public function test_every_seeded_estimator_item_belongs_to_a_real_group(): void
+    {
+        $this->seed();
+
+        $groups = EstimatorGroup::pluck('key')->all();
+
+        $orphans = EstimatorItem::whereNotIn('group', $groups)->pluck('key')->all();
+
+        // An orphan still renders — under its raw slug — so this would not
+        // break the page, but a seeded catalogue should not rely on that.
+        $this->assertSame([], $orphans, 'Seeded items point at groups that do not exist: '.implode(', ', $orphans));
     }
 
     public function test_re_seeding_never_overwrites_a_price_an_admin_has_entered(): void

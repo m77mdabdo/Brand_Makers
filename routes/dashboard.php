@@ -8,6 +8,7 @@ use App\Http\Controllers\Dashboard\CommentController;
 use App\Http\Controllers\Dashboard\ContactMessageController;
 use App\Http\Controllers\Dashboard\CountryController;
 use App\Http\Controllers\Dashboard\DashboardHomeController;
+use App\Http\Controllers\Dashboard\EstimatorGroupController;
 use App\Http\Controllers\Dashboard\EstimatorItemController;
 use App\Http\Controllers\Dashboard\FaqController;
 use App\Http\Controllers\Dashboard\LeadController;
@@ -105,6 +106,13 @@ Route::prefix('dashboard')
             Route::resource('estimator-items', EstimatorItemController::class)
                 ->except('show')
                 ->parameters(['estimator-items' => 'estimatorItem']);
+
+            // The selectors those items are grouped into. Same shape and
+            // the same reasoning: no slug, so the default binding is the
+            // id, and nothing to show beyond the edit form.
+            Route::resource('estimator-groups', EstimatorGroupController::class)
+                ->except('show')
+                ->parameters(['estimator-groups' => 'estimatorGroup']);
 
             // Faqs and Testimonials have no slug, so their default binding
             // is already the id.
