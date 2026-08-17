@@ -90,6 +90,8 @@ return [
 
     'services' => [
         'label' => 'Services',
+        'on_request' => 'Priced on request',
+        'currency' => 'SAR',
         'read_more' => 'Read more',
         'requirements' => 'What we need from you',
         'process' => 'How it works',

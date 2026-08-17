@@ -20,6 +20,15 @@ class Service extends Model
         'icon',
         'cover_image',
         'is_flagship',
+        /*
+         * NOT `price` or `currency`. Both are admin-only figures that end
+         * up on the public pricing surfaces, and there is no public write
+         * path to a Service — but leaving them out of $fillable means a
+         * crafted payload still cannot reach them even if one is added
+         * later, or if a controller somewhere starts passing request data
+         * straight to create(). ServiceContentService assigns them
+         * explicitly instead; see its WRITABLE list.
+         */
         'sort_order',
         'is_active',
         'name',
@@ -44,7 +53,22 @@ class Service extends Model
             'is_flagship' => 'boolean',
             'is_active' => 'boolean',
             'sort_order' => 'integer',
+            'price' => 'decimal:2',
         ];
+    }
+
+    /**
+     * True when this service has no agreed figure yet.
+     *
+     * Same meaning as Package::isPriceOnRequest() and
+     * EstimatorItem::isPriceOnRequest(): null is "على الطلب", which is a
+     * different fact from 0.00 (free). An on-request service is still
+     * offered and still selectable in the estimator — it turns the quote
+     * into a floor rather than contributing a number.
+     */
+    public function isPriceOnRequest(): bool
+    {
+        return $this->price === null;
     }
 
     public function getRouteKeyName(): string

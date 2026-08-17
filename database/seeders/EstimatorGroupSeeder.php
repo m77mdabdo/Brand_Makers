@@ -38,7 +38,11 @@ class EstimatorGroupSeeder extends Seeder
             $existing = EstimatorGroup::where('key', $group['key'])->first();
 
             if ($existing) {
-                $existing->update(['label' => $group['label'], 'selection' => $group['selection']]);
+                $existing->update([
+                    'label' => $group['label'],
+                    'selection' => $group['selection'],
+                    'source' => $group['source'] ?? EstimatorGroup::SOURCE_ITEMS,
+                ]);
 
                 continue;
             }
@@ -54,15 +58,33 @@ class EstimatorGroupSeeder extends Seeder
     {
         return [
             [
+                /*
+                 * SOURCED FROM THE SERVICE CATALOGUE, not from items.
+                 *
+                 * The eight formation services used to be duplicated here
+                 * as estimator items, so the catalogue existed twice:
+                 * renaming a service on /services left this selector
+                 * showing the old wording, and pricing one in either place
+                 * left the other silent. The options and their prices are
+                 * now read live from `services`.
+                 */
                 'key' => 'services',
                 'selection' => EstimatorGroup::SELECTION_MULTI,
+                'source' => EstimatorGroup::SOURCE_SERVICES,
                 'label' => ['ar' => 'الخدمات'],
             ],
             [
-                // Single: acquiring a company abroad is one arrangement,
-                // not a basket. A checkbox list here would let a visitor
-                // total two acquisitions of the same entity.
-                'key' => 'foreign-acquisition',
+                /*
+                 * Single: a visitor is acquiring a company in ONE country.
+                 * A checkbox list here would let them total two
+                 * acquisitions of the same entity.
+                 *
+                 * The options are countries, each priced separately —
+                 * acquiring in the UAE and acquiring in Egypt are
+                 * different pieces of work, and one blanket figure would
+                 * be wrong for both.
+                 */
+                'key' => 'acquisition_country',
                 'selection' => EstimatorGroup::SELECTION_SINGLE,
                 'label' => ['ar' => 'الاستحواذ على شركة خارجية'],
             ],

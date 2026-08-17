@@ -5,6 +5,7 @@ namespace App\Services\Estimator;
 use App\Models\EstimatorGroup;
 use App\Models\EstimatorItem;
 use App\Models\Package;
+use App\Models\Service;
 use Illuminate\Support\Collection;
 
 /**
@@ -92,13 +93,26 @@ class EstimatorService
 
         $defined = EstimatorGroup::query()->ordered()->get();
 
+        // Read once, not per group: several groups could be
+        // service-sourced, and each would otherwise repeat the query.
+        $services = Service::query()->active()->ordered()->get();
+
         $groups = $defined
             ->where('is_active', true)
             ->map(fn (EstimatorGroup $group) => [
                 'key' => $group->key,
                 'label' => $group->label,
                 'multiple' => $group->allowsMultiple(),
-                'items' => $itemsByGroup->get($group->key, collect()),
+                /*
+                 * A service-sourced group's options ARE the service
+                 * catalogue, with the prices set on /dashboard/services —
+                 * so a service renamed or repriced there changes this
+                 * selector with no second edit and no code change.
+                 */
+                'source' => $group->source,
+                'items' => $group->isServiceSourced()
+                    ? $services
+                    : $itemsByGroup->get($group->key, collect()),
             ])
             ->concat(
                 /*
@@ -118,6 +132,7 @@ class EstimatorService
                         'key' => $key,
                         'label' => EstimatorGroup::labelFor($key),
                         'multiple' => true,
+                        'source' => EstimatorGroup::SOURCE_ITEMS,
                         'items' => $items,
                     ])
                     ->values()
@@ -136,6 +151,7 @@ class EstimatorService
              * therefore checked for an actual number.
              */
             'has_pricing' => $itemsByGroup->flatten()->contains(fn (EstimatorItem $item) => ! $item->isPriceOnRequest() && (float) $item->price > 0)
+                || $services->contains(fn (Service $service) => ! $service->isPriceOnRequest() && (float) $service->price > 0)
                 || $packages->contains(fn (Package $package) => ! $package->isPriceOnRequest()),
         ];
     }
@@ -143,9 +159,18 @@ class EstimatorService
     /**
      * The quote for a selection.
      *
+     * A selection now spans THREE catalogues — the package base, the
+     * service list, and the estimator's own line items — because the
+     * services are read live rather than duplicated as items. They are
+     * separate parameters rather than one merged key list: a service slug
+     * and an item key are drawn from different tables and could collide,
+     * and merging them would make that collision silent.
+     *
      * @param  array<int, mixed>  $itemKeys
+     * @param  array<int, mixed>  $serviceSlugs
      * @return array{
      *     package: ?Package,
+     *     services: Collection<int, Service>,
      *     items: Collection<int, EstimatorItem>,
      *     total: ?string,
      *     currency: string,
@@ -154,10 +179,11 @@ class EstimatorService
      *     has_selection: bool
      * }
      */
-    public function quote(?string $packageSlug, array $itemKeys): array
+    public function quote(?string $packageSlug, array $itemKeys, array $serviceSlugs = []): array
     {
         $package = $this->resolvePackage($packageSlug);
         $items = $this->resolveItems($itemKeys);
+        $services = $this->resolveServices($serviceSlugs);
 
         // Priced-on-request lines, by label, so the view and the stored
         // snapshot can both name exactly what is missing from the figure.
@@ -173,10 +199,12 @@ class EstimatorService
             // lets the visitor see WHICH part of their selection is
             // missing from the figure, rather than just that some of it is.
             ->concat($items->filter->isPriceOnRequest()->map->label)
+            ->concat($services->filter->isPriceOnRequest()->map->name)
             ->values()
             ->all();
 
         $currencies = $items->reject->isPriceOnRequest()->pluck('currency')
+            ->concat($services->reject->isPriceOnRequest()->pluck('currency'))
             ->when($package?->price !== null, fn (Collection $c) => $c->push($package->currency))
             ->filter()
             ->unique();
@@ -190,16 +218,19 @@ class EstimatorService
         $summable = $currencies->count() <= 1;
 
         $total = $items->reject->isPriceOnRequest()->sum(fn (EstimatorItem $item) => (float) $item->price)
+            + $services->reject->isPriceOnRequest()->sum(fn (Service $service) => (float) $service->price)
             + ($package?->price !== null ? (float) $package->price : 0.0);
 
         // At least one line has to carry a real number, or there is no
         // figure to show — a selection made entirely of on-request lines
         // produces "on request", not "0.00".
         $hasPricedLine = $items->contains(fn (EstimatorItem $item) => ! $item->isPriceOnRequest())
+            || $services->contains(fn (Service $service) => ! $service->isPriceOnRequest())
             || $package?->price !== null;
 
         return [
             'package' => $package,
+            'services' => $services,
             'items' => $items,
             'total' => $hasPricedLine && $summable ? number_format($total, 2, '.', '') : null,
             'currency' => $currencies->first() ?? self::DEFAULT_CURRENCY,
@@ -207,7 +238,7 @@ class EstimatorService
             // A floor rather than a total: something in the selection has
             // no price, so the real figure can only be higher.
             'is_partial' => $onRequest !== [] || ! $summable,
-            'has_selection' => $package !== null || $items->isNotEmpty(),
+            'has_selection' => $package !== null || $items->isNotEmpty() || $services->isNotEmpty(),
         ];
     }
 
@@ -227,6 +258,8 @@ class EstimatorService
     {
         /** @var Collection<int, EstimatorItem> $items */
         $items = $quote['items'];
+        /** @var Collection<int, Service> $services */
+        $services = $quote['services'] ?? collect();
         /** @var ?Package $package */
         $package = $quote['package'];
 
@@ -252,11 +285,25 @@ class EstimatorService
                 'name' => $package->getTranslations('name'),
                 'price' => $package->isPriceOnRequest() ? null : number_format((float) $package->price, 2, '.', ''),
             ],
+            /*
+             * Services are recorded separately from items rather than
+             * flattened together: they come from a different table, and a
+             * reader of an old lead should be able to tell which lines
+             * were catalogue services and which were estimator add-ons
+             * without guessing from the label.
+             */
+            'services' => $services->map(fn (Service $service) => [
+                'slug' => $service->slug,
+                'name' => $service->getTranslations('name'),
+                // null stays null: an on-request line recorded as 0.00
+                // would read as free when someone opens the lead later.
+                'price' => $service->isPriceOnRequest() ? null : number_format((float) $service->price, 2, '.', ''),
+            ])->values()->all(),
             'items' => $items->map(fn (EstimatorItem $item) => [
                 'key' => $item->key,
                 'label' => $item->getTranslations('label'),
                 'group' => $item->group,
-                'price' => number_format((float) $item->price, 2, '.', ''),
+                'price' => $item->isPriceOnRequest() ? null : number_format((float) $item->price, 2, '.', ''),
             ])->values()->all(),
         ];
     }
@@ -273,6 +320,37 @@ class EstimatorService
      * @param  array<int, mixed>  $keys
      * @return Collection<int, EstimatorItem>
      */
+    /**
+     * Active services for the submitted slugs, in catalogue order.
+     *
+     * Mirrors resolveItems, and for the same reasons: the same cap on how
+     * many a client may send (the slugs reach a whereIn), the same
+     * unique() so a repeated slug cannot be charged twice, and the same
+     * active() so a service withdrawn from the catalogue cannot be quoted
+     * from a stale bookmark.
+     *
+     * @param  array<int, mixed>  $slugs
+     * @return Collection<int, Service>
+     */
+    private function resolveServices(array $slugs): Collection
+    {
+        $slugs = collect($slugs)
+            ->filter(fn ($slug) => is_string($slug) && $slug !== '')
+            ->unique()
+            ->take(self::MAX_SELECTED_ITEMS)
+            ->values();
+
+        if ($slugs->isEmpty()) {
+            return collect();
+        }
+
+        return Service::query()
+            ->active()
+            ->whereIn('slug', $slugs->all())
+            ->ordered()
+            ->get();
+    }
+
     private function resolveItems(array $keys): Collection
     {
         $keys = collect($keys)

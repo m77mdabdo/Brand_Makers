@@ -216,6 +216,17 @@ class TranslateContentToEnglish extends Command
         'الاستحواذ على شركة خارجية' => 'Acquiring a company abroad',
         'خدمات أخرى' => 'Other services',
 
+        // --- acquisition_country. Country names, so these are the
+        // established English exonyms rather than translations of the
+        // Arabic — the same treatment CountrySeeder gives its own names.
+        'الإمارات العربية المتحدة' => 'United Arab Emirates',
+        'قطر' => 'Qatar',
+        'الكويت' => 'Kuwait',
+        'البحرين' => 'Bahrain',
+        'سلطنة عُمان' => 'Oman',
+        'مصر' => 'Egypt',
+        'الأردن' => 'Jordan',
+
         // --- EstimatorItemSeeder, new lines ----------------------------
         'التصديقات' => 'Attestations',
         'صحيفة الاستثمار (السجل الاستثماري)' => 'Investment record (investment registration)',

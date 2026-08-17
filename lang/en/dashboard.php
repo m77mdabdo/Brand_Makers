@@ -389,6 +389,11 @@ return [
         ],
     ],
 
+    'services' => [
+        'price' => 'Price',
+        'price_help' => 'Leave blank to show "priced on request". This price appears on the services page and is added up in the cost estimator.',
+    ],
+
     'estimator_items' => [
         'intro' => 'The cost estimator\'s price list. Nothing on the public site is hardcoded — what you enter here is what visitors are quoted.',
         'label_field' => 'Item label',

@@ -13,6 +13,20 @@
         <x-dashboard.field name="slug" :label="__('dashboard.fields.slug')" dir="ltr" :value="$service?->slug" :help="__('dashboard.fields.slug_help')" />
         <x-dashboard.field name="icon" :label="__('dashboard.fields.icon')" dir="ltr" :value="$service?->icon" />
         <x-dashboard.field name="sort_order" :label="__('dashboard.fields.sort_order')" type="number" :value="$service?->sort_order ?? 0" />
+
+        {{-- The single source of truth for what this service costs: the
+             services page and the estimator both read this column, so a
+             figure typed here reaches both without a code change. Leave it
+             blank for "على الطلب". --}}
+        <x-dashboard.field
+            name="price"
+            type="number"
+            step="0.01"
+            dir="ltr"
+            :label="__('dashboard.services.price')"
+            :value="$service?->price"
+            :help="__('dashboard.services.price_help')"
+        />
     </div>
 
     <div>

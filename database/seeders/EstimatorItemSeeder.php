@@ -55,6 +55,21 @@ class EstimatorItemSeeder extends Seeder
         'business-cards', 'stationery', 'company-profile', 'brochure', 'signage', 'packaging',
         'website-design', 'landing-page', 'email-templates', 'presentation-template',
         'social-templates', 'social-monthly', 'animated-logo', 'explainer-video', 'photography-direction',
+
+        /*
+         * The eight formation services, which briefly lived here as
+         * duplicates of the service catalogue. The estimator now reads
+         * `services` directly (see EstimatorGroupSeeder), so these rows
+         * would be a second, drifting copy of the same list — and a
+         * visitor could select a service AND its twin item and be charged
+         * for it twice.
+         */
+        'llc-formation', 'foreign-investment-licence', 'company-acquisition',
+        'commercial-registration', 'national-address-bank-account',
+        'municipal-sector-licences', 'post-formation-services', 'consulting-and-studies',
+
+        // Replaced by one priced row per country in acquisition_country.
+        'foreign-company-acquisition',
     ];
 
     public function run(): void
@@ -99,25 +114,22 @@ class EstimatorItemSeeder extends Seeder
     private function items(): array
     {
         return [
-            // --- الخدمات ---------------------------------------------------
-            // The eight formation services, as selectable lines. They mirror
-            // the service catalogue by name on purpose: a visitor who read
-            // /services should recognise these without translating between
-            // two vocabularies.
-            ['key' => 'llc-formation', 'group' => 'services', 'label' => ['ar' => 'تأسيس شركة ذات مسؤولية محدودة']],
-            ['key' => 'foreign-investment-licence', 'group' => 'services', 'label' => ['ar' => 'رخصة الاستثمار الأجنبي']],
-            ['key' => 'company-acquisition', 'group' => 'services', 'label' => ['ar' => 'الاستحواذ على شركة قائمة']],
-            ['key' => 'commercial-registration', 'group' => 'services', 'label' => ['ar' => 'السجل التجاري والتوثيق']],
-            ['key' => 'national-address-bank-account', 'group' => 'services', 'label' => ['ar' => 'العنوان الوطني وفتح الحساب البنكي']],
-            ['key' => 'municipal-sector-licences', 'group' => 'services', 'label' => ['ar' => 'الرخص البلدية والقطاعية']],
-            ['key' => 'post-formation-services', 'group' => 'services', 'label' => ['ar' => 'خدمات ما بعد التأسيس']],
-            ['key' => 'consulting-and-studies', 'group' => 'services', 'label' => ['ar' => 'الاستشارات والدراسات']],
-
-            // --- الاستحواذ على شركة خارجية ---------------------------------
-            // One honest option rather than an invented taxonomy of
-            // jurisdictions. The group is single-select, so this reads as a
-            // yes/no today and gains variants when the admin adds them.
-            ['key' => 'foreign-company-acquisition', 'group' => 'foreign-acquisition', 'label' => ['ar' => 'الاستحواذ على شركة خارجية']],
+            // --- الاستحواذ على شركة خارجية، بلداً بلداً ------------------
+            // The countries a client most often acquires an existing
+            // entity in. Each is priced on its own because acquiring in
+            // the UAE and acquiring in Egypt are different pieces of
+            // work — one blanket figure would be wrong for both.
+            //
+            // The admin adds more countries and prices each from
+            // /dashboard/estimator-items; nothing here needs a code
+            // change for that.
+            ['key' => 'acquisition-uae', 'group' => 'acquisition_country', 'label' => ['ar' => 'الإمارات العربية المتحدة']],
+            ['key' => 'acquisition-qatar', 'group' => 'acquisition_country', 'label' => ['ar' => 'قطر']],
+            ['key' => 'acquisition-kuwait', 'group' => 'acquisition_country', 'label' => ['ar' => 'الكويت']],
+            ['key' => 'acquisition-bahrain', 'group' => 'acquisition_country', 'label' => ['ar' => 'البحرين']],
+            ['key' => 'acquisition-oman', 'group' => 'acquisition_country', 'label' => ['ar' => 'سلطنة عُمان']],
+            ['key' => 'acquisition-egypt', 'group' => 'acquisition_country', 'label' => ['ar' => 'مصر']],
+            ['key' => 'acquisition-jordan', 'group' => 'acquisition_country', 'label' => ['ar' => 'الأردن']],
 
             // --- خدمات أخرى -----------------------------------------------
             ['key' => 'attestations', 'group' => 'other-services', 'label' => ['ar' => 'التصديقات']],
