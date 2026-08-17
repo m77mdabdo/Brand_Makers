@@ -125,10 +125,16 @@
                         {{-- A REAL range from priced, active items — never
                              an invented figure. --}}
                         <p class="mt-4 text-sm text-mist">{{ __('site.home_estimator.total_label') }}</p>
+                        {{-- A span of one number is not a range. With a
+                             single priced row, min and max are the same
+                             figure and this rendered "1 – 1"; it now
+                             prints that figure once. --}}
                         <p class="mt-1 text-3xl font-black text-amber sm:text-4xl" dir="ltr">
                             {{ number_format($estimatorRange['min'], 0) }}
-                            <span class="text-mist-dim">–</span>
-                            {{ number_format($estimatorRange['max'], 0) }}
+                            @if ($estimatorRange['max'] > $estimatorRange['min'])
+                                <span class="text-mist-dim">–</span>
+                                {{ number_format($estimatorRange['max'], 0) }}
+                            @endif
                             <span class="text-xl text-mist">{{ __('site.home_estimator.currency') }}</span>
                         </p>
                         <p class="mt-4 text-xs leading-relaxed text-mist-dim">{{ __('site.home_estimator.disclaimer') }}</p>
