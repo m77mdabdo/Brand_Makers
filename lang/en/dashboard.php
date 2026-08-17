@@ -94,6 +94,7 @@ return [
         'contact_messages' => 'Contact messages',
         'unhandled' => 'unhandled',
         'services' => 'Services',
+        'packages' => 'Packages',
         'countries' => 'Countries',
         'faqs' => 'FAQs',
         'testimonials' => 'Testimonials',
@@ -132,6 +133,7 @@ return [
     ],
 
     'fields' => [
+        'message' => 'Message',
         'type' => 'Type',
         'source_platform' => 'Source',
         'interest' => 'Interest',

@@ -99,6 +99,7 @@ return [
         'contact_messages' => 'رسائل التواصل',
         'unhandled' => 'غير مُعالجة',
         'services' => 'الخدمات',
+        'packages' => 'الباقات',
         'countries' => 'الدول',
         'faqs' => 'الأسئلة الشائعة',
         'testimonials' => 'آراء العملاء',
@@ -137,6 +138,7 @@ return [
     ],
 
     'fields' => [
+        'message' => 'الرسالة',
         'type' => 'النوع',
         'source_platform' => 'المصدر',
         'interest' => 'الاهتمام',
