@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Dashboard;
 
+use App\Http\Requests\Dashboard\ReorderMenuRequest;
 use App\Models\MenuItem;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -146,6 +147,148 @@ class MenuManagerTest extends TestCase
     // -----------------------------------------------------------------
     // Reorder
     // -----------------------------------------------------------------
+
+    /**
+     * THE BUG THIS FILE MISSED.
+     *
+     * The reorder screen posts items[<id>][sort_order] — the number the
+     * admin types — and the service ignored it, writing the index of the
+     * row in the posted array instead. Because the form is keyed by id,
+     * PHP hands the rows back in the order they were RENDERED, which is
+     * the order already stored, so every save rewrote the existing
+     * arrangement onto itself and reported success.
+     *
+     * The old tests posted rows WITHOUT sort_order and asserted on the
+     * resulting positions, so they passed against exactly the behaviour
+     * that was broken. This one types numbers, like the screen does, and
+     * follows them all the way to the public navbar.
+     */
+    public function test_reordering_in_the_dashboard_changes_the_public_navbar(): void
+    {
+        $this->seed();
+
+        $before = MenuItem::topLevel()->visible()->ordered()->pluck('key')->all();
+        $this->assertGreaterThan(2, count($before));
+
+        // Send the current arrangement back with the LAST item asked to
+        // come first, exactly as the form would post it.
+        $items = MenuItem::topLevel()->ordered()->get();
+        $last = $items->last();
+
+        $payload = [];
+
+        foreach ($items as $index => $item) {
+            $payload[$item->id] = [
+                'id' => $item->id,
+                'parent_id' => '',
+                'sort_order' => $item->is($last) ? 0 : $index + 1,
+            ];
+        }
+
+        $this->actingAs($this->admin)
+            ->post(route('dashboard.menu.reorder'), ['items' => $payload])
+            ->assertRedirect(route('dashboard.menu.index'));
+
+        $after = MenuItem::topLevel()->visible()->ordered()->pluck('key')->all();
+
+        $this->assertSame($last->key, $after[0], 'The stored order did not follow the numbers typed.');
+        $this->assertNotSame($before, $after);
+
+        // …and the public bar renders it. Asserting on the database alone
+        // would have passed even when the navbar read from somewhere else.
+        preg_match('/<nav class="hidden.*?<\/nav>/s', $this->get('/')->getContent(), $nav);
+        $this->assertNotEmpty($nav);
+
+        $labels = MenuItem::topLevel()->visible()->ordered()->get()
+            ->filter(fn (MenuItem $item) => $item->href() !== null)
+            ->map(fn (MenuItem $item) => $item->getTranslation('label', 'ar'))
+            ->values()
+            ->all();
+
+        $positions = array_map(fn (string $label) => strpos($nav[0], $label), $labels);
+        $sorted = $positions;
+        sort($sorted);
+
+        $this->assertSame($sorted, $positions, 'The public navbar ignored the new order.');
+    }
+
+    public function test_sparse_numbers_collapse_to_contiguous_positions(): void
+    {
+        $a = MenuItem::factory()->create(['sort_order' => 0]);
+        $b = MenuItem::factory()->create(['sort_order' => 1]);
+        $c = MenuItem::factory()->create(['sort_order' => 2]);
+
+        // Typing 30/10/20 is how an admin leaves room between items. The
+        // relative order is what is stored, not the literal numbers.
+        $this->actingAs($this->admin)->post(route('dashboard.menu.reorder'), [
+            'items' => [
+                $a->id => ['id' => $a->id, 'parent_id' => '', 'sort_order' => 30],
+                $b->id => ['id' => $b->id, 'parent_id' => '', 'sort_order' => 10],
+                $c->id => ['id' => $c->id, 'parent_id' => '', 'sort_order' => 20],
+            ],
+        ])->assertRedirect();
+
+        // Scoped to the three rows under test: setUp() seeds the real
+        // navigation, and the reorder endpoint only renumbers what was
+        // POSTED — which on the real screen is every row, but here is
+        // deliberately just these.
+        $reordered = MenuItem::whereIn('id', [$a->id, $b->id, $c->id])->ordered()->get();
+
+        $this->assertSame([$b->id, $c->id, $a->id], $reordered->pluck('id')->all());
+        $this->assertSame([0, 1, 2], $reordered->pluck('sort_order')->all());
+    }
+
+    public function test_children_are_numbered_within_their_own_parent(): void
+    {
+        $parent = MenuItem::factory()->create(['sort_order' => 0]);
+        $childA = MenuItem::factory()->create(['parent_id' => $parent->id]);
+        $childB = MenuItem::factory()->create(['parent_id' => $parent->id]);
+
+        $this->actingAs($this->admin)->post(route('dashboard.menu.reorder'), [
+            'items' => [
+                $parent->id => ['id' => $parent->id, 'parent_id' => '', 'sort_order' => 0],
+                $childA->id => ['id' => $childA->id, 'parent_id' => $parent->id, 'sort_order' => 5],
+                $childB->id => ['id' => $childB->id, 'parent_id' => $parent->id, 'sort_order' => 1],
+            ],
+        ])->assertRedirect();
+
+        // A child's 0 must not compete with the parent's 0.
+        $this->assertSame(0, $parent->fresh()->sort_order);
+        $this->assertSame([$childB->id, $childA->id], MenuItem::where('parent_id', $parent->id)->ordered()->pluck('id')->all());
+        $this->assertSame([0, 1], MenuItem::where('parent_id', $parent->id)->ordered()->pluck('sort_order')->all());
+    }
+
+    /**
+     * The field name is the contract between the form and the request.
+     * When they drifted, the save silently did nothing — so this reads the
+     * actual Blade and checks the rules accept what it posts.
+     */
+    public function test_the_reorder_form_posts_the_field_the_request_validates(): void
+    {
+        $row = file_get_contents(resource_path('views/dashboard/menu/_row.blade.php'));
+
+        $this->assertStringContainsString('name="items[{{ $item->id }}][sort_order]"', $row);
+        $this->assertArrayHasKey('items.*.sort_order', (new ReorderMenuRequest)->rules());
+    }
+
+    public function test_a_cleared_sort_order_box_does_not_reject_the_whole_arrangement(): void
+    {
+        $a = MenuItem::factory()->create(['sort_order' => 0]);
+        $b = MenuItem::factory()->create(['sort_order' => 1]);
+
+        $this->actingAs($this->admin)->post(route('dashboard.menu.reorder'), [
+            'items' => [
+                $a->id => ['id' => $a->id, 'parent_id' => '', 'sort_order' => ''],
+                $b->id => ['id' => $b->id, 'parent_id' => '', 'sort_order' => 3],
+            ],
+        ])->assertRedirect()->assertSessionHasNoErrors();
+
+        // Blank sorts to the front rather than 500-ing or discarding the save.
+        $this->assertSame(
+            [$a->id, $b->id],
+            MenuItem::whereIn('id', [$a->id, $b->id])->ordered()->pluck('id')->all()
+        );
+    }
 
     public function test_reorder_writes_positions_and_parents_in_one_pass(): void
     {
