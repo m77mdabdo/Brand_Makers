@@ -306,6 +306,77 @@ class ContentRedirectTest extends TestCase
         }
     }
 
+    /**
+     * Reported as "English package names are missing — slugs like
+     * formation-basic show instead".
+     *
+     * It does not reproduce on a seeded database, and it cannot: spatie
+     * falls back to the Arabic when an English translation is absent, so
+     * the degraded state shows Arabic, never a slug. Reproduced the
+     * pre-translation state deliberately (run PackageSeeder without the
+     * translate step) and confirmed /en/packages rendered Arabic names and
+     * zero slugs in visible text.
+     *
+     * The likely cause is a database seeded before the translate step
+     * existed. These assertions are what would have caught it either way:
+     * the English name has to be the ENGLISH one, not the Arabic fallback,
+     * and no slug may reach the page as text.
+     */
+    public function test_the_english_packages_page_shows_english_names_not_arabic_and_not_slugs(): void
+    {
+        $body = $this->get('/en/packages')->assertOk()->getContent();
+
+        foreach (Package::active()->get() as $package) {
+            $english = $package->getTranslation('name', 'en', false);
+            $arabic = $package->getTranslation('name', 'ar', false);
+
+            $this->assertNotEmpty($english, "Package {$package->slug} has no English name.");
+            $this->assertStringContainsString($english, $body);
+            $this->assertStringNotContainsString($arabic, $body, 'The English page fell back to Arabic.');
+        }
+
+        // The slug is an internal identifier and a URL segment. It is
+        // rendered deliberately in the DASHBOARD list as a muted hint, and
+        // must never reach a public page as visible text.
+        $visible = strip_tags($body);
+
+        foreach (Package::withTrashed()->pluck('slug') as $slug) {
+            $this->assertStringNotContainsString($slug, $visible, "The slug \"{$slug}\" is visible on /en/packages.");
+        }
+    }
+
+    public function test_the_english_packages_page_shows_english_feature_bullets(): void
+    {
+        $body = $this->get('/en/packages')->assertOk()->getContent();
+
+        foreach (Package::active()->get() as $package) {
+            foreach ($package->features ?? [] as $feature) {
+                $this->assertNotEmpty($feature['en'] ?? null);
+                $this->assertStringContainsString($feature['en'], $body);
+            }
+        }
+    }
+
+    public function test_the_dictionary_covers_every_package_string(): void
+    {
+        // Re-running the translator over already-translated content must
+        // report nothing missing. --force makes it retranslate rather than
+        // skip, which is what turns this into a coverage check instead of
+        // a no-op.
+        $this->artisan('content:translate-to-english', ['--force' => true])
+            ->assertSuccessful()
+            ->expectsOutputToContain('English translation summary');
+
+        foreach (Package::all() as $package) {
+            $this->assertNotEmpty($package->getTranslation('name', 'en', false));
+            $this->assertNotEmpty($package->getTranslation('description', 'en', false));
+
+            foreach ($package->features ?? [] as $feature) {
+                $this->assertNotEmpty($feature['en'] ?? null);
+            }
+        }
+    }
+
     // -----------------------------------------------------------------
     // The funnel
     // -----------------------------------------------------------------
