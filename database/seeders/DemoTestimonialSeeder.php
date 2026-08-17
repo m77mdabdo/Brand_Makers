@@ -41,8 +41,8 @@ class DemoTestimonialSeeder extends Seeder
                 'client_title' => 'مؤسِّسة',
                 'client_country' => 'السعودية',
                 'quote' => [
-                    'ar' => 'بدأنا بجلسة استراتيجية غيّرت فهمنا لعلامتنا قبل أن نرى أي تصميم، وهذا ما جعل الشعار في النهاية قراراً واضحاً لا مفاضلة بين أذواق.',
-                    'en' => 'We started with a strategy session that changed how we understood our own brand before we saw any design — which is why the final logo felt like a clear decision rather than a matter of taste.',
+                    'ar' => 'بدأنا باستشارة حدّدت النشاط والكيان قبل أي إجراء، وهذا وحده وفّر علينا تعديلاً كنا سندفع ثمنه لاحقاً.',
+                    'en' => 'We started with a consultation that settled the activity and the entity before any procedure — and that alone saved us an amendment we would have paid for later.',
                 ],
             ],
             [
@@ -50,8 +50,8 @@ class DemoTestimonialSeeder extends Seeder
                 'client_title' => 'مدير التسويق',
                 'client_country' => 'الإمارات',
                 'quote' => [
-                    'ar' => 'دليل الهوية هو ما فرق فعلاً. فريقنا صار ينتج محتوى يومياً دون أن نضطر للعودة إليهم في كل تفصيل.',
-                    'en' => 'The brand guide is what made the real difference. Our team now produces content daily without coming back to them for every detail.',
+                    'ar' => 'خدمات ما بعد التأسيس هي ما فرق فعلاً. الإقرارات والتجديدات تمشي في مواعيدها دون أن نتابعها بأنفسنا.',
+                    'en' => 'The post-formation service is what made the real difference. Returns and renewals happen on time without us chasing them.',
                 ],
             ],
             [
@@ -59,8 +59,8 @@ class DemoTestimonialSeeder extends Seeder
                 'client_title' => 'شريكة مؤسِّسة',
                 'client_country' => 'الأردن',
                 'quote' => [
-                    'ar' => 'أول استوديو نتعامل معه يتعامل مع النسخة العربية من الهوية بنفس جدية النسخة الإنجليزية، لا كترجمة تُضاف في آخر يوم.',
-                    'en' => 'The first studio we have worked with that treats the Arabic half of an identity as seriously as the English one, instead of a translation added on the last day.',
+                    'ar' => 'أول جهة تشرح لنا الفرق بين التأسيس والاستحواذ بالأرقام بدل أن تبيعنا الخيار الأغلى مباشرة.',
+                    'en' => 'The first firm that explained the difference between forming and acquiring in actual figures, instead of steering us straight to the more expensive option.',
                 ],
             ],
             [
@@ -68,8 +68,8 @@ class DemoTestimonialSeeder extends Seeder
                 'client_title' => 'Managing Director',
                 'client_country' => 'United Kingdom',
                 'quote' => [
-                    'ar' => 'التزموا بالجدول الزمني المتفق عليه، وكانت كل مراجعة مصحوبة بشرح لسبب القرار لا بعرض خيارات فقط.',
-                    'en' => 'They held to the agreed timeline, and every review came with the reasoning behind a decision rather than just a set of options.',
+                    'ar' => 'كنا نعرف في كل أسبوع أين وصلت المعاملة وما المطلوب منا، وهو ما لم نجده في تجربتنا السابقة.',
+                    'en' => 'Every week we knew where the application had got to and what was needed from us — which is not what we experienced the last time.',
                 ],
             ],
         ];

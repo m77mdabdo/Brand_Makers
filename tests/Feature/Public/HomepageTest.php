@@ -8,6 +8,7 @@ use App\Models\Faq;
 use App\Models\Package;
 use App\Models\Service;
 use App\Models\Testimonial;
+use App\Services\Cms\SettingsRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
@@ -126,15 +127,32 @@ class HomepageTest extends TestCase
     {
         $this->seed();
 
-        $expected = $locale === 'ar'
-            ? 'صنّاع العلامات التجارية — تصميم الهوية البصرية واستراتيجية العلامة'
-            : 'Creative Mark — Visual Identity &amp; Brand Strategy';
+        /*
+         * Read from the settings rather than hardcoded.
+         *
+         * This test used to pin the literal branding title, so a content
+         * change broke it for a reason that had nothing to do with what
+         * it guards. What it actually guards is that the homepage uses
+         * home_meta_title AT ALL — the homepage has no backing record to
+         * carry a SeoMeta row, so without the home_seo settings it falls
+         * through to the generic site default, which is the classic way
+         * the most-shared page on a site ends up with a placeholder
+         * title. Asserting the two differ is what proves it did not.
+         */
+        // translated() reads the CURRENT locale, and the test process
+        // starts in Arabic regardless of which URL is about to be
+        // requested — so the locale has to be set before reading, or the
+        // English case compares the page against the Arabic title.
+        $this->app->setLocale($locale);
 
-        // The homepage has no backing record to carry a SeoMeta row, so
-        // without the home_seo settings it would silently fall through to
-        // the generic site default — the classic way the most-shared page
-        // on a site ends up with a placeholder title.
-        $this->get($url)->assertSee('<title>'.$expected.'</title>', false);
+        $settings = app(SettingsRepository::class);
+
+        $home = $settings->translated('home_meta_title');
+        $default = $settings->translated('default_meta_title');
+
+        $this->assertNotSame($default, $home, 'The homepage title must not be the site-wide default.');
+
+        $this->get($url)->assertSee('<title>'.e($home).'</title>', false);
     }
 
     // -----------------------------------------------------------------

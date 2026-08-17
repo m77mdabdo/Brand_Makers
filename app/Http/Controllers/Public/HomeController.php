@@ -7,10 +7,13 @@ use App\Models\Article;
 use App\Models\EstimatorItem;
 use App\Models\Faq;
 use App\Models\Package;
+use App\Models\Page;
+use App\Models\PageSection;
 use App\Models\Service;
 use App\Models\Testimonial;
 use App\Services\Cms\SettingsRepository;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Collection;
 
 /**
  * The homepage.
@@ -50,6 +53,19 @@ class HomeController extends Controller
             'seoTitle' => $this->settings->translated('home_meta_title'),
             'seoDescription' => $this->settings->translated('home_meta_description'),
 
+            /*
+             * The four economic sectors, read from the Activities page's
+             * own sections rather than duplicated into this file.
+             *
+             * One source of truth: the homepage grid and /activities
+             * render the same rows, so an admin who reworded a sector in
+             * the dashboard changes both. An empty collection — page
+             * unpublished, or sections deactivated — renders no section
+             * at all rather than an empty heading.
+             */
+            'activities' => $this->sectionsOf('activities'),
+            'whySaudi' => $this->sectionsOf('why-invest-saudi-arabia'),
+
             'services' => Service::query()
                 ->active()
                 ->ordered()
@@ -85,6 +101,27 @@ class HomeController extends Controller
             // teaser renders its "pricing in preparation" state instead.
             'estimatorRange' => $this->estimatorRange(),
         ]);
+    }
+
+    /**
+     * A published page's active sections, or an empty collection.
+     *
+     * Deliberately tolerant: a missing or unpublished page is a section
+     * the homepage simply does not render, not an error. That is the same
+     * rule the testimonials block already follows, and it is what lets
+     * this page survive an admin unpublishing something.
+     *
+     * @return Collection<int, PageSection>
+     */
+    private function sectionsOf(string $slug): Collection
+    {
+        $page = Page::query()
+            ->published()
+            ->where('slug', $slug)
+            ->with(['sections' => fn ($query) => $query->active()->ordered()])
+            ->first();
+
+        return $page?->sections ?? collect();
     }
 
     /**

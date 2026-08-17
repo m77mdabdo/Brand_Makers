@@ -43,8 +43,8 @@ class SettingsSeeder extends Seeder
                 'en' => 'Creative Mark',
             ]],
             ['key' => 'site_tagline', 'group' => 'general', 'value' => [
-                'ar' => 'نبني العلامات التجارية التي تُذكر',
-                'en' => 'We build brands that get remembered',
+                'ar' => 'شريكك في تأسيس الشركات والاستثمار في السعودية',
+                'en' => 'Your partner for company formation and investment in Saudi Arabia',
             ]],
             ['key' => 'site_logo', 'group' => 'general', 'value' => null],
 
@@ -69,18 +69,18 @@ class SettingsSeeder extends Seeder
                 'en' => 'Creative Mark',
             ]],
             ['key' => 'default_meta_description', 'group' => 'seo_defaults', 'value' => [
-                'ar' => 'استوديو متخصص في بناء الهويات البصرية واستراتيجيات العلامات التجارية.',
-                'en' => 'A studio specialising in visual identity and brand strategy.',
+                'ar' => 'تأسيس الشركات وتمكين الاستثمار في المملكة العربية السعودية.',
+                'en' => 'Company formation and investment enablement in the Kingdom of Saudi Arabia.',
             ]],
 
             // --- Homepage SEO --------------------------------------------
             ['key' => 'home_meta_title', 'group' => 'home_seo', 'value' => [
-                'ar' => 'صنّاع العلامات التجارية — تصميم الهوية البصرية واستراتيجية العلامة',
-                'en' => 'Creative Mark — Visual Identity & Brand Strategy',
+                'ar' => 'صنّاع العلامات التجارية — تأسيس الشركات والاستثمار في السعودية',
+                'en' => 'Creative Mark — Company Formation & Investment in Saudi Arabia',
             ]],
             ['key' => 'home_meta_description', 'group' => 'home_seo', 'value' => [
-                'ar' => 'نصمّم الهويات البصرية والشعارات ونبني استراتيجيات العلامات التجارية للشركات الناشئة والمؤسسات في السعودية والخليج.',
-                'en' => 'Visual identity, logo design and brand strategy for startups and established companies across Saudi Arabia and the Gulf.',
+                'ar' => 'نؤسّس شركتك في السعودية ونستخرج تراخيصها: تأسيس واستحواذ ورخص استثمار وسجل تجاري وخدمات ما بعد التأسيس، بأسعار معلنة.',
+                'en' => 'We form your company in Saudi Arabia and obtain its licences: formation, acquisition, investment licences, Commercial Registration and post-formation services, at published prices.',
             ]],
 
             // --- Homepage stats ------------------------------------------

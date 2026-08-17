@@ -211,6 +211,20 @@ class TranslateContentToEnglish extends Command
         'نسجّلك لدى الجهات المطلوبة، وندير المحاسبة والإقرارات والتأمينات والتجديدات حتى يعمل الكيان بانتظام.' => 'We register you with the required authorities and run the accounting, the returns, the social insurance and the renewals, so the entity operates in good order.',
 
         // -------------------------------------------------------------
+        // CountrySeeder — notes only. Country NAMES keep their English in
+        // the seeder: they are proper nouns, not copy, and routing them
+        // through a translation dictionary would be pretence.
+        // -------------------------------------------------------------
+        'سوقنا الأساسي ومحل التأسيس. نؤسّس ونرخّص في الرياض وجدة والدمام وبقية المناطق.' => 'Our home market, and where the formation happens. We form and licence in Riyadh, Jeddah, Dammam and beyond.',
+        'نخدم مستثمرين من دبي وأبوظبي والشارقة يوسّعون نشاطهم إلى السوق السعودي.' => 'We serve investors from Dubai, Abu Dhabi and Sharjah expanding into the Saudi market.',
+        'مستثمرون وشركات من الدوحة يؤسّسون كياناتهم في المملكة.' => 'Investors and companies from Doha forming their entities in the Kingdom.',
+        'نعمل عن بُعد مع المستثمرين في الكويت بنفس المسار والمتابعة.' => 'We work remotely with investors in Kuwait, through the same route and the same follow-up.',
+        'تأسيس وتراخيص للمنشآت الصغيرة والمتوسطة القادمة من البحرين.' => 'Formation and licensing for small and medium businesses coming from Bahrain.',
+        'مستثمرون من مسقط وخارجها يدخلون السوق السعودي.' => 'Investors from Muscat and beyond entering the Saudi market.',
+        'نعمل مع رواد أعمال من القاهرة والإسكندرية يؤسّسون كيانات في المملكة.' => 'We work with founders from Cairo and Alexandria forming entities in the Kingdom.',
+        'مستثمرون من عمّان يبحثون عن كيان ورخصة استثمار في السعودية.' => 'Investors from Amman seeking an entity and an investment licence in Saudi Arabia.',
+
+        // -------------------------------------------------------------
         // FaqSeeder
         // -------------------------------------------------------------
         'كم تستغرق إجراءات تأسيس الشركة؟' => 'How long does company formation take?',

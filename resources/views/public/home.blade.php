@@ -21,6 +21,64 @@
         <x-public.marquee :items="$services->map->name" />
     @endif
 
+
+    {{-- ------------------------------------------------------------- --}}
+    {{-- Value props                                                     --}}
+    {{-- ------------------------------------------------------------- --}}
+    {{-- Fixed copy from lang, not the database: these four are a
+         positioning statement rather than a catalogue, and they sit with
+         the hero they answer. --}}
+    <section id="values" class="section scroll-mt-24 pb-0">
+        <div class="wrap">
+            <div class="sec-head">
+                <span class="eyebrow eyebrow-light">{{ __('site.values.eyebrow') }}</span>
+                <h2>{{ __('site.values.title') }}</h2>
+            </div>
+
+            <ul class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                @foreach (__('site.values.items') as $value)
+                    <li class="rounded-2xl border border-line bg-white p-6">
+                        <h3 class="text-lg font-black text-ink">{{ $value['title'] }}</h3>
+                        <p class="mt-2 text-sm leading-relaxed text-muted-ink">{{ $value['body'] }}</p>
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+    </section>
+
+    {{-- ------------------------------------------------------------- --}}
+    {{-- Activities                                                      --}}
+    {{-- ------------------------------------------------------------- --}}
+    {{-- The same PageSection rows the /activities page renders, so the
+         two can never disagree. Absent when the page is unpublished. --}}
+    @if ($activities->isNotEmpty())
+        <section id="activities" class="section scroll-mt-24">
+            <div class="wrap">
+                <div class="sec-head">
+                    <span class="eyebrow eyebrow-light">{{ __('site.activities.eyebrow') }}</span>
+                    <h2>{{ __('site.activities.title') }}</h2>
+                    <p>{{ __('site.activities.lead') }}</p>
+                </div>
+
+                <ul class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                    @foreach ($activities as $activity)
+                        <li class="flex h-full flex-col rounded-2xl border border-line bg-white p-6">
+                            <span class="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-cream text-petrol" aria-hidden="true">
+                                <x-public.service-icon :name="$activity->icon" />
+                            </span>
+                            <h3 class="mt-4 text-lg font-black text-ink">{{ $activity->title }}</h3>
+                            <p class="mt-2 text-sm leading-relaxed text-muted-ink">{{ $activity->description }}</p>
+                        </li>
+                    @endforeach
+                </ul>
+
+                <div class="mt-8 text-center">
+                    <a href="{{ lroute('pages.activities') }}" class="btn btn-ghost-dark">{{ __('site.activities.view_all') }}</a>
+                </div>
+            </div>
+        </section>
+    @endif
+
     {{-- ------------------------------------------------------------- --}}
     {{-- Services                                                        --}}
     {{-- ------------------------------------------------------------- --}}
@@ -83,7 +141,7 @@
                         <p class="mt-3 text-sm leading-relaxed text-mist">{{ __('site.home_estimator.unpriced_hint') }}</p>
                     @endif
 
-                    <a href="#booking" class="btn btn-primary btn-on-dark mt-6 w-full">{{ __('site.home_estimator.cta') }}</a>
+                    <a href="{{ lroute('estimator') }}" class="btn btn-primary btn-on-dark mt-6 w-full">{{ __('site.home_estimator.cta') }}</a>
                 </div>
             </div>
         </div>
@@ -169,7 +227,7 @@
                             </ul>
 
                             <a
-                                href="#booking"
+                                href="{{ lroute('packages.index') }}#package-enquiry"
                                 @class([
                                     'btn mt-6 w-full',
                                     'btn-white btn-on-dark' => $package->is_popular,
@@ -243,6 +301,34 @@
             </div>
         </div>
     </section>
+
+
+    {{-- ------------------------------------------------------------- --}}
+    {{-- Why Saudi Arabia                                                --}}
+    {{-- ------------------------------------------------------------- --}}
+    @if ($whySaudi->isNotEmpty())
+        <section id="why-saudi" class="section scroll-mt-24 pt-0">
+            <div class="wrap">
+                <div class="sec-head">
+                    <span class="eyebrow eyebrow-light">{{ __('site.why_saudi.eyebrow') }}</span>
+                    <h2>{{ __('site.why_saudi.title') }}</h2>
+                </div>
+
+                <ul class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                    @foreach ($whySaudi as $reason)
+                        <li class="rounded-2xl border border-line bg-cream-2/40 p-6">
+                            <h3 class="text-base font-black text-ink">{{ $reason->title }}</h3>
+                            <p class="mt-2 text-sm leading-relaxed text-muted-ink">{{ $reason->description }}</p>
+                        </li>
+                    @endforeach
+                </ul>
+
+                <div class="mt-8 text-center">
+                    <a href="{{ lroute('pages.why-saudi') }}" class="btn btn-ghost-dark">{{ __('site.why_saudi.view_all') }}</a>
+                </div>
+            </div>
+        </section>
+    @endif
 
     {{-- ------------------------------------------------------------- --}}
     {{-- Testimonials — demo-only data, so normally absent               --}}
@@ -341,7 +427,7 @@
             <div class="rounded-[2rem] bg-[linear-gradient(120deg,#B84A15,#8C370D)] p-10 text-center text-white sm:p-14">
                 <h2 class="text-3xl font-black sm:text-4xl">{{ __('site.home_booking.title') }}</h2>
                 <p class="mx-auto mt-4 max-w-lg text-lg text-white/95">{{ __('site.home_booking.lead') }}</p>
-                <a href="{{ lroute('pages.about') }}" class="btn btn-white btn-on-dark mt-7">{{ __('site.home_booking.cta') }}</a>
+                <a href="{{ lroute('booking') }}" class="btn btn-white btn-on-dark mt-7">{{ __('site.home_booking.cta') }}</a>
             </div>
         </div>
     </section>

@@ -115,7 +115,7 @@ class DemoOrderSeeder extends Seeder
                 'timeline' => [
                     ['status' => Order::STATUS_PENDING, 'progress' => 0, 'note' => ['ar' => 'تم استلام الطلب. '.DemoDataSeeder::SAMPLE_MARKER, 'en' => 'Order received. '.DemoDataSeeder::SAMPLE_MARKER]],
                     ['status' => Order::STATUS_IN_PROGRESS, 'progress' => 60, 'note' => ['ar' => 'تطوير الاتجاه المعتمد.', 'en' => 'Developing the approved direction.']],
-                    ['status' => Order::STATUS_COMPLETED, 'note' => ['ar' => 'تم تسليم كامل الملفات ودليل الهوية.', 'en' => 'All files and the brand guide delivered.']],
+                    ['status' => Order::STATUS_COMPLETED, 'note' => ['ar' => 'تم تسليم السجل التجاري وكامل التراخيص.', 'en' => 'Commercial Registration and all licences delivered.']],
                 ],
             ],
             [
