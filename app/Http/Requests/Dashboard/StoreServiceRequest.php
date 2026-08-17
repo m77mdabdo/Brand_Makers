@@ -42,6 +42,14 @@ class StoreServiceRequest extends FormRequest
             'is_active' => ['nullable', 'boolean'],
             'sort_order' => ['nullable', 'integer', 'min:0', 'max:9999'],
 
+            /*
+             * NULLABLE, and that is a real answer: blank means "على
+             * الطلب", the same fact packages and estimator items express
+             * the same way. decimal(12,2) — the max is what the column
+             * can hold.
+             */
+            'price' => ['nullable', 'numeric', 'min:0', 'max:9999999999.99'],
+
             'name' => ['required', 'array'],
             'name.ar' => ['required', 'string', 'max:255'],
             'name.en' => ['nullable', 'string', 'max:255'],

@@ -53,6 +53,7 @@ class EstimatorController extends Controller
         $quote = $this->estimator->quote(
             $request->validated('package'),
             $request->validated('items') ?? [],
+            $request->validated('services') ?? [],
         );
 
         $lead = Lead::create([

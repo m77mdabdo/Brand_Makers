@@ -44,6 +44,17 @@ class StoreEstimateRequest extends FormRequest
             'items' => ['nullable', 'array', 'max:'.EstimatorService::MAX_SELECTED_ITEMS],
             'items.*' => ['string', 'max:255'],
 
+            /*
+             * Service slugs, kept separate from item keys because they are
+             * drawn from a different table and could collide — merging
+             * them would make that collision silent. Same as above, these
+             * are identifiers only: NO price is accepted from the client,
+             * and the figure is re-read from `services` on every
+             * submission.
+             */
+            'services' => ['nullable', 'array', 'max:'.EstimatorService::MAX_SELECTED_ITEMS],
+            'services.*' => ['string', 'max:255'],
+
             'consent_given' => ['accepted'],
 
             ...$this->attributionRules(),

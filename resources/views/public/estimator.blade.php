@@ -19,11 +19,21 @@
             'none' => __('site.estimator.none_selected'),
             'selected' => __('site.estimator.selected_count'),
         ],
-        'items' => $groups->pluck('items')->flatten()->mapWithKeys(fn ($item) => [
-            // null, not 0 — an on-request line contributes no number and
-            // the client must not add one.
-            $item->key => ['label' => $item->label, 'price' => $item->isPriceOnRequest() ? null : (string) $item->price],
-        ])->all(),
+        /*
+         * Two maps, not one. Services are keyed by slug and items by key,
+         * from different tables — merging them would let a collision go
+         * unnoticed and charge the wrong line.
+         */
+        'items' => $groups->where('source', '!==', \App\Models\EstimatorGroup::SOURCE_SERVICES)
+            ->pluck('items')->flatten()->mapWithKeys(fn ($item) => [
+                // null, not 0 — an on-request line contributes no number
+                // and the client must not add one.
+                $item->key => ['label' => $item->label, 'price' => $item->isPriceOnRequest() ? null : (string) $item->price],
+            ])->all(),
+        'services' => $groups->where('source', \App\Models\EstimatorGroup::SOURCE_SERVICES)
+            ->pluck('items')->flatten()->mapWithKeys(fn ($service) => [
+                $service->slug => ['label' => $service->name, 'price' => $service->isPriceOnRequest() ? null : (string) $service->price],
+            ])->all(),
         'packages' => $packages->mapWithKeys(fn ($package) => [
             $package->slug => [
                 'name' => $package->name,
@@ -150,7 +160,7 @@
                                         aria-labelledby="{{ $groupId }}-label"
                                         class="mt-4 flex min-h-[44px] w-full items-center justify-between gap-3 rounded-xl border border-line bg-white px-4 text-start text-sm font-bold text-ink transition hover:border-petrol focus:outline-none focus-visible:ring-2 focus-visible:ring-petrol"
                                     >
-                                        <span x-text="groupSummary(@js(collect($group['items'])->pluck('key')->all()))"></span>
+                                        <span x-text="groupSummary(@js(collect($group['items'])->pluck($group['source'] === \App\Models\EstimatorGroup::SOURCE_SERVICES ? 'slug' : 'key')->all()), @js($group['source'] === \App\Models\EstimatorGroup::SOURCE_SERVICES))"></span>
                                         <svg class="h-4 w-4 shrink-0 transition-transform" :class="open && 'rotate-180'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                             <path d="M6 9l6 6 6-6" stroke-linecap="round" />
                                         </svg>
@@ -158,15 +168,20 @@
 
                                     <div id="{{ $groupId }}-panel" x-show="open" x-cloak x-transition.opacity class="mt-3 grid gap-2 sm:grid-cols-2">
                                         @foreach ($group['items'] as $item)
+                                            @php
+                                                $isService = $group['source'] === \App\Models\EstimatorGroup::SOURCE_SERVICES;
+                                                $optionValue = $isService ? $item->slug : $item->key;
+                                                $optionLabel = $isService ? $item->name : $item->label;
+                                            @endphp
                                             <label class="flex min-h-[44px] cursor-pointer items-start gap-3 rounded-xl border border-line p-3 transition hover:border-petrol has-[:checked]:border-petrol has-[:checked]:bg-cream">
                                                 <input
                                                     type="checkbox"
-                                                    value="{{ $item->key }}"
-                                                    x-model="selectedItems"
+                                                    value="{{ $optionValue }}"
+                                                    x-model="{{ $isService ? 'selectedServices' : 'selectedItems' }}"
                                                     class="mt-0.5 h-5 w-5 shrink-0 rounded border-line text-orange-ink focus:ring-petrol"
                                                 >
                                                 <span class="min-w-0 flex-1">
-                                                    <span class="block text-sm font-bold text-ink">{{ $item->label }}</span>
+                                                    <span class="block text-sm font-bold text-ink">{{ $optionLabel }}</span>
                                                     <span class="mt-1 block text-xs font-bold {{ $item->isPriceOnRequest() ? 'text-muted-ink' : 'text-orange-ink' }}" @if (! $item->isPriceOnRequest()) dir="ltr" @endif>
                                                         @if ($item->isPriceOnRequest())
                                                             {{ __('site.estimator.on_request') }}
@@ -186,13 +201,14 @@
 
                                     <select
                                         id="{{ $groupId }}"
-                                        @change="chooseOne(@js(collect($group['items'])->pluck('key')->all()), $event.target.value)"
+                                        @change="chooseOne(@js(collect($group['items'])->pluck($group['source'] === \App\Models\EstimatorGroup::SOURCE_SERVICES ? 'slug' : 'key')->all()), $event.target.value, @js($group['source'] === \App\Models\EstimatorGroup::SOURCE_SERVICES))"
                                         class="mt-4 block min-h-[44px] w-full rounded-xl border-line bg-white text-sm font-bold text-ink shadow-sm focus:border-petrol focus:ring-petrol"
                                     >
                                         <option value="">{{ __('site.estimator.none_selected') }}</option>
                                         @foreach ($group['items'] as $item)
-                                            <option value="{{ $item->key }}">
-                                                {{ $item->label }}
+                                            @php $isService = $group['source'] === \App\Models\EstimatorGroup::SOURCE_SERVICES; @endphp
+                                            <option value="{{ $isService ? $item->slug : $item->key }}">
+                                                {{ $isService ? $item->name : $item->label }}
                                                 @if ($item->isPriceOnRequest())
                                                     — {{ __('site.estimator.on_request') }}
                                                 @else
@@ -291,6 +307,9 @@
                                     sees it quoted.
                                 --}}
                                 <input type="hidden" name="package" :value="selectedPackage">
+                                <template x-for="slug in selectedServices" :key="slug">
+                                    <input type="hidden" name="services[]" :value="slug">
+                                </template>
                                 <template x-for="key in selectedItems" :key="key">
                                     <input type="hidden" name="items[]" :value="key">
                                 </template>

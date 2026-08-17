@@ -48,6 +48,16 @@ function formatMajorUnits(minorUnits, locale) {
 Alpine.data('costEstimator', (config = {}) => ({
     /** @type {Record<string, {price: number|null, label: string}>} */
     items: config.items || {},
+    /**
+     * Services, keyed by SLUG rather than key.
+     *
+     * A separate map from `items` because the two come from different
+     * tables: a service slug and an item key could collide, and one
+     * merged map would silently charge whichever landed last.
+     *
+     * @type {Record<string, {price: number|null, label: string}>}
+     */
+    services: config.services || {},
     /** @type {Record<string, {price: number|null, name: string}>} */
     packages: config.packages || {},
     locale: config.locale || 'ar',
@@ -56,6 +66,7 @@ Alpine.data('costEstimator', (config = {}) => ({
     labels: config.labels || { none: '', selected: '' },
 
     selectedItems: [],
+    selectedServices: [],
     selectedPackage: '',
 
     get selectedLines() {
@@ -68,6 +79,12 @@ Alpine.data('costEstimator', (config = {}) => ({
 
         // Iterate the CATALOGUE, not the selection, so the breakdown is
         // always in catalogue order however the visitor clicked.
+        Object.keys(this.services).forEach((slug) => {
+            if (this.selectedServices.includes(slug)) {
+                lines.push({ id: 'service:' + slug, label: this.services[slug].label, price: this.services[slug].price });
+            }
+        });
+
         Object.keys(this.items).forEach((key) => {
             if (this.selectedItems.includes(key)) {
                 lines.push({ id: 'item:' + key, label: this.items[key].label, price: this.items[key].price });
@@ -87,16 +104,20 @@ Alpine.data('costEstimator', (config = {}) => ({
      * the grouping to drift.
      *
      * @param {string[]} keys
+     * @param {boolean} isService  read from `services`, not `items`
      */
-    groupSummary(keys) {
-        const chosen = keys.filter((key) => this.selectedItems.includes(key));
+    groupSummary(keys, isService = false) {
+        const selection = isService ? this.selectedServices : this.selectedItems;
+        const catalogue = isService ? this.services : this.items;
+
+        const chosen = keys.filter((key) => selection.includes(key));
 
         if (chosen.length === 0) {
             return this.labels.none;
         }
 
         if (chosen.length === 1) {
-            return this.items[chosen[0]]?.label ?? this.labels.none;
+            return catalogue[chosen[0]]?.label ?? this.labels.none;
         }
 
         return this.labels.selected.replace(':count', String(chosen.length));
@@ -108,12 +129,15 @@ Alpine.data('costEstimator', (config = {}) => ({
      *
      * @param {string[]} keys
      * @param {string} chosen
+     * @param {boolean} isService
      */
-    chooseOne(keys, chosen) {
-        this.selectedItems = this.selectedItems.filter((key) => ! keys.includes(key));
+    chooseOne(keys, chosen, isService = false) {
+        const bucket = isService ? 'selectedServices' : 'selectedItems';
+
+        this[bucket] = this[bucket].filter((key) => ! keys.includes(key));
 
         if (chosen) {
-            this.selectedItems.push(chosen);
+            this[bucket].push(chosen);
         }
     },
 
@@ -168,6 +192,7 @@ Alpine.data('costEstimator', (config = {}) => ({
 
     reset() {
         this.selectedItems = [];
+        this.selectedServices = [];
         this.selectedPackage = '';
     },
 }));
@@ -191,7 +216,14 @@ export function estimatorConfig(element) {
 
     const items = {};
     Object.entries(raw.items || {}).forEach(([key, item]) => {
-        items[key] = { label: item.label, price: toMinorUnits(item.price) };
+        // null survives as null: an on-request line contributes nothing
+        // and must not be coerced to a zero the client then adds up.
+        items[key] = { label: item.label, price: item.price === null ? null : toMinorUnits(item.price) };
+    });
+
+    const services = {};
+    Object.entries(raw.services || {}).forEach(([slug, service]) => {
+        services[slug] = { label: service.label, price: service.price === null ? null : toMinorUnits(service.price) };
     });
 
     const packages = {};
@@ -199,7 +231,7 @@ export function estimatorConfig(element) {
         packages[slug] = { name: pkg.name, price: pkg.price === null ? null : toMinorUnits(pkg.price) };
     });
 
-    return { items, packages, locale: raw.locale || 'ar' };
+    return { items, services, packages, labels: raw.labels || {}, locale: raw.locale || 'ar' };
 }
 
 window.estimatorConfig = estimatorConfig;

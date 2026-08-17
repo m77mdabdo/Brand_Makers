@@ -22,7 +22,20 @@
                                 </span>
                                 <h2 class="text-lg font-extrabold">{{ $service->name }}</h2>
                                 <p class="mt-2 flex-1 text-sm text-muted-ink">{{ $service->summary }}</p>
-                                <span class="mt-4 text-sm font-bold text-orange-ink">{{ __('site.services.read_more') }}</span>
+
+                                {{-- null is "على الطلب", never a zero: a
+                                     service nobody has priced is still
+                                     offered, and printing 0 would say it
+                                     is free. --}}
+                                <p class="mt-4 text-sm font-black {{ $service->isPriceOnRequest() ? 'text-muted-ink' : 'text-orange-ink' }}" @if (! $service->isPriceOnRequest()) dir="ltr" @endif>
+                                    @if ($service->isPriceOnRequest())
+                                        {{ __('site.services.on_request') }}
+                                    @else
+                                        {{ number_format((float) $service->price, 0) }} {{ __('site.services.currency') }}
+                                    @endif
+                                </p>
+
+                                <span class="mt-2 text-sm font-bold text-orange-ink">{{ __('site.services.read_more') }}</span>
                             </a>
                         </li>
                     @endforeach

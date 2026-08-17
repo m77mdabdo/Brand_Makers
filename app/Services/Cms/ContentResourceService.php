@@ -78,6 +78,8 @@ abstract class ContentResourceService
 
             $record = $this->model()::create($attributes);
 
+            $this->applyGuarded($record, $attributes);
+
             if ($this->supportsSeo()) {
                 $this->seoMeta->persist($record, $seo, $ogImage);
             }
@@ -100,6 +102,8 @@ abstract class ContentResourceService
             }
 
             $record->update($attributes);
+
+            $this->applyGuarded($record, $attributes);
 
             if ($this->supportsSeo()) {
                 $this->seoMeta->persist($record, $seo, $ogImage);
@@ -173,6 +177,51 @@ abstract class ContentResourceService
     /**
      * @return array<int, string>
      */
+    /**
+     * Columns this resource writes EXPLICITLY, because the model guards
+     * them against mass assignment.
+     *
+     * A price that reaches a public pricing page is worth keeping out of
+     * $fillable — there is no public write path to these models today,
+     * and this is what keeps that true if one is ever added, or if a
+     * controller starts handing request data straight to create(). The
+     * cost is one hook; the alternative is trusting every future caller.
+     *
+     * @return list<string>
+     */
+    protected function guardedFields(): array
+    {
+        return [];
+    }
+
+    /**
+     * Assigns the guarded columns from an ALREADY-SANITISED payload.
+     *
+     * $attributes has been through sanitize(), which intersects with the
+     * resource's WRITABLE list, so nothing arrives here that the resource
+     * did not name. array_key_exists rather than isset: null is a
+     * meaningful value for a price ("على الطلب") and isset would drop it.
+     *
+     * @param  array<string, mixed>  $attributes
+     */
+    private function applyGuarded(Model $record, array $attributes): void
+    {
+        $dirty = false;
+
+        foreach ($this->guardedFields() as $field) {
+            if (! array_key_exists($field, $attributes)) {
+                continue;
+            }
+
+            $record->{$field} = $attributes[$field];
+            $dirty = true;
+        }
+
+        if ($dirty) {
+            $record->save();
+        }
+    }
+
     protected function booleanFields(): array
     {
         return ['is_active'];

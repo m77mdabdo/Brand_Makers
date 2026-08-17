@@ -97,6 +97,8 @@ return [
     'services' => [
         'label' => 'خدماتنا',
         'read_more' => 'اقرأ التفاصيل',
+        'on_request' => 'السعر على الطلب',
+        'currency' => 'ر.س',
         'requirements' => 'ما نحتاجه منك',
         'process' => 'خطوات العمل',
         'enquire' => 'اطلب هذه الخدمة',

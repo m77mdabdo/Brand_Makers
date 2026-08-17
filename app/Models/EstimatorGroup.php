@@ -35,10 +35,25 @@ class EstimatorGroup extends Model
     /** @var list<string> */
     public const SELECTIONS = [self::SELECTION_SINGLE, self::SELECTION_MULTI];
 
+    /**
+     * Where the group's options come from.
+     *
+     * ITEMS is estimator_items rows. SERVICES is the service catalogue
+     * itself, read live with its own prices — see the add_source
+     * migration for why the services are not duplicated as items.
+     */
+    public const SOURCE_ITEMS = 'items';
+
+    public const SOURCE_SERVICES = 'services';
+
+    /** @var list<string> */
+    public const SOURCES = [self::SOURCE_ITEMS, self::SOURCE_SERVICES];
+
     protected $fillable = [
         'key',
         'label',
         'selection',
+        'source',
         'sort_order',
         'is_active',
     ];
@@ -79,6 +94,11 @@ class EstimatorGroup extends Model
     public function scopeOrdered(Builder $query): Builder
     {
         return $query->orderBy('sort_order')->orderBy('id');
+    }
+
+    public function isServiceSourced(): bool
+    {
+        return $this->source === self::SOURCE_SERVICES;
     }
 
     public function allowsMultiple(): bool
