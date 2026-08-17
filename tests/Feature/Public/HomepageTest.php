@@ -156,6 +156,73 @@ class HomepageTest extends TestCase
     }
 
     // -----------------------------------------------------------------
+    // The estimator teaser's range
+    // -----------------------------------------------------------------
+
+    public function test_the_teaser_range_spans_packages_as_well_as_items(): void
+    {
+        $this->seed();
+
+        // A fresh install prices the three tiers and ships the add-on
+        // catalogue unpriced. Reading items alone made the teaser announce
+        // "pricing in preparation" on the same page whose packages section
+        // was quoting 13,000 — the site contradicting itself.
+        $this->get('/')
+            ->assertSee('13,000', false)
+            ->assertSee('30,000', false)
+            ->assertDontSee(__('site.home_estimator.unpriced'), false);
+    }
+
+    public function test_a_priced_add_on_widens_the_range(): void
+    {
+        $this->seed();
+
+        EstimatorItem::query()->where('key', 'bank-account')->update(['price' => 4500, 'is_active' => true]);
+
+        $this->get('/')->assertSee('4,500', false)->assertSee('30,000', false);
+    }
+
+    public function test_a_single_priced_row_renders_one_figure_rather_than_a_range_of_one(): void
+    {
+        $this->seed();
+
+        Package::query()->update(['price' => null]);
+        EstimatorItem::query()->where('key', 'bank-account')->update(['price' => 4500, 'is_active' => true]);
+
+        $body = $this->get('/')->assertOk()->getContent();
+
+        preg_match('/<p class="mt-1 text-3xl font-black text-amber.*?<\/p>/s', $body, $figure);
+        $this->assertNotEmpty($figure);
+
+        // This rendered "1 – 1" when min and max were the same row.
+        $this->assertStringContainsString('4,500', $figure[0]);
+        $this->assertStringNotContainsString('–', $figure[0], 'A span of one number is not a range.');
+    }
+
+    public function test_an_activated_but_unpriced_item_does_not_advertise_a_minimum_of_zero(): void
+    {
+        $this->seed();
+
+        // The catalogue ships at 0.00 and inactive because 0 is not a
+        // price. An admin who activates a row before pricing it must not
+        // drag the advertised minimum to zero.
+        EstimatorItem::query()->where('key', 'bank-account')->update(['is_active' => true]);
+
+        $this->get('/')->assertSee('13,000', false)->assertDontSee('>0 –', false);
+    }
+
+    public function test_nothing_priced_hides_the_range_cleanly(): void
+    {
+        $this->seed();
+
+        Package::query()->update(['price' => null]);
+
+        $this->get('/')
+            ->assertSee(__('site.home_estimator.unpriced'), false)
+            ->assertDontSee(__('site.home_estimator.total_label'), false);
+    }
+
+    // -----------------------------------------------------------------
     // The animated hero
     // -----------------------------------------------------------------
 
@@ -302,32 +369,27 @@ class HomepageTest extends TestCase
         $this->get('/')->assertSee('id="testimonials"', false);
     }
 
-    public function test_the_estimator_teaser_quotes_no_number_until_items_are_priced(): void
-    {
-        $this->seed();
-
-        // The production seed ships the estimator catalogue inactive on
-        // purpose — a teaser that invented a figure would quote visitors a
-        // price the studio never agreed.
-        $this->assertSame(0, EstimatorItem::active()->count());
-
-        $response = $this->get('/');
-        $response->assertSee(__('site.home_estimator.unpriced'), false);
-        $response->assertDontSee(__('site.home_estimator.total_label'), false);
-    }
-
-    public function test_the_estimator_teaser_shows_a_real_range_once_items_are_priced(): void
+    /**
+     * This used to assert the opposite — that a seeded install quotes no
+     * number, because the catalogue ships inactive. That was true while
+     * the range read estimator items ALONE, and it is what let the teaser
+     * announce "pricing in preparation" on a page already quoting 13,000
+     * in its packages section. The seeded install has three real prices,
+     * so quoting them is correct; the "nothing priced" case is asserted
+     * in test_nothing_priced_hides_the_range_cleanly instead.
+     */
+    public function test_the_estimator_teaser_shows_a_real_range_once_anything_is_priced(): void
     {
         $this->seed();
 
         EstimatorItem::factory()->create(['key' => 'cheap', 'price' => 1200, 'is_active' => true]);
-        EstimatorItem::factory()->create(['key' => 'dear', 'price' => 18000, 'is_active' => true]);
         EstimatorItem::factory()->inactive()->create(['key' => 'hidden', 'price' => 99999]);
 
         $response = $this->get('/');
 
         $response->assertSee('1,200', false);
-        $response->assertSee('18,000', false);
+        // The dearest package, since the span covers both sources.
+        $response->assertSee('30,000', false);
         // An inactive item must not stretch the published range.
         $response->assertDontSee('99,999', false);
     }

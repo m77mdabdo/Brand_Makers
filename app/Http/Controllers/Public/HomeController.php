@@ -125,28 +125,59 @@ class HomeController extends Controller
     }
 
     /**
-     * The span between the cheapest and the most expensive active
-     * estimator item, or null when nothing has been priced yet.
+     * What the estimator can actually quote today: cheapest to dearest,
+     * or null when nothing is priced.
      *
-     * One aggregate query, not a fetch-and-sum in PHP.
+     * THIS USED TO READ ESTIMATOR ITEMS ONLY, and that was wrong in both
+     * directions once the packages carried real figures.
+     *
+     * Too low: a fresh install has three packages at 13,000 / 22,000 /
+     * 30,000 SAR and an add-on catalogue that ships unpriced, so the
+     * teaser announced "الأسعار قيد الإعداد" on the same page whose
+     * packages section was quoting 13,000 — the site contradicting
+     * itself two screens apart.
+     *
+     * Too narrow: with a single add-on activated, MIN and MAX were the
+     * same row and the teaser rendered "1 – 1", a range of one number.
+     *
+     * So the span covers BOTH sources, which is also what the estimator
+     * itself sums — a visitor starts from a package and adds items, so a
+     * range built from only half of that was never the real span.
+     *
+     * PRICES OF ZERO ARE EXCLUDED. EstimatorItemSeeder ships the
+     * catalogue at 0.00 and inactive precisely because 0 is not a price,
+     * and an admin who activates a row before pricing it would otherwise
+     * drag the advertised minimum to zero — "from 0 SAR" on the homepage
+     * being considerably worse than saying nothing yet.
      *
      * @return array{min: float, max: float, count: int}|null
      */
     private function estimatorRange(): ?array
     {
-        $stats = EstimatorItem::query()
+        $itemStats = EstimatorItem::query()
             ->active()
-            ->selectRaw('MIN(price) as min_price, MAX(price) as max_price, COUNT(*) as item_count')
+            ->where('price', '>', 0)
+            ->selectRaw('MIN(price) as min_price, MAX(price) as max_price, COUNT(*) as row_count')
             ->first();
 
-        if (! $stats || (int) $stats->item_count === 0 || $stats->max_price === null) {
+        $packageStats = Package::query()
+            ->active()
+            ->whereNotNull('price')
+            ->where('price', '>', 0)
+            ->selectRaw('MIN(price) as min_price, MAX(price) as max_price, COUNT(*) as row_count')
+            ->first();
+
+        $mins = array_filter([$itemStats?->min_price, $packageStats?->min_price], fn ($v) => $v !== null);
+        $maxes = array_filter([$itemStats?->max_price, $packageStats?->max_price], fn ($v) => $v !== null);
+
+        if ($mins === [] || $maxes === []) {
             return null;
         }
 
         return [
-            'min' => (float) $stats->min_price,
-            'max' => (float) $stats->max_price,
-            'count' => (int) $stats->item_count,
+            'min' => (float) min($mins),
+            'max' => (float) max($maxes),
+            'count' => (int) ($itemStats?->row_count ?? 0) + (int) ($packageStats?->row_count ?? 0),
         ];
     }
 }
