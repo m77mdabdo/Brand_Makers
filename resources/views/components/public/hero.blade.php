@@ -69,8 +69,11 @@
         </p>
 
         <div class="mt-9 flex flex-wrap items-center justify-center gap-3.5">
-            <a href="#booking" class="btn btn-primary btn-on-dark">{{ __('site.hero.cta_primary') }}</a>
-            <a href="#estimator" class="btn btn-ghost-light btn-on-dark">{{ __('site.hero.cta_secondary') }}</a>
+            {{-- Real destinations, not homepage fragments. "ابدأ الآن"
+                 opens the booking page and "احسب تكلفتك" the estimator —
+                 the two entry points of the funnel. --}}
+            <a href="{{ lroute('booking') }}" class="btn btn-primary btn-on-dark">{{ __('site.hero.cta_primary') }}</a>
+            <a href="{{ lroute('estimator') }}" class="btn btn-ghost-light btn-on-dark">{{ __('site.hero.cta_secondary') }}</a>
         </div>
 
         @if ($stats->isNotEmpty())

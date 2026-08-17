@@ -148,8 +148,8 @@ class DemoLeadSeeder extends Seeder
                 'type' => Lead::TYPE_CONSULTATION,
                 'source_platform' => 'google',
                 'campaign_id' => 'sample_google_search',
-                'landing_page_url' => '/services/visual-identity',
-                'message' => 'بيانات عينة — طلب استشارة لتصميم هوية بصرية. '.DemoDataSeeder::SAMPLE_MARKER,
+                'landing_page_url' => '/services/llc-formation',
+                'message' => 'بيانات عينة — طلب استشارة لتأسيس شركة ذات مسؤولية محدودة. '.DemoDataSeeder::SAMPLE_MARKER,
                 'handled' => true,
                 'conversions' => [
                     ['type' => 'qualified', 'value' => null, 'days_ago' => 25],
@@ -176,7 +176,7 @@ class DemoLeadSeeder extends Seeder
                 'type' => Lead::TYPE_CONTACT,
                 'source_platform' => 'behance',
                 'landing_page_url' => '/contact',
-                'message' => 'Sample data — general enquiry about packaging design. '.DemoDataSeeder::SAMPLE_MARKER,
+                'message' => 'Sample data — general enquiry about the foreign investment licence. '.DemoDataSeeder::SAMPLE_MARKER,
             ],
             [
                 'full_name' => 'فيصل الدوسري',

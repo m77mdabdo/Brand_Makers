@@ -9,7 +9,7 @@ return [
     'brand' => [
         'name' => 'Creative Mark',
         'name_latin' => 'Creative Mark',
-        'tagline' => 'We build brands that get remembered',
+        'tagline' => 'Your partner for company formation and investment in Saudi Arabia',
     ],
 
     'nav' => [
@@ -27,18 +27,18 @@ return [
     ],
 
     'hero' => [
-        'eyebrow' => 'Brand & identity studio · Saudi Arabia',
-        'title_before' => 'We build',
-        'title_highlight' => 'brands',
-        'title_after' => 'that last',
-        'lead' => 'From strategy to a complete visual identity — we turn what your brand stands for into a coherent system that holds up everywhere it appears.',
-        'cta_primary' => 'Book a consultation',
+        'eyebrow' => 'Company formation & investment · Saudi Arabia',
+        'title_before' => 'Your trusted partner for forming',
+        'title_highlight' => 'your company',
+        'title_after' => 'and investing in Saudi Arabia',
+        'lead' => 'From an idea to an active Commercial Registration — we handle the formation, the licences, the acquisition and every government procedure for you, with clear steps, published prices, and a specialist Saudi team beside you at each one.',
+        'cta_primary' => 'Start now',
         'cta_secondary' => 'Estimate your cost',
         'scroll_cue' => 'Scroll down',
         // Labels for the hero figures. The VALUES are editable
         // settings (seeded empty); these labels are chrome.
         'stats' => [
-            'companies' => 'projects delivered',
+            'companies' => 'companies formed',
             'turnaround' => 'average turnaround',
             'satisfaction' => 'client satisfaction',
         ],
@@ -60,6 +60,34 @@ return [
         'label' => 'What we do',
     ],
 
+    // The four value props under the hero. Fixed copy rather than
+    // database content, on the same rule as the hero itself.
+    'values' => [
+        'eyebrow' => 'Why us',
+        'title' => 'Formation whose steps and cost you know from the start',
+        'items' => [
+            ['title' => 'End-to-end formation', 'body' => 'Every procedure and licence under one roof.'],
+            ['title' => '100% foreign ownership', 'body' => 'In the activities where it is permitted.'],
+            ['title' => 'Fast and transparent', 'body' => 'Clear steps, live progress, published prices.'],
+            ['title' => 'Post-formation support', 'body' => 'Accounting, tax, zakat, social insurance and compliance.'],
+        ],
+    ],
+
+    // The homepage activities section. Titles and descriptions come from
+    // the Activities page's sections in the database; this is the frame.
+    'activities' => [
+        'eyebrow' => 'Activities',
+        'title' => 'We form and licence across every sector',
+        'lead' => 'We form and licence companies across every economic sector, and guide you to the activity and entity that fit best.',
+        'view_all' => 'Explore the activities',
+    ],
+
+    'why_saudi' => [
+        'eyebrow' => 'The market',
+        'title' => 'Why invest in Saudi Arabia',
+        'view_all' => 'Read more',
+    ],
+
     'services' => [
         'label' => 'Services',
         'read_more' => 'Read more',
@@ -68,23 +96,23 @@ return [
         'enquire' => 'Enquire about this service',
         'other' => 'Other services',
         'eyebrow' => 'What we do',
-        'title' => 'Work built on understanding, not taste',
-        'lead' => 'We ask before we design, and hand over a complete system your team can apply with confidence.',
+        'title' => 'Everything it takes to form your entity and run it',
+        'lead' => 'From choosing the activity and the licences through to accounting and compliance once you are operating — under one roof.',
         'view_all' => 'All services',
         'empty' => 'No services have been added yet.',
     ],
 
     'home_estimator' => [
         'eyebrow' => 'Interactive calculator',
-        'title' => 'Estimate your project in seconds',
-        'lead' => 'Pick the deliverables you need and get an instant indicative figure — no phone call required.',
+        'title' => 'Estimate your formation cost in seconds',
+        'lead' => 'Pick your package and any add-ons you need, and get an instant indicative figure — no phone call required.',
         'cta' => 'Open the estimator',
         'panel_title' => 'Indicative estimate',
         'total_label' => 'Estimated cost',
         'currency' => 'SAR',
         'disclaimer' => 'Indicative only and not binding. A formal proposal follows your consultation.',
         'unpriced' => 'Pricing in preparation',
-        'unpriced_hint' => 'Get in touch for a detailed proposal for your project.',
+        'unpriced_hint' => 'Get in touch for a detailed quote for forming your entity.',
     ],
 
     'packages' => [
@@ -97,8 +125,8 @@ return [
         'included' => 'Included',
         'not_included' => 'Not included',
         'eyebrow' => 'Our packages',
-        'title' => 'Pick the package that fits your stage',
-        'lead' => 'Clear scopes and defined deliverables. Compare and choose, or ask for a custom scope.',
+        'title' => 'Pick the package that fits your case',
+        'lead' => 'Published prices and defined inclusions. Compare and choose, or ask for a scope tailored to your activity.',
         'popular' => 'Most popular',
         'price_on_request' => 'On request',
         'currency' => 'SAR',
@@ -109,13 +137,13 @@ return [
 
     'home_tracker' => [
         'eyebrow' => 'Client portal',
-        'title' => 'Follow your project, step by step',
+        'title' => 'Follow your application, step by step',
         'lead' => 'Every order gets its own private tracking link showing the current stage, progress and latest update.',
         'cta' => 'Track your order',
         'steps' => [
-            ['title' => 'Place the order', 'body' => 'Choose a package or scope and get started.'],
-            ['title' => 'Work and review', 'body' => 'We work through the stages and share each one with you.'],
-            ['title' => 'Handover', 'body' => 'You receive the files and the complete brand guide.'],
+            ['title' => 'Place the order', 'body' => 'Choose a package and get started, and we establish which documents are needed.'],
+            ['title' => 'Procedures and licences', 'body' => 'We submit the applications and follow them with the competent authorities.'],
+            ['title' => 'Handover', 'body' => 'You receive the registration and the licences, with your entity ready to operate.'],
         ],
         'sample_reference' => 'Order #CM-XXXX',
         'sample_status' => 'In progress',
@@ -124,9 +152,9 @@ return [
     ],
 
     'home_booking' => [
-        'title' => 'Ready to build your brand?',
-        'lead' => 'Book a consultation and we will map the route from idea to a complete identity with you.',
-        'cta' => 'Book your slot',
+        'title' => 'Ready to start your entity?',
+        'lead' => 'Book a consultation and we will settle the right activity and entity, the steps and the cost with you.',
+        'cta' => 'Book a consultation',
     ],
 
     'testimonials' => [
@@ -148,7 +176,7 @@ return [
         'empty' => 'No articles published yet.',
         'related' => 'Related articles',
         'eyebrow' => 'From the blog',
-        'title' => 'Thinking about brands',
+        'title' => 'Guides and articles on formation and investment',
         'read_more' => 'Read the article',
         'view_all' => 'All articles',
     ],
@@ -166,7 +194,7 @@ return [
         'label' => 'Markets',
         'eyebrow' => 'Where we work',
         'title' => 'The markets we serve',
-        'lead' => 'We work with clients across Saudi Arabia, the Gulf and the wider Middle East.',
+        'lead' => 'We serve investors from Saudi Arabia, the Gulf and beyond the region.',
         'empty' => 'No markets have been added yet.',
     ],
 
@@ -250,12 +278,12 @@ return [
     ],
 
     // Appointment booking. Times shown to a visitor are always the
-    // studio's wall clock — see config/booking.php.
+    // office's wall clock — see config/booking.php.
     'booking' => [
         'label' => 'Book a consultation',
         'eyebrow' => 'Talk to us',
         'title' => 'Book a consultation',
-        'lead' => 'Pick a time that suits you. The session is a conversation about your brand — where it is now and what it needs.',
+        'lead' => 'Pick a time that suits you. The session is a conversation about your plans — the activity, the entity and what forming it involves.',
         'timezone_label' => 'Riyadh time',
         'timezone_note' => 'All times are shown in :timezone.',
         'step_topic' => '1 · What would you like to discuss?',
@@ -297,7 +325,7 @@ return [
         'label' => 'Track your order',
         'eyebrow' => 'Client portal',
         'title' => 'Track your order',
-        'lead' => 'Enter your order reference and the tracking code we sent you to see exactly where your project has got to.',
+        'lead' => 'Enter your order reference and the tracking code we sent you to see exactly where your application has got to.',
         'form_heading' => 'Open your order',
         'form_hint' => 'Both are on the confirmation we sent you. The tracking code is long — paste it rather than typing it.',
         'reference' => 'Order reference',
@@ -309,7 +337,7 @@ return [
         'package' => 'Package',
         'progress' => 'Progress',
         'stages_heading' => 'Where your project is',
-        'updates_heading' => 'Updates from the studio',
+        'updates_heading' => 'Updates from the team',
         'latest_note' => 'Latest note',
         'cancelled_note' => 'This order was cancelled. The stages below show how far it had got.',
         'check_another' => 'Check another order',
@@ -342,7 +370,7 @@ return [
     ],
 
     'footer' => [
-        'about' => 'A studio specialising in visual identity and brand strategy across Saudi Arabia and the Gulf.',
+        'about' => 'A Saudi advisory firm specialising in company formation and investment enablement in the Kingdom of Saudi Arabia.',
         'links_about' => 'About',
         'links_process' => 'How we work',
         'links_heading' => 'Links',

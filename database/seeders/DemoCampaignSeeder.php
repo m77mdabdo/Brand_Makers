@@ -36,7 +36,7 @@ class DemoCampaignSeeder extends Seeder
     {
         return [
             [
-                'name' => 'حملة الهوية البصرية — بحث جوجل '.DemoDataSeeder::SAMPLE_MARKER,
+                'name' => 'حملة تأسيس الشركات — بحث جوجل '.DemoDataSeeder::SAMPLE_MARKER,
                 'platform' => 'google',
                 'external_campaign_id' => 'sample_google_search',
                 'budget' => 30000.00,
