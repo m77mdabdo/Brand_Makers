@@ -18,18 +18,22 @@ use Illuminate\Database\Seeder;
  *
  * So what lives here is only what a client adds ON TOP of a tier.
  *
- * SEEDED PRICED AT ZERO AND INACTIVE, ON PURPOSE — unchanged from the
- * catalogue this replaced, and for the same reason. The labels are real
- * services this company performs, so the catalogue is production content.
- * The prices are not: nobody has set them, and an estimator seeded with
- * invented figures would quote visitors numbers the business never agreed
- * to, on a page whose entire purpose is to state a price.
+ * SEEDED WITH NO PRICE, ON PURPOSE. The labels are real services this
+ * company performs, so the catalogue is production content. The prices
+ * are not: nobody has set them, and an estimator seeded with invented
+ * figures would quote visitors numbers the business never agreed to, on a
+ * page whose entire purpose is to state a price.
  *
- * `price` is NOT NULL by design (an unpriced line cannot be summed), so
- * "no price yet" is expressed the only other honest way available:
- * is_active = false. A fresh install therefore ships the full add-on list
- * and an estimator that quotes the three real tiers and nothing else, and
- * each add-on starts counting the moment an admin prices and activates it.
+ * price = null now means "على الطلب" rather than "hidden". These rows ship
+ * ACTIVE: the visitor sees the full menu of what can be added, each
+ * unpriced line is labelled on request, and selecting one turns the quote
+ * into a floor instead of contributing a number. Previously the only way
+ * to say "not priced yet" was is_active = false, which meant a fresh
+ * install rendered an estimator with nothing in it — honest, but useless
+ * until an admin had priced every line.
+ *
+ * Each line starts counting toward the total the moment an admin gives it
+ * a figure, with no other change needed.
  *
  * ARABIC ONLY; English comes from content:translate-to-english.
  *
@@ -73,8 +77,11 @@ class EstimatorItemSeeder extends Seeder
 
             EstimatorItem::create($attributes + [
                 'key' => $item['key'],
-                'price' => 0,
-                'is_active' => false,
+                // null, not 0, and ACTIVE rather than hidden. See the
+                // class docblock: an unpriced line now says "على الطلب"
+                // instead of vanishing.
+                'price' => null,
+                'is_active' => true,
             ]);
         }
 
@@ -82,29 +89,47 @@ class EstimatorItemSeeder extends Seeder
     }
 
     /**
-     * Group keys resolve against site.estimator.groups, falling back to
-     * the raw key so a group an admin invents still renders.
+     * `group` is the key of an EstimatorGroup, which carries the label and
+     * decides whether the selector admits one answer or several. An item
+     * naming a group with no row still renders — under its raw slug — so a
+     * rename in progress is not an outage.
      *
      * @return array<int, array{key: string, group: string, label: array<string, string>}>
      */
     private function items(): array
     {
         return [
-            // --- التراخيص -------------------------------------------------
-            ['key' => 'foreign-investment-licence', 'group' => 'licensing', 'label' => ['ar' => 'رخصة الاستثمار الأجنبي']],
-            ['key' => 'municipal-sector-licence', 'group' => 'licensing', 'label' => ['ar' => 'رخصة بلدية أو قطاعية']],
+            // --- الخدمات ---------------------------------------------------
+            // The eight formation services, as selectable lines. They mirror
+            // the service catalogue by name on purpose: a visitor who read
+            // /services should recognise these without translating between
+            // two vocabularies.
+            ['key' => 'llc-formation', 'group' => 'services', 'label' => ['ar' => 'تأسيس شركة ذات مسؤولية محدودة']],
+            ['key' => 'foreign-investment-licence', 'group' => 'services', 'label' => ['ar' => 'رخصة الاستثمار الأجنبي']],
+            ['key' => 'company-acquisition', 'group' => 'services', 'label' => ['ar' => 'الاستحواذ على شركة قائمة']],
+            ['key' => 'commercial-registration', 'group' => 'services', 'label' => ['ar' => 'السجل التجاري والتوثيق']],
+            ['key' => 'national-address-bank-account', 'group' => 'services', 'label' => ['ar' => 'العنوان الوطني وفتح الحساب البنكي']],
+            ['key' => 'municipal-sector-licences', 'group' => 'services', 'label' => ['ar' => 'الرخص البلدية والقطاعية']],
+            ['key' => 'post-formation-services', 'group' => 'services', 'label' => ['ar' => 'خدمات ما بعد التأسيس']],
+            ['key' => 'consulting-and-studies', 'group' => 'services', 'label' => ['ar' => 'الاستشارات والدراسات']],
 
-            // --- البنك والعنوان -------------------------------------------
-            ['key' => 'bank-account', 'group' => 'banking', 'label' => ['ar' => 'فتح حساب بنكي']],
-            ['key' => 'national-address', 'group' => 'banking', 'label' => ['ar' => 'العنوان الوطني']],
+            // --- الاستحواذ على شركة خارجية ---------------------------------
+            // One honest option rather than an invented taxonomy of
+            // jurisdictions. The group is single-select, so this reads as a
+            // yes/no today and gains variants when the admin adds them.
+            ['key' => 'foreign-company-acquisition', 'group' => 'foreign-acquisition', 'label' => ['ar' => 'الاستحواذ على شركة خارجية']],
 
-            // --- المحاسبة والامتثال ---------------------------------------
-            ['key' => 'accounting-annual', 'group' => 'compliance', 'label' => ['ar' => 'باقة محاسبة سنوية']],
-            ['key' => 'vat-and-zakat', 'group' => 'compliance', 'label' => ['ar' => 'ضريبة القيمة المضافة والزكاة']],
-            ['key' => 'social-insurance', 'group' => 'compliance', 'label' => ['ar' => 'التأمينات الاجتماعية']],
-
-            // --- الاستشارات -----------------------------------------------
-            ['key' => 'feasibility-study', 'group' => 'advisory', 'label' => ['ar' => 'دراسة جدوى']],
+            // --- خدمات أخرى -----------------------------------------------
+            ['key' => 'attestations', 'group' => 'other-services', 'label' => ['ar' => 'التصديقات']],
+            ['key' => 'investment-record', 'group' => 'other-services', 'label' => ['ar' => 'صحيفة الاستثمار (السجل الاستثماري)']],
+            ['key' => 'financial-statements', 'group' => 'other-services', 'label' => ['ar' => 'القوائم المالية']],
+            ['key' => 'bank-account', 'group' => 'other-services', 'label' => ['ar' => 'فتح حساب بنكي']],
+            ['key' => 'national-address', 'group' => 'other-services', 'label' => ['ar' => 'العنوان الوطني']],
+            ['key' => 'municipal-sector-licence', 'group' => 'other-services', 'label' => ['ar' => 'رخصة بلدية أو قطاعية']],
+            ['key' => 'accounting-annual', 'group' => 'other-services', 'label' => ['ar' => 'باقة محاسبة سنوية']],
+            ['key' => 'vat-and-zakat', 'group' => 'other-services', 'label' => ['ar' => 'ضريبة القيمة المضافة والزكاة']],
+            ['key' => 'social-insurance', 'group' => 'other-services', 'label' => ['ar' => 'التأمينات الاجتماعية']],
+            ['key' => 'feasibility-study', 'group' => 'other-services', 'label' => ['ar' => 'دراسة جدوى']],
         ];
     }
 }

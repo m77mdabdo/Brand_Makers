@@ -121,10 +121,14 @@ class DemoDataSeparationTest extends TestCase
 
         $this->assertSame(3, Package::whereNotNull('price')->count());
 
+        // Add-ons ship VISIBLE now, labelled على الطلب, so "active" is no
+        // longer the thing to assert — an active line may legitimately
+        // carry no price. What must hold is that none of them carries a
+        // figure nobody agreed.
         $this->assertSame(
             0,
-            EstimatorItem::active()->count(),
-            'An add-on may not go live until someone prices it.'
+            EstimatorItem::whereNotNull('price')->count(),
+            'An add-on may not carry a price until someone sets it.'
         );
 
         $this->assertSame(

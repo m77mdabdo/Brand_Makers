@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Dashboard;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Validator;
 
 class UpdateEstimatorItemRequest extends FormRequest
 {
@@ -33,25 +32,13 @@ class UpdateEstimatorItemRequest extends FormRequest
 
             'group' => ['required', 'string', 'max:255', 'alpha_dash'],
 
-            'price' => ['required', 'numeric', 'min:0', 'max:9999999999.99'],
+            // Nullable: blank means "على الطلب", not zero. See
+            // StoreEstimatorItemRequest for the full reasoning.
+            'price' => ['nullable', 'numeric', 'min:0', 'max:9999999999.99'],
 
             'is_active' => ['nullable', 'boolean'],
             'sort_order' => ['nullable', 'integer', 'min:0', 'max:9999'],
         ];
-    }
-
-    /**
-     * Identical rule to the create request, and for the same reason: an
-     * item cannot be switched on until it has a real price, so nothing
-     * that adds 0 SAR to a visitor's quote can reach the public estimator.
-     */
-    public function withValidator(Validator $validator): void
-    {
-        $validator->after(function (Validator $validator) {
-            if ($this->boolean('is_active') && (float) $this->input('price') <= 0) {
-                $validator->errors()->add('price', __('dashboard.estimator_items.active_needs_price'));
-            }
-        });
     }
 
     /**

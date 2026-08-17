@@ -24,6 +24,7 @@
             ['route' => 'dashboard.services.index', 'label' => __('dashboard.resources.services'), 'icon' => 'sparkles'],
             ['route' => 'dashboard.packages.index', 'label' => __('dashboard.resources.packages'), 'icon' => 'cube'],
             ['route' => 'dashboard.estimator-items.index', 'label' => __('dashboard.resources.estimator_items'), 'icon' => 'calculator'],
+            ['route' => 'dashboard.estimator-groups.index', 'label' => __('dashboard.resources.estimator_groups'), 'icon' => 'calculator'],
             ['route' => 'dashboard.countries.index', 'label' => __('dashboard.resources.countries'), 'icon' => 'globe'],
             ['route' => 'dashboard.faqs.index', 'label' => __('dashboard.resources.faqs'), 'icon' => 'question'],
             ['route' => 'dashboard.testimonials.index', 'label' => __('dashboard.resources.testimonials'), 'icon' => 'quote'],

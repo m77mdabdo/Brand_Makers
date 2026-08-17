@@ -71,10 +71,19 @@ class EstimatorItemService extends ContentResourceService
         $data = array_intersect_key($data, array_flip(self::WRITABLE));
 
         if (array_key_exists('price', $data)) {
-            // Stored as a decimal string rather than a float: the column is
-            // decimal(12,2) and every consumer sums it as minor units, so
-            // there is no point letting a float representation in at all.
-            $data['price'] = number_format((float) $data['price'], 2, '.', '');
+            /*
+             * A blank price is NULL, not 0.00 — "على الطلب" rather than
+             * free. The column became nullable so an item could say that,
+             * and coercing a cleared box to zero here would silently turn
+             * "we have not priced this" into "this costs nothing", on the
+             * one screen where that distinction is the whole point.
+             */
+            $data['price'] = $data['price'] === null || $data['price'] === ''
+                ? null
+                // Stored as a decimal string rather than a float: the column
+                // is decimal(12,2) and every consumer sums it as minor
+                // units, so there is no point letting a float in at all.
+                : number_format((float) $data['price'], 2, '.', '');
         }
 
         /*

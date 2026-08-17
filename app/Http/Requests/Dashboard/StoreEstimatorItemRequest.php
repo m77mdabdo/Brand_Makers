@@ -4,7 +4,6 @@ namespace App\Http\Requests\Dashboard;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Validator;
 
 class StoreEstimatorItemRequest extends FormRequest
 {
@@ -43,30 +42,20 @@ class StoreEstimatorItemRequest extends FormRequest
             // slug as the heading — see the estimator view.
             'group' => ['required', 'string', 'max:255', 'alpha_dash'],
 
-            // decimal(12,2) — the max is what the column can actually hold.
-            'price' => ['required', 'numeric', 'min:0', 'max:9999999999.99'],
+            /*
+             * NULLABLE, and that is a real answer rather than a missing
+             * one: a blank price means "على الطلب", the same fact packages
+             * have always been able to express. The column became nullable
+             * so an unpriced line could stay visible and selectable instead
+             * of having to be switched off.
+             *
+             * decimal(12,2) — the max is what the column can actually hold.
+             */
+            'price' => ['nullable', 'numeric', 'min:0', 'max:9999999999.99'],
 
             'is_active' => ['nullable', 'boolean'],
             'sort_order' => ['nullable', 'integer', 'min:0', 'max:9999'],
         ];
-    }
-
-    /**
-     * A live estimator line must carry a real price.
-     *
-     * The catalogue ships priced at 0.00 and INACTIVE precisely because an
-     * unpriced line has no honest number to show, and `price` is NOT NULL
-     * so is_active = false is the only way to express "no price yet". This
-     * closes the loop: an admin cannot publish a line to the public
-     * estimator that would silently add 0 SAR to a visitor's quote.
-     */
-    public function withValidator(Validator $validator): void
-    {
-        $validator->after(function (Validator $validator) {
-            if ($this->boolean('is_active') && (float) $this->input('price') <= 0) {
-                $validator->errors()->add('price', __('dashboard.estimator_items.active_needs_price'));
-            }
-        });
     }
 
     /**
