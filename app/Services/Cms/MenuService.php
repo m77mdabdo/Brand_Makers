@@ -71,7 +71,27 @@ class MenuService
     /**
      * Persists a whole tree in one transaction.
      *
-     * @param  array<int, array{id: int|string, parent_id?: int|string|null}>  $items
+     * THE SUBMITTED sort_order IS WHAT DECIDES THE ORDER.
+     *
+     * This used to ignore it entirely and write $position — the index of
+     * the row in the posted array. The form posts `items[<id>][...]`
+     * keyed by id, so PHP hands them back in the order they were
+     * RENDERED, which is the order already stored. Every save therefore
+     * rewrote the existing arrangement onto itself: the admin typed new
+     * numbers, saw "تم حفظ الترتيب", and nothing moved. It was a no-op
+     * that reported success.
+     *
+     * So the rows are sorted by the number the admin typed, and only then
+     * numbered 0..n. Sorting rather than storing the raw value is what
+     * keeps sort_order contiguous and gap-free — the admin can type 10,
+     * 20, 30 to leave room and still get 0, 1, 2 stored — and it is what
+     * lets a value repeated across two rows resolve deterministically
+     * rather than leaving two items fighting for one slot.
+     *
+     * Numbering is PER PARENT: children are ordered within their own
+     * parent, so a child's 0 does not compete with a top-level item's 0.
+     *
+     * @param  array<int|string, array{id: int|string, parent_id?: int|string|null, sort_order?: int|string|null}>  $items
      * @return int rows written
      */
     public function reorder(array $items): int
@@ -79,27 +99,10 @@ class MenuService
         return DB::transaction(function () use ($items) {
             $written = 0;
 
-            foreach (array_values($items) as $position => $row) {
-                $parentId = $row['parent_id'] ?? null;
-                $parentId = ($parentId === '' || $parentId === 'null') ? null : $parentId;
-
-                // Nesting is capped at ONE level: an item may only be
-                // parented to something that is itself top-level. The
-                // navbar renders parent → children and nothing deeper, so
-                // a grandchild would simply vanish from the site.
-                if ($parentId !== null && MenuItem::whereKey($parentId)->whereNotNull('parent_id')->exists()) {
-                    $parentId = null;
-                }
-
-                // An item cannot be its own parent — that would make the
-                // tree unrenderable.
-                if ($parentId !== null && (int) $parentId === (int) $row['id']) {
-                    $parentId = null;
-                }
-
+            foreach ($this->sequence($items) as $row) {
                 $written += MenuItem::whereKey($row['id'])->update([
-                    'parent_id' => $parentId,
-                    'sort_order' => $position,
+                    'parent_id' => $row['parent_id'],
+                    'sort_order' => $row['sort_order'],
                 ]);
             }
 
@@ -111,6 +114,89 @@ class MenuService
 
             return $written;
         });
+    }
+
+    /**
+     * Turns the posted rows into what should actually be written: a
+     * resolved parent, and a contiguous position within that parent.
+     *
+     * Order of operations matters. The parent is normalised FIRST,
+     * because an item whose illegal parent is reset to null joins the
+     * top-level group and has to be numbered against those siblings, not
+     * against the children it was trying to join.
+     *
+     * The sort is stable on the submitted order, so two rows carrying the
+     * same number keep the arrangement the admin is looking at rather
+     * than swapping unpredictably on each save.
+     *
+     * @param  array<int|string, array{id: int|string, parent_id?: int|string|null, sort_order?: int|string|null}>  $items
+     * @return list<array{id: int, parent_id: int|null, sort_order: int}>
+     */
+    private function sequence(array $items): array
+    {
+        $rows = [];
+
+        foreach (array_values($items) as $submittedAt => $row) {
+            $rows[] = [
+                'id' => (int) $row['id'],
+                'parent_id' => $this->resolveParent($row),
+                // The number the admin typed. Absent or non-numeric sorts
+                // to the front rather than throwing — a menu save must not
+                // 500 on a field somebody cleared.
+                'requested' => is_numeric($row['sort_order'] ?? null) ? (int) $row['sort_order'] : 0,
+                'submitted_at' => $submittedAt,
+            ];
+        }
+
+        $grouped = [];
+
+        foreach ($rows as $row) {
+            $grouped[$row['parent_id'] ?? 0][] = $row;
+        }
+
+        $sequenced = [];
+
+        foreach ($grouped as $siblings) {
+            usort($siblings, fn (array $a, array $b) => [$a['requested'], $a['submitted_at']] <=> [$b['requested'], $b['submitted_at']]);
+
+            foreach (array_values($siblings) as $position => $row) {
+                $sequenced[] = [
+                    'id' => $row['id'],
+                    'parent_id' => $row['parent_id'],
+                    'sort_order' => $position,
+                ];
+            }
+        }
+
+        return $sequenced;
+    }
+
+    /**
+     * @param  array{id: int|string, parent_id?: int|string|null}  $row
+     */
+    private function resolveParent(array $row): ?int
+    {
+        $parentId = $row['parent_id'] ?? null;
+
+        if ($parentId === '' || $parentId === null || $parentId === 'null') {
+            return null;
+        }
+
+        // Nesting is capped at ONE level: an item may only be parented to
+        // something that is itself top-level. The navbar renders parent →
+        // children and nothing deeper, so a grandchild would simply vanish
+        // from the site.
+        if (MenuItem::whereKey($parentId)->whereNotNull('parent_id')->exists()) {
+            return null;
+        }
+
+        // An item cannot be its own parent — that would make the tree
+        // unrenderable.
+        if ((int) $parentId === (int) $row['id']) {
+            return null;
+        }
+
+        return (int) $parentId;
     }
 
     private function nextSortOrder(mixed $parentId): int
