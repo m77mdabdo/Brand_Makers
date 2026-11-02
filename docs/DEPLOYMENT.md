@@ -3,7 +3,7 @@
 Target: Hostinger shared/business hosting (hPanel, LiteSpeed, MySQL).
 Stack as built: **Laravel 12 · PHP 8.2+ · MySQL 8 · Vite/Tailwind 3 · Alpine 3**.
 
-
+See the **Roadmap** section of the [README](../README.md#roadmap) for what remains before a public launch.
 
 ---
 
@@ -24,7 +24,7 @@ Extensions — all verified loaded in the build environment:
 In **PHP Configuration → PHP options**, set:
 
 ```ini
-expose_php = Off        ; AUDIT §2.6 — otherwise X-Powered-By leaks the exact PHP version
+expose_php = Off        ; otherwise X-Powered-By leaks the exact PHP version
 memory_limit = 256M
 upload_max_filesize = 4M ; uploads are capped at 2 MB in validation; leave headroom
 post_max_size = 8M
@@ -114,13 +114,13 @@ SESSION_SECURE_COOKIE=true        # HTTPS only — without this the session cook
                                   # travels in the clear
 CACHE_STORE=database
 QUEUE_CONNECTION=database         # nothing is queued today (no ShouldQueue classes);
-                                  # required once mail lands — AUDIT §2.2
+                                  # required once mail lands
 
 # ── Filesystem ───────────────────────────────────────────────────────
 FILESYSTEM_DISK=public
 
 # ── Mail ─────────────────────────────────────────────────────────────
-# Nothing is sent today (AUDIT §2.2). Set these when the notifier is wired;
+# Nothing is sent today (see the README roadmap). Set these when the notifier is wired;
 # until then password-reset emails will NOT arrive either.
 MAIL_MAILER=smtp
 MAIL_HOST=smtp.hostinger.com
@@ -151,7 +151,7 @@ LOG_DEPRECATIONS_CHANNEL=null
 ADMIN_EMAIL=you@YOURDOMAIN
 ADMIN_PASSWORD=
 
-# ── Booking (defaults are correct; listed for visibility — AUDIT §2.11) ─
+# ── Booking (defaults are correct; listed for visibility) ─
 BOOKING_TIMEZONE=Asia/Riyadh      # the studio's wall clock. scheduled_at stays UTC.
 BOOKING_NOTIFICATIONS_ENABLED=false  # leave false until a transport exists
 ```
@@ -184,7 +184,7 @@ cd ~/creativemark
 php artisan key:generate --force        # only if APP_KEY is empty
 php artisan migrate --force             # --force is required in production
 php artisan db:seed --force             # production content only — see below
-php artisan storage:link                # AUDIT §2.10 — uploads 404 without this
+php artisan storage:link                # uploads 404 without this
 
 php artisan config:cache
 php artisan route:cache
@@ -256,7 +256,7 @@ Currently scheduled (`php artisan schedule:list`):
 
 ### Queue worker
 
-**Not needed today.** No class implements `ShouldQueue` and nothing calls `dispatch()`. When mail lands (AUDIT §2.2), add:
+**Not needed today.** No class implements `ShouldQueue` and nothing calls `dispatch()`. When mail lands (see the README roadmap), add:
 
 ```
 * * * * * cd /home/uXXXXXXX/creativemark && /usr/bin/php artisan queue:work --stop-when-empty --max-time=55 >> /dev/null 2>&1

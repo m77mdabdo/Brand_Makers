@@ -1,13 +1,17 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "m77mdabdo/brand-makers",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "Creative Mark — bilingual company-formation and investment platform for Saudi Arabia: public site, cost estimator, consultation booking, order tracking and an admin dashboard.",
     "keywords": [
         "laravel",
-        "framework"
+        "saudi-arabia",
+        "company-formation",
+        "bilingual",
+        "rtl",
+        "cms"
     ],
-    "license": "MIT",
+    "license": "proprietary",
     "require": {
         "php": "^8.2",
         "laravel/framework": "^12.0",
