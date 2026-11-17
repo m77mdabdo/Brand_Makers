@@ -114,7 +114,7 @@ class EstimatorItemSeeder extends Seeder
     private function items(): array
     {
         return [
-            // --- الاستحواذ على شركة خارجية، بلداً بلداً ------------------
+            // --- Acquiring a foreign company, country by country ----------
             // The countries a client most often acquires an existing
             // entity in. Each is priced on its own because acquiring in
             // the UAE and acquiring in Egypt are different pieces of
@@ -131,7 +131,7 @@ class EstimatorItemSeeder extends Seeder
             ['key' => 'acquisition-egypt', 'group' => 'acquisition_country', 'label' => ['ar' => 'مصر']],
             ['key' => 'acquisition-jordan', 'group' => 'acquisition_country', 'label' => ['ar' => 'الأردن']],
 
-            // --- خدمات أخرى -----------------------------------------------
+            // --- Other services ---------------------------------------------
             ['key' => 'attestations', 'group' => 'other-services', 'label' => ['ar' => 'التصديقات']],
             ['key' => 'investment-record', 'group' => 'other-services', 'label' => ['ar' => 'صحيفة الاستثمار (السجل الاستثماري)']],
             ['key' => 'financial-statements', 'group' => 'other-services', 'label' => ['ar' => 'القوائم المالية']],
